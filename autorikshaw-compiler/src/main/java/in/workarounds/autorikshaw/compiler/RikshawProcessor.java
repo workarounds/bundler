@@ -22,6 +22,7 @@ import in.workarounds.autorikshaw.annotations.Destination;
 import in.workarounds.autorikshaw.annotations.Passenger;
 import in.workarounds.autorikshaw.compiler.model.DestinationModel;
 import in.workarounds.autorikshaw.compiler.model.PassengerModel;
+import in.workarounds.autorikshaw.compiler.support.CustomTypeVisitor;
 
 @AutoService(Processor.class)
 public class RikshawProcessor extends AbstractProcessor {
@@ -43,22 +44,29 @@ public class RikshawProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        for(Element element: roundEnv.getElementsAnnotatedWith(Destination.class)) {
+        CustomTypeVisitor visitor = new CustomTypeVisitor();
+        for (Element element : roundEnv.getElementsAnnotatedWith(Destination.class)) {
             try {
                 DestinationModel model = new DestinationModel(element, typeUtils);
-                 message(null, "class name: %s", model.getClassName());
-                 for(PassengerModel passenger: model.getPassengers()) {
-                     message(null, "passenger: %s", passenger.getLabel());
-                 }
+                message(null, "class name: %s", model.getClassName());
             } catch (IllegalArgumentException exception) {
                 error(element, exception.getMessage());
+            }
+
+            for(Element possiblePassenger: element.getEnclosedElements()) {
+                Passenger passenger = possiblePassenger.getAnnotation(Passenger.class);
+                if(passenger != null) {
+                    PassengerModel passengerModel = new PassengerModel(possiblePassenger);
+                    message(possiblePassenger, "label %s", passengerModel.getLabel());
+                    passengerModel.getType().accept(visitor, this);
+                }
             }
         }
 
         return true;
     }
 
-        @Override
+    @Override
     public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
     }
@@ -78,21 +86,21 @@ public class RikshawProcessor extends AbstractProcessor {
         return super.getSupportedOptions();
     }
 
-    private void error(Element e, String msg, Object... args) {
+    public void error(Element e, String msg, Object... args) {
         messager.printMessage(
                 Diagnostic.Kind.ERROR,
                 String.format(msg, args),
                 e);
     }
 
-    private void message(Element e, String msg, Object... args) {
+    public void message(Element e, String msg, Object... args) {
         messager.printMessage(
                 Diagnostic.Kind.NOTE,
                 String.format(msg, args),
                 e);
     }
 
-    private void warn(Element e, String msg, Object... args) {
+    public void warn(Element e, String msg, Object... args) {
         messager.printMessage(
                 Diagnostic.Kind.WARNING,
                 String.format(msg, args),

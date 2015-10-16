@@ -1,8 +1,5 @@
 package in.workarounds.autorikshaw.compiler.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -11,7 +8,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
 import in.workarounds.autorikshaw.annotations.Destination;
-import in.workarounds.autorikshaw.annotations.Passenger;
 
 /**
  * Created by madki on 16/10/15.
@@ -24,7 +20,6 @@ public class DestinationModel {
 
     private VARIETY variety;
     private String className;
-    private List<PassengerModel> passengers;
 
     public DestinationModel(Element element, Types typeUtils) throws IllegalArgumentException {
         if(element.getKind() != ElementKind.CLASS) {
@@ -34,13 +29,7 @@ public class DestinationModel {
         }
         variety = getVariety((TypeElement) element, typeUtils);
         className = ((TypeElement) element).getQualifiedName().toString();
-        passengers = new ArrayList<>();
 
-        for(Element possiblePassenger: element.getEnclosedElements()) {
-            if(possiblePassenger.getAnnotation(Passenger.class) != null) {
-                passengers.add(new PassengerModel(possiblePassenger, typeUtils));
-            }
-        }
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -85,10 +74,6 @@ public class DestinationModel {
 
     public String getClassName() {
         return className;
-    }
-
-    public List<PassengerModel> getPassengers() {
-        return passengers;
     }
 
     enum VARIETY {
