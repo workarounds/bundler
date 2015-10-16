@@ -1,1 +1,1 @@
-include ':app', ':autorikshaw-compiler', ':autorikshaw-annotations'
+include ':app', ':autorickshaw-compiler', ':autorickshaw-annotations'

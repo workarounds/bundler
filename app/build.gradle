@@ -22,8 +22,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':autorikshaw-annotations')
-    apt project(':autorikshaw-compiler')
+    compile project(':autorickshaw-annotations')
+    apt project(':autorickshaw-compiler')
 
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.0.1'

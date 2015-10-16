@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AutoRikshaw.iml" filepath="$PROJECT_DIR$/AutoRikshaw.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AutoRickshaw.iml" filepath="$PROJECT_DIR$/AutoRickshaw.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/autorikshaw-annotations/autorikshaw-annotations.iml" filepath="$PROJECT_DIR$/autorikshaw-annotations/autorikshaw-annotations.iml" />
-      <module fileurl="file://$PROJECT_DIR$/autorikshaw-compiler/autorikshaw-compiler.iml" filepath="$PROJECT_DIR$/autorikshaw-compiler/autorikshaw-compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autorickshaw-annotations/autorickshaw-annotations.iml" filepath="$PROJECT_DIR$/autorickshaw-annotations/autorickshaw-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autorickshaw-compiler/autorickshaw-compiler.iml" filepath="$PROJECT_DIR$/autorickshaw-compiler/autorickshaw-compiler.iml" />
     </modules>
   </component>
 </project>
