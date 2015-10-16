@@ -39,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
     Intent intent;
     @Passenger
     DataInputStream stream;
+    @Passenger
+    int[] array;
+    @Passenger
+    byte[] bytes;
+    Byte aByte;
+
+    short aShort;
+    Short someShort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("Integer", second);
-        
+
     }
 }

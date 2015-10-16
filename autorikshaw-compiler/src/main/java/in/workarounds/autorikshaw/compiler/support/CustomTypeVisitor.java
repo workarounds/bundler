@@ -24,6 +24,8 @@ import javax.lang.model.util.SimpleTypeVisitor7;
  */
 public class CustomTypeVisitor extends SimpleTypeVisitor7<ParsedType, ParsedType> {
     private static CustomTypeVisitor typeVisitor;
+    private static final String PARCELABLE_CLASS_NAME = "android.os.Parcelable";
+    private static final String SERIALIZABLE_CLASS_NAME = "java.io.Serializable";
 
     public static CustomTypeVisitor getInstance() {
         if (typeVisitor == null) {
@@ -46,7 +48,6 @@ public class CustomTypeVisitor extends SimpleTypeVisitor7<ParsedType, ParsedType
             boolean serializable = isSerializable(t);
             inputType.setParcelable(parcelable);
             inputType.setSerializable(serializable);
-            inputType.setUnsupported(!(parcelable || serializable));
             inputType.setPrimaryType(ClassName.bestGuess(
                     ((TypeElement) t.asElement())
                             .getQualifiedName()
@@ -55,13 +56,16 @@ public class CustomTypeVisitor extends SimpleTypeVisitor7<ParsedType, ParsedType
             String secondaryClass = ((TypeElement) t.asElement())
                     .getQualifiedName()
                     .toString();
-            if (secondaryClass.equalsIgnoreCase("java.util.List")) {
-                inputType.setList(true);
+            inputType.setSecondaryType(ClassName.bestGuess(secondaryClass));
+            if (TypeMatcher.isSupportedSecondaryType(secondaryClass)) {
+                inputType.setParametrized(true);
                 t.getTypeArguments().get(0).accept(CustomTypeVisitor.getInstance(), inputType);
             } else {
+                // TODO Currently supporting parametric types with only one parameter and that too only lists
                 inputType.setUnsupported(true);
             }
         } else {
+            // TODO Currently supporting parametric types with only one parameter and that too only lists
             inputType.setUnsupported(true);
         }
 
@@ -94,7 +98,7 @@ public class CustomTypeVisitor extends SimpleTypeVisitor7<ParsedType, ParsedType
 
     @Override
     public ParsedType visitPrimitive(PrimitiveType t, ParsedType inputType) {
-        parsePrimitive(t, inputType);
+        TypeMatcher.parsePrimitive(t, inputType);
         return inputType;
     }
 
@@ -138,11 +142,11 @@ public class CustomTypeVisitor extends SimpleTypeVisitor7<ParsedType, ParsedType
     }
 
     private boolean isParcelable(TypeMirror typeMirror) {
-        return implementsInterface(typeMirror, "android.os.Parcelable");
+        return implementsInterface(typeMirror, PARCELABLE_CLASS_NAME);
     }
 
     private boolean isSerializable(TypeMirror typeMirror) {
-        return implementsInterface(typeMirror, "java.io.Serializable");
+        return implementsInterface(typeMirror, SERIALIZABLE_CLASS_NAME);
     }
 
     private boolean isSameInterface(TypeMirror t, String qualifiedName) {
@@ -157,26 +161,5 @@ public class CustomTypeVisitor extends SimpleTypeVisitor7<ParsedType, ParsedType
             }
         }
         return false;
-    }
-
-    private void parsePrimitive(PrimitiveType t, ParsedType inputType) {
-        inputType.setUnsupported(false);
-        if (t.getKind() == TypeKind.BOOLEAN) {
-            inputType.setPrimitiveType(boolean.class);
-        } else if (t.getKind() == TypeKind.BYTE) {
-            inputType.setPrimitiveType(byte.class);
-        } else if (t.getKind() == TypeKind.CHAR) {
-            inputType.setPrimitiveType(char.class);
-        } else if (t.getKind() == TypeKind.DOUBLE) {
-            inputType.setPrimitiveType(double.class);
-        } else if (t.getKind() == TypeKind.FLOAT) {
-            inputType.setPrimitiveType(float.class);
-        } else if (t.getKind() == TypeKind.INT) {
-            inputType.setPrimitiveType(int.class);
-        } else if (t.getKind() == TypeKind.LONG) {
-            inputType.setPrimitiveType(long.class);
-        } else {
-            inputType.setUnsupported(true);
-        }
     }
 }

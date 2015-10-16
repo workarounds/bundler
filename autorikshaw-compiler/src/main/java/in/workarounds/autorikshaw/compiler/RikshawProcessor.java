@@ -2,7 +2,9 @@ package in.workarounds.autorikshaw.compiler;
 
 import com.google.auto.service.AutoService;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -23,6 +25,7 @@ import in.workarounds.autorikshaw.annotations.Passenger;
 import in.workarounds.autorikshaw.compiler.model.DestinationModel;
 import in.workarounds.autorikshaw.compiler.model.PassengerModel;
 import in.workarounds.autorikshaw.compiler.support.CustomTypeVisitor;
+import in.workarounds.autorikshaw.compiler.support.TypeMatcher;
 
 @AutoService(Processor.class)
 public class RikshawProcessor extends AbstractProcessor {
@@ -47,22 +50,26 @@ public class RikshawProcessor extends AbstractProcessor {
         for (Element element : roundEnv.getElementsAnnotatedWith(Destination.class)) {
             try {
                 DestinationModel model = new DestinationModel(element, typeUtils);
-                message(null, "class name: %s", model.getClassName());
             } catch (IllegalArgumentException exception) {
                 error(element, exception.getMessage());
             }
 
-            for(Element possiblePassenger: element.getEnclosedElements()) {
+            List<PassengerModel> passengers = new ArrayList<>();
+            for (Element possiblePassenger : element.getEnclosedElements()) {
                 Passenger passenger = possiblePassenger.getAnnotation(Passenger.class);
-                if(passenger != null) {
+                if (passenger != null) {
                     PassengerModel passengerModel = new PassengerModel(possiblePassenger);
-                    message(possiblePassenger, "label %s", passengerModel.getLabel());
                     passengerModel.getType().accept(CustomTypeVisitor.getInstance(), passengerModel.parsedType);
-                    if(passengerModel.parsedType != null) {
-                        message(possiblePassenger, passengerModel.parsedType.toString());
+                    if(TypeMatcher.finalCheck(passengerModel.parsedType)) {
+                        passengers.add(passengerModel);
+                    } else {
+                        error(possiblePassenger, "Unsupported type found for @%s %s",
+                                Passenger.class.getSimpleName(),
+                                passengerModel.getLabel());
                     }
                 }
             }
+
         }
 
         return true;

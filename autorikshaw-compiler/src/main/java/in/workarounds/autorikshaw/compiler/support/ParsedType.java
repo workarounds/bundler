@@ -7,14 +7,18 @@ import com.squareup.javapoet.ClassName;
  */
 public class ParsedType {
     private SupportedType supportedType;
-    private Class<?> primitiveType;
     private ClassName primaryType;
     private ClassName secondaryType;
+    private boolean primitive;
     private boolean unsupported;
-    private boolean list;
+    private boolean parametrized;
     private boolean array;
     private boolean parcelable;
     private boolean serializable;
+
+    public ParsedType() {
+        supportedType = SupportedType.NONE;
+    }
 
     public SupportedType getSupportedType() {
         return supportedType;
@@ -25,7 +29,7 @@ public class ParsedType {
         return new StringBuilder("")
                 .append("supportedType = ").append(supportedType)
                 .append("\n")
-                .append("primitiveType = ").append(primitiveType)
+                .append("primitive = ").append(primitive)
                 .append("\n")
                 .append("primaryType = ").append(primaryType)
                 .append("\n")
@@ -33,7 +37,7 @@ public class ParsedType {
                 .append("\n")
                 .append("unsupported = ").append(unsupported)
                 .append("\n")
-                .append("list = ").append(list)
+                .append("parametrized = ").append(parametrized)
                 .append("\n")
                 .append("array = ").append(array)
                 .append("\n")
@@ -63,6 +67,14 @@ public class ParsedType {
         this.secondaryType = secondaryType;
     }
 
+    public boolean isPrimitive() {
+        return primitive;
+    }
+
+    public void setPrimitive(boolean primitive) {
+        this.primitive = primitive;
+    }
+
     public boolean isUnsupported() {
         return unsupported;
     }
@@ -71,12 +83,12 @@ public class ParsedType {
         this.unsupported = unsupported;
     }
 
-    public boolean isList() {
-        return list;
+    public boolean isParametrized() {
+        return parametrized;
     }
 
-    public void setList(boolean list) {
-        this.list = list;
+    public void setParametrized(boolean parametrized) {
+        this.parametrized = parametrized;
     }
 
     public boolean isArray() {
@@ -97,14 +109,6 @@ public class ParsedType {
 
     public boolean isSerializable() {
         return serializable;
-    }
-
-    public Class<?> getPrimitiveType() {
-        return primitiveType;
-    }
-
-    public void setPrimitiveType(Class<?> primitiveType) {
-        this.primitiveType = primitiveType;
     }
 
     public void setSerializable(boolean serializable) {
