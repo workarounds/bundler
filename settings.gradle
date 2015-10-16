@@ -1,0 +1,1 @@
+include ':app', ':autorikshaw-compiler', ':autorikshaw-annotations'
