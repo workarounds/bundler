@@ -1,8 +1,12 @@
 package in.workarounds.samples.autorikshaw;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 
+import java.io.DataInputStream;
+import java.util.HashMap;
 import java.util.List;
 
 import in.workarounds.autorikshaw.annotations.Destination;
@@ -27,10 +31,22 @@ public class MainActivity extends AppCompatActivity {
     String[] sixth;
     @Passenger
     List<String> seventh;
+    @Passenger
+    IBinder binder;
+    @Passenger
+    HashMap<Integer, String> hashMap;
+    @Passenger
+    Intent intent;
+    @Passenger
+    DataInputStream stream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("Integer", second);
+        
     }
 }

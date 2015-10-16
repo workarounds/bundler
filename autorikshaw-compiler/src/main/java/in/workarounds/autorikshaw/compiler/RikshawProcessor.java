@@ -44,7 +44,6 @@ public class RikshawProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        CustomTypeVisitor visitor = new CustomTypeVisitor();
         for (Element element : roundEnv.getElementsAnnotatedWith(Destination.class)) {
             try {
                 DestinationModel model = new DestinationModel(element, typeUtils);
@@ -58,7 +57,10 @@ public class RikshawProcessor extends AbstractProcessor {
                 if(passenger != null) {
                     PassengerModel passengerModel = new PassengerModel(possiblePassenger);
                     message(possiblePassenger, "label %s", passengerModel.getLabel());
-                    passengerModel.getType().accept(visitor, this);
+                    passengerModel.getType().accept(CustomTypeVisitor.getInstance(), passengerModel.parsedType);
+                    if(passengerModel.parsedType != null) {
+                        message(possiblePassenger, passengerModel.parsedType.toString());
+                    }
                 }
             }
         }
