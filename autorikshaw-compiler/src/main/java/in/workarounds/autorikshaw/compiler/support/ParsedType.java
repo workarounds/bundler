@@ -2,11 +2,13 @@ package in.workarounds.autorikshaw.compiler.support;
 
 import com.squareup.javapoet.ClassName;
 
+import javax.lang.model.type.TypeKind;
+
 /**
  * Created by madki on 16/10/15.
  */
 public class ParsedType {
-    private SupportedType supportedType;
+    private TypeKind primitiveType;
     private ClassName primaryType;
     private ClassName secondaryType;
     private boolean primitive;
@@ -16,20 +18,12 @@ public class ParsedType {
     private boolean parcelable;
     private boolean serializable;
 
-    public ParsedType() {
-        supportedType = SupportedType.NONE;
-    }
-
-    public SupportedType getSupportedType() {
-        return supportedType;
-    }
-
     @Override
     public String toString() {
         return new StringBuilder("")
-                .append("supportedType = ").append(supportedType)
-                .append("\n")
                 .append("primitive = ").append(primitive)
+                .append("\n")
+                .append("primitiveType = ").append(primitiveType)
                 .append("\n")
                 .append("primaryType = ").append(primaryType)
                 .append("\n")
@@ -47,8 +41,12 @@ public class ParsedType {
                 .toString();
     }
 
-    public void setSupportedType(SupportedType supportedType) {
-        this.supportedType = supportedType;
+    public TypeKind getPrimitiveType() {
+        return primitiveType;
+    }
+
+    public void setPrimitiveType(TypeKind primitiveType) {
+        this.primitiveType = primitiveType;
     }
 
     public ClassName getPrimaryType() {

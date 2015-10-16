@@ -3,28 +3,52 @@ package in.workarounds.autorikshaw.compiler.model;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 
-import in.workarounds.autorikshaw.compiler.support.ParsedType;
+import in.workarounds.autorikshaw.annotations.Passenger;
+import in.workarounds.autorikshaw.compiler.RikshawProcessor;
+import in.workarounds.autorikshaw.compiler.model.type.RootType;
+import in.workarounds.autorikshaw.compiler.support.ParserTypeVisitor;
+import in.workarounds.autorikshaw.compiler.support.TypeMatcher;
 
 /**
  * Created by madki on 16/10/15.
  */
 public class PassengerModel {
-    private TypeMirror type;
     private String label;
-    public ParsedType parsedType;
+    private RootType type;
 
-
-    public PassengerModel(Element element) throws IllegalArgumentException {
+    public PassengerModel(Element element, RikshawProcessor processor) {
         label = element.getSimpleName().toString();
-        type = element.asType();
-        parsedType = new ParsedType();
-    }
+        TypeMirror typeMirror = element.asType();
+        type = typeMirror.accept(ParserTypeVisitor.getInstance(), null);
 
-    public TypeMirror getType() {
-        return type;
+        checkValidity(element, processor);
     }
 
     public String getLabel() {
         return label;
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public RootType getType() {
+        return type;
+    }
+
+    public void setType(RootType type) {
+        this.type = type;
+    }
+
+    private void checkValidity(Element element, RikshawProcessor processor) {
+        if(!TypeMatcher.isSupported(type)) {
+            processor.error(element,
+                    "Field %s annotated with @%s has an unsupported type",
+                    label,
+                    Passenger.class.getSimpleName()
+            );
+            processor.errorStatus = true;
+        }
+    }
+
 }

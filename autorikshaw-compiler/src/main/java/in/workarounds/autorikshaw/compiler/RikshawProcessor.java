@@ -24,15 +24,16 @@ import in.workarounds.autorikshaw.annotations.Destination;
 import in.workarounds.autorikshaw.annotations.Passenger;
 import in.workarounds.autorikshaw.compiler.model.DestinationModel;
 import in.workarounds.autorikshaw.compiler.model.PassengerModel;
-import in.workarounds.autorikshaw.compiler.support.CustomTypeVisitor;
-import in.workarounds.autorikshaw.compiler.support.TypeMatcher;
 
 @AutoService(Processor.class)
 public class RikshawProcessor extends AbstractProcessor {
-    private Types typeUtils;
-    private Elements elementUtils;
-    private Filer filer;
-    private Messager messager;
+
+    public Types typeUtils;
+    public Elements elementUtils;
+    public Filer filer;
+    public Messager messager;
+
+    public boolean errorStatus;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -42,33 +43,25 @@ public class RikshawProcessor extends AbstractProcessor {
         elementUtils = processingEnv.getElementUtils();
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
+
     }
 
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Destination.class)) {
-            try {
-                DestinationModel model = new DestinationModel(element, typeUtils);
-            } catch (IllegalArgumentException exception) {
-                error(element, exception.getMessage());
-            }
+            DestinationModel model = new DestinationModel(element, this);
+            if(errorStatus) return true;
 
             List<PassengerModel> passengers = new ArrayList<>();
             for (Element possiblePassenger : element.getEnclosedElements()) {
                 Passenger passenger = possiblePassenger.getAnnotation(Passenger.class);
                 if (passenger != null) {
-                    PassengerModel passengerModel = new PassengerModel(possiblePassenger);
-                    passengerModel.getType().accept(CustomTypeVisitor.getInstance(), passengerModel.parsedType);
-                    if(TypeMatcher.finalCheck(passengerModel.parsedType)) {
-                        passengers.add(passengerModel);
-                    } else {
-                        error(possiblePassenger, "Unsupported type found for @%s %s",
-                                Passenger.class.getSimpleName(),
-                                passengerModel.getLabel());
-                    }
+                    PassengerModel passengerModel = new PassengerModel(possiblePassenger, this);
                 }
             }
+
+            if(errorStatus) return true;
 
         }
 
@@ -115,5 +108,6 @@ public class RikshawProcessor extends AbstractProcessor {
                 String.format(msg, args),
                 e);
     }
+
 
 }

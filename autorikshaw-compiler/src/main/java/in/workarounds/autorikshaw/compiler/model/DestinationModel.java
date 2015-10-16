@@ -8,6 +8,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
 import in.workarounds.autorikshaw.annotations.Destination;
+import in.workarounds.autorikshaw.compiler.RikshawProcessor;
 
 /**
  * Created by madki on 16/10/15.
@@ -21,13 +22,15 @@ public class DestinationModel {
     private VARIETY variety;
     private String className;
 
-    public DestinationModel(Element element, Types typeUtils) throws IllegalArgumentException {
+    public DestinationModel(Element element, RikshawProcessor processor) {
         if(element.getKind() != ElementKind.CLASS) {
-            throw new IllegalArgumentException(String.format("@%s annotation used on a non-class element %s",
+            processor.error(element, "@%s annotation used on a non-class element %s",
                     Destination.class.getSimpleName(),
-                    element.getSimpleName()));
+                    element.getSimpleName());
+            processor.errorStatus = true;
+            return;
         }
-        variety = getVariety((TypeElement) element, typeUtils);
+        variety = getVariety((TypeElement) element, processor.typeUtils);
         className = ((TypeElement) element).getQualifiedName().toString();
 
     }

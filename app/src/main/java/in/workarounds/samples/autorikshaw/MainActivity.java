@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     @Passenger
     byte[] bytes;
     Byte aByte;
-
     short aShort;
     Short someShort;
 
