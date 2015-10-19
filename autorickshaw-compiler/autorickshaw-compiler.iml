@@ -32,5 +32,6 @@
     <orderEntry type="library" exported="" name="auto-common-0.4" level="project" />
     <orderEntry type="library" exported="" name="javapoet-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />
+    <orderEntry type="library" exported="" name="autorickshaw-compiler.autorickshaw-compiler" level="project" />
   </component>
 </module>

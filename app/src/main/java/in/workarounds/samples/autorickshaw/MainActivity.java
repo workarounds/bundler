@@ -13,6 +13,8 @@ import in.workarounds.autorickshaw.annotations.Passenger;
 public class MainActivity extends AppCompatActivity {
     @Passenger
     int first;
+    @Passenger
+    int[] array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

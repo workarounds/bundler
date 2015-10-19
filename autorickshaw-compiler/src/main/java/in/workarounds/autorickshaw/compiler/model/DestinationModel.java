@@ -1,5 +1,7 @@
 package in.workarounds.autorickshaw.compiler.model;
 
+import com.squareup.javapoet.ClassName;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -7,7 +9,8 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
-import in.workarounds.autorickshaw.compiler.RickshawProcessor;
+import in.workarounds.autorickshaw.annotations.Destination;
+import in.workarounds.autorickshaw.compiler.Provider;
 
 /**
  * Created by madki on 16/10/15.
@@ -19,19 +22,22 @@ public class DestinationModel {
     private static final String SERVICE     = "android.app.Service";
 
     private VARIETY variety;
-    private String className;
+    private String simpleName;
+    private String packageName;
 
-    public DestinationModel(Element element, RickshawProcessor processor) {
+    public DestinationModel(Element element, Provider provider) {
         if(element.getKind() != ElementKind.CLASS) {
-            processor.error(element, "@%s annotation used on a non-class element %s",
-                    in.workarounds.autorickshaw.annotations.Destination.class.getSimpleName(),
+            provider.error(element, "@%s annotation used on a non-class element %s",
+                    Destination.class.getSimpleName(),
                     element.getSimpleName());
-            processor.errorStatus = true;
+            provider.reportError();
             return;
         }
-        variety = getVariety((TypeElement) element, processor.typeUtils);
-        className = ((TypeElement) element).getQualifiedName().toString();
-
+        variety = getVariety((TypeElement) element, provider.typeUtils());
+        String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
+        ClassName name = ClassName.bestGuess(qualifiedName);
+        packageName = name.packageName();
+        simpleName = name.simpleName();
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -74,8 +80,12 @@ public class DestinationModel {
         return variety;
     }
 
-    public String getClassName() {
-        return className;
+    public String getSimpleName() {
+        return simpleName;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     enum VARIETY {

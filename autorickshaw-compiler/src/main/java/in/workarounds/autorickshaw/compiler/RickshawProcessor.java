@@ -2,6 +2,7 @@ package in.workarounds.autorickshaw.compiler;
 
 import com.google.auto.service.AutoService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,15 +21,21 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import in.workarounds.autorickshaw.annotations.Destination;
+import in.workarounds.autorickshaw.annotations.Passenger;
+import in.workarounds.autorickshaw.compiler.generator.TestWriter;
+import in.workarounds.autorickshaw.compiler.model.DestinationModel;
+import in.workarounds.autorickshaw.compiler.model.PassengerModel;
+
 @AutoService(Processor.class)
-public class RickshawProcessor extends AbstractProcessor {
+public class RickshawProcessor extends AbstractProcessor implements Provider {
 
-    public Types typeUtils;
-    public Elements elementUtils;
-    public Filer filer;
-    public Messager messager;
+    private Types typeUtils;
+    private Elements elementUtils;
+    private Filer filer;
+    private Messager messager;
 
-    public boolean errorStatus;
+    private boolean errorOccurred;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -44,20 +51,27 @@ public class RickshawProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        for (Element element : roundEnv.getElementsAnnotatedWith(in.workarounds.autorickshaw.annotations.Destination.class)) {
-            in.workarounds.autorickshaw.compiler.model.DestinationModel model = new in.workarounds.autorickshaw.compiler.model.DestinationModel(element, this);
-            if(errorStatus) return true;
+        for (Element element : roundEnv.getElementsAnnotatedWith(Destination.class)) {
+            DestinationModel model = new DestinationModel(element, this);
+            if(hasErrorOccurred()) return true;
 
-            List<in.workarounds.autorickshaw.compiler.model.PassengerModel> passengers = new ArrayList<>();
+            List<PassengerModel> passengers = new ArrayList<>();
             for (Element possiblePassenger : element.getEnclosedElements()) {
-                in.workarounds.autorickshaw.annotations.Passenger passenger = possiblePassenger.getAnnotation(in.workarounds.autorickshaw.annotations.Passenger.class);
+                Passenger passenger = possiblePassenger.getAnnotation(Passenger.class);
                 if (passenger != null) {
-                    in.workarounds.autorickshaw.compiler.model.PassengerModel passengerModel = new in.workarounds.autorickshaw.compiler.model.PassengerModel(possiblePassenger, this);
+                    PassengerModel passengerModel = new PassengerModel(possiblePassenger, this);
+                    passengers.add(passengerModel);
                 }
             }
 
-            if(errorStatus) return true;
+            if(hasErrorOccurred()) return true;
 
+            TestWriter writer = new TestWriter(this, model, passengers);
+            try {
+                writer.brewMaker().writeTo(filer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return true;
@@ -72,8 +86,8 @@ public class RickshawProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<String>();
 
-        annotations.add(in.workarounds.autorickshaw.annotations.Passenger.class.getCanonicalName());
-        annotations.add(in.workarounds.autorickshaw.annotations.Destination.class.getCanonicalName());
+        annotations.add(Passenger.class.getCanonicalName());
+        annotations.add(Destination.class.getCanonicalName());
 
         return annotations;
     }
@@ -83,6 +97,27 @@ public class RickshawProcessor extends AbstractProcessor {
         return super.getSupportedOptions();
     }
 
+    @Override
+    public Types typeUtils() {
+        return typeUtils;
+    }
+
+    @Override
+    public Elements elementUtils() {
+        return elementUtils;
+    }
+
+    @Override
+    public Filer filer() {
+        return filer;
+    }
+
+    @Override
+    public Messager messager() {
+        return messager;
+    }
+
+    @Override
     public void error(Element e, String msg, Object... args) {
         messager.printMessage(
                 Diagnostic.Kind.ERROR,
@@ -90,6 +125,7 @@ public class RickshawProcessor extends AbstractProcessor {
                 e);
     }
 
+    @Override
     public void message(Element e, String msg, Object... args) {
         messager.printMessage(
                 Diagnostic.Kind.NOTE,
@@ -97,11 +133,22 @@ public class RickshawProcessor extends AbstractProcessor {
                 e);
     }
 
+    @Override
     public void warn(Element e, String msg, Object... args) {
         messager.printMessage(
                 Diagnostic.Kind.WARNING,
                 String.format(msg, args),
                 e);
+    }
+
+    @Override
+    public void reportError() {
+        this.errorOccurred = true;
+    }
+
+    @Override
+    public boolean hasErrorOccurred() {
+        return errorOccurred;
     }
 
 
