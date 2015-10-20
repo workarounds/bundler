@@ -12,9 +12,37 @@ import in.workarounds.autorickshaw.annotations.Passenger;
 @Destination
 public class MainActivity extends AppCompatActivity {
     @Passenger
-    int first;
+    int integer;
     @Passenger
-    int[] array;
+    int[] integerArray;
+    @Passenger
+    boolean bool;
+    @Passenger
+    boolean[] boolArray;
+    @Passenger
+    char character;
+    @Passenger
+    char[] characterArray;
+    @Passenger
+    long longNumber;
+    @Passenger
+    long[] longArray;
+    @Passenger
+    double doubleNumber;
+    @Passenger
+    double[] doubleArray;
+    @Passenger
+    byte aByte;
+    @Passenger
+    byte[] byteArray;
+    @Passenger
+    float floatNumber;
+    @Passenger
+    float[] floatArray;
+    @Passenger
+    short shortNumber;
+    @Passenger
+    short[] shortArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

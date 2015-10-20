@@ -68,6 +68,7 @@ public class RickshawProcessor extends AbstractProcessor implements Provider {
 
             TestWriter writer = new TestWriter(this, model, passengers);
             try {
+                writer.brewKeys().writeTo(filer);
                 writer.brewMaker().writeTo(filer);
             } catch (IOException e) {
                 e.printStackTrace();

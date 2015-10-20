@@ -34,7 +34,7 @@ public class MainActivityInjector {
         }
 
         public void into(MainActivity activity) {
-            activity.first = first(activity.first);
+//            activity.first = first(activity.first);
         }
     }
 }

@@ -14,6 +14,7 @@ import javax.lang.model.element.Modifier;
 
 import in.workarounds.autorickshaw.compiler.model.PassengerModel;
 import in.workarounds.autorickshaw.compiler.model.type.RootType;
+import in.workarounds.autorickshaw.compiler.util.StringUtils;
 
 /**
  * Created by madki on 16/10/15.
@@ -27,7 +28,7 @@ public abstract class SupportHelper {
         this.label = passengerModel.getLabel();
     }
 
-    public abstract String getTypeForPrefix();
+    public abstract String getTypeForIntentKey();
     protected abstract ClassName getFieldType();
 
     protected ParameterSpec getSetterParameter() {
@@ -63,14 +64,13 @@ public abstract class SupportHelper {
         return methods;
     }
 
-    public abstract void addToBundle(MethodSpec.Builder bundleBuilder, String BUNDLE_VAR);
+    public abstract void addToBundle(MethodSpec.Builder bundleBuilder, String BUNDLE_VAR, ClassName KEYS_CLASS);
 
-    public String generateIntentKeyPrefix() {
-        String prefix = "INTENT_KEY_" + getTypeForPrefix();
+    public String getIntentKey() {
+        String suffix = getTypeForIntentKey();
         if(rootType.isArray()) {
-            return prefix + "_ARRAY_";
-        } else {
-            return prefix + "_";
+            suffix =  suffix + "_ARRAY";
         }
+        return StringUtils.getConstantName(label) + "_" + suffix;
     }
 }

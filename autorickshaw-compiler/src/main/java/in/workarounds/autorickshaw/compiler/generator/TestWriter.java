@@ -25,13 +25,17 @@ public class TestWriter {
     private DestinationModel destinationModel;
     private List<PassengerModel> passengerModels;
     private static final String MAKER_PREFIX = "Intent";
-
+    private static final String KEYS_PREFIX = "Keys";
 
     private String MAKER_NAME;
     private String MAKER_SIMPLE_NAME;
     private String BUILDER_NAME = "Builder";
-    private String CONTEXT_VAR = "context";
     private ClassName BUILDER_CLASS;
+
+    private String KEYS_SIMPLE_NAME;
+    private ClassName KEYS_CLASS;
+
+    private String CONTEXT_VAR = "context";
 
     public TestWriter(Provider provider, DestinationModel destinationModel, List<PassengerModel> passengerModels) {
         this.provider = provider;
@@ -41,6 +45,21 @@ public class TestWriter {
         MAKER_SIMPLE_NAME = MAKER_PREFIX + destinationModel.getSimpleName();
         MAKER_NAME = destinationModel.getPackageName() + "." + MAKER_SIMPLE_NAME;
         BUILDER_CLASS = ClassName.bestGuess(MAKER_NAME + "." + BUILDER_NAME);
+
+        KEYS_SIMPLE_NAME = KEYS_PREFIX + destinationModel.getSimpleName();
+        KEYS_CLASS = ClassName.get(destinationModel.getPackageName(), KEYS_SIMPLE_NAME);
+    }
+
+    public JavaFile brewKeys() {
+        TypeSpec.Builder keyBuilder = TypeSpec.classBuilder(KEYS_SIMPLE_NAME);
+        for (PassengerModel passenger : passengerModels) {
+            SupportHelper helper = TypeMatcher.getSupportHelper(passenger);
+            FieldSpec field = FieldSpec.builder(String.class, helper.getIntentKey(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                    .initializer("$S", helper.getIntentKey().toLowerCase())
+                    .build();
+            keyBuilder.addField(field);
+        }
+        return JavaFile.builder(destinationModel.getPackageName(), keyBuilder.build()).build();
     }
 
     public JavaFile brewMaker() {
@@ -86,7 +105,7 @@ public class TestWriter {
             builder.addField(helper.getBuilderField())
                     .addMethods(helper.getBuilderMethods(BUILDER_CLASS));
             bundleBuilder.beginControlFlow("if($L != null)", passenger.getLabel());
-            helper.addToBundle(bundleBuilder, BUNDLE_VAR);
+            helper.addToBundle(bundleBuilder, BUNDLE_VAR, KEYS_CLASS);
             bundleBuilder.endControlFlow();
         }
 

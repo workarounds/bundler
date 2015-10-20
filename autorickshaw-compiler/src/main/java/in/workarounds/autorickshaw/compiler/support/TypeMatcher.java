@@ -1,11 +1,9 @@
 package in.workarounds.autorickshaw.compiler.support;
 
-import javax.lang.model.type.TypeKind;
-
 import in.workarounds.autorickshaw.compiler.model.PassengerModel;
 import in.workarounds.autorickshaw.compiler.model.type.BasicType;
 import in.workarounds.autorickshaw.compiler.model.type.RootType;
-import in.workarounds.autorickshaw.compiler.support.helper.IntSupportHelper;
+import in.workarounds.autorickshaw.compiler.support.helper.PrimitiveSupportHelper;
 import in.workarounds.autorickshaw.compiler.support.helper.SupportHelper;
 
 /**
@@ -32,10 +30,7 @@ public class TypeMatcher {
         }
 
         if(rootType instanceof BasicType) {
-            TypeKind kind = ((BasicType) rootType).getKind();
-            if(kind == TypeKind.INT) {
-                return new IntSupportHelper(passengerModel);
-            }
+            return new PrimitiveSupportHelper(passengerModel);
         }
 
         return null;
