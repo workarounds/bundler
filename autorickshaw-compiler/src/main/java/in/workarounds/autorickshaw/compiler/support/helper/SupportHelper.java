@@ -32,21 +32,12 @@ public abstract class SupportHelper {
     protected abstract ClassName getFieldType();
 
     protected ParameterSpec getSetterParameter() {
-        if(rootType.isArray()) {
-            return ParameterSpec.builder(ArrayTypeName.of(getFieldType()), label).build();
-        } else {
-            return ParameterSpec.builder(getFieldType(), label).build();
-        }
+        return ParameterSpec.builder(getCorrectedFieldTypeIfArray(), label).build();
     }
 
     public FieldSpec getBuilderField() {
-        if(rootType.isArray()) {
-            return FieldSpec.builder(getFieldType(), label, Modifier.PRIVATE)
+            return FieldSpec.builder(getCorrectedFieldTypeIfArray(), label, Modifier.PRIVATE)
                     .build();
-        } else {
-            return FieldSpec.builder(ArrayTypeName.of(getFieldType()), label, Modifier.PRIVATE)
-                    .build();
-        }
     }
 
     public List<MethodSpec> getBuilderMethods(TypeName builder) {
@@ -64,6 +55,10 @@ public abstract class SupportHelper {
         return methods;
     }
 
+    public abstract List<MethodSpec> getParserMethods(String hasMethodName, String BUNDLE_VAR, ClassName KEYS_CLASS);
+
+    public abstract void addIntoStatement(MethodSpec.Builder intoBuilder, String DESTINATION_VAR);
+
     public abstract void addToBundle(MethodSpec.Builder bundleBuilder, String BUNDLE_VAR, ClassName KEYS_CLASS);
 
     public String getIntentKey() {
@@ -72,5 +67,17 @@ public abstract class SupportHelper {
             suffix =  suffix + "_ARRAY";
         }
         return StringUtils.getConstantName(label) + "_" + suffix;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    private TypeName getCorrectedFieldTypeIfArray() {
+        if(rootType.isArray()) {
+            return ArrayTypeName.of(getFieldType());
+        } else {
+            return getFieldType();
+        }
     }
 }

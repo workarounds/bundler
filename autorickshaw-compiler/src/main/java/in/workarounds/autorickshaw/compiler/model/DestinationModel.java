@@ -22,8 +22,7 @@ public class DestinationModel {
     private static final String SERVICE     = "android.app.Service";
 
     private VARIETY variety;
-    private String simpleName;
-    private String packageName;
+    private ClassName className;
 
     public DestinationModel(Element element, Provider provider) {
         if(element.getKind() != ElementKind.CLASS) {
@@ -35,9 +34,7 @@ public class DestinationModel {
         }
         variety = getVariety((TypeElement) element, provider.typeUtils());
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
-        ClassName name = ClassName.bestGuess(qualifiedName);
-        packageName = name.packageName();
-        simpleName = name.simpleName();
+        className = ClassName.bestGuess(qualifiedName);
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -81,11 +78,15 @@ public class DestinationModel {
     }
 
     public String getSimpleName() {
-        return simpleName;
+        return className.simpleName();
     }
 
     public String getPackageName() {
-        return packageName;
+        return className.packageName();
+    }
+
+    public ClassName getClassName() {
+        return className;
     }
 
     enum VARIETY {

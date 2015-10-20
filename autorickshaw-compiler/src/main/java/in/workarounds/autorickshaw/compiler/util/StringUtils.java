@@ -24,7 +24,7 @@ public class StringUtils {
         if(name == null) return null;
 
         Pattern p = Pattern.compile("_(.)");
-        Matcher m = p.matcher(name.toLowerCase());
+        Matcher m = p.matcher(name);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             m.appendReplacement(sb, m.group(1).toUpperCase());
@@ -44,5 +44,13 @@ public class StringUtils {
         if(name == null) return null;
 
         return getProperCase(getCamelCase(name));
+    }
+
+    public static String getVariableName(String name) {
+        if(name == null) return null;
+
+        String className = getClassName(name);
+        String firstChar = Character.toString(className.charAt(0));
+        return className.replaceFirst(firstChar, firstChar.toLowerCase());
     }
 }

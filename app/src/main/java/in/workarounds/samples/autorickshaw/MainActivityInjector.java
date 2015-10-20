@@ -23,12 +23,14 @@ public class MainActivityInjector {
         }
 
         public boolean hasFirst() {
-            return intent.hasExtra(IntentKeysMainActivity.INTENT_KEY_FIRST_INT);
+            return true;
+//            return intent.hasExtra(IntentKeysMainActivity.INTENT_KEY_FIRST_INT);
         }
 
         public int first(int defaultValue) {
             if(hasFirst()) {
-                return intent.getIntExtra(IntentKeysMainActivity.INTENT_KEY_FIRST_INT, defaultValue);
+                return 1;
+//                return intent.getIntExtra(IntentKeysMainActivity.INTENT_KEY_FIRST_INT, defaultValue);
             }
             return defaultValue;
         }
