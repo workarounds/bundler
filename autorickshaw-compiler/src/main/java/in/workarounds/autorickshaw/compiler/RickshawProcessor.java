@@ -2,6 +2,7 @@ package in.workarounds.autorickshaw.compiler;
 
 import com.google.auto.service.AutoService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.tools.Diagnostic;
 import in.workarounds.autorickshaw.annotations.Cargo;
 import in.workarounds.autorickshaw.annotations.Destination;
 import in.workarounds.autorickshaw.annotations.Passenger;
+import in.workarounds.autorickshaw.compiler.generator.BaseWriter;
 import in.workarounds.autorickshaw.compiler.model.CargoModel;
 import in.workarounds.autorickshaw.compiler.model.DestinationModel;
 
@@ -64,6 +66,16 @@ public class RickshawProcessor extends AbstractProcessor implements Provider {
             }
 
             if(hasErrorOccurred()) return true;
+
+            BaseWriter writer = new BaseWriter(this, model, cargos);
+
+            try {
+                writer.brewKeys().writeTo(filer);
+                writer.brewLoader().writeTo(filer);
+                writer.brewUnLoader().writeTo(filer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return true;

@@ -1,6 +1,8 @@
 package in.workarounds.autorickshaw.compiler.util;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 
 import java.util.List;
 
@@ -96,4 +98,12 @@ public class Utils {
         }
         return null;
     }
+
+    public static boolean isPrimitiveArray(TypeName typeName) {
+        if(typeName instanceof ArrayTypeName) {
+            return ((ArrayTypeName) typeName).componentType.isPrimitive();
+        }
+        return false;
+    }
+
 }
