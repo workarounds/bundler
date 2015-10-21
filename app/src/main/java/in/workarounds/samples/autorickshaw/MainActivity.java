@@ -3,50 +3,46 @@ package in.workarounds.samples.autorickshaw;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.ArrayList;
-
+import in.workarounds.autorickshaw.annotations.Cargo;
 import in.workarounds.autorickshaw.annotations.Destination;
-import in.workarounds.autorickshaw.annotations.Passenger;
 
 /**
  * Created by madki on 16/10/15.
  */
 @Destination
 public class MainActivity extends AppCompatActivity {
-    @Passenger
+    @Cargo
     int integer;
-    @Passenger
+    @Cargo
     int[] integerArray;
-    @Passenger
+    @Cargo
     boolean bool;
-    @Passenger
+    @Cargo
     boolean[] boolArray;
-    @Passenger
+    @Cargo
     char character;
-    @Passenger
+    @Cargo
     char[] characterArray;
-    @Passenger
+    @Cargo
     long longNumber;
-    @Passenger
+    @Cargo
     long[] longArray;
-    @Passenger
+    @Cargo
     double doubleNumber;
-    @Passenger
+    @Cargo
     double[] doubleArray;
-    @Passenger
+    @Cargo
     byte aByte;
-    @Passenger
+    @Cargo
     byte[] byteArray;
-    @Passenger
+    @Cargo
     float floatNumber;
-    @Passenger
+    @Cargo
     float[] floatArray;
-    @Passenger
+    @Cargo
     short shortNumber;
-    @Passenger
+    @Cargo
     short[] shortArray;
-    @Passenger
-    ArrayList<String>[] strArray= null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Bundle bundle = new Bundle();
-
-        bundle.putSerializable("key", strArray);
     }
 
     private static class SomeObject {

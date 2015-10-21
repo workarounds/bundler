@@ -2,7 +2,6 @@ package in.workarounds.autorickshaw.compiler;
 
 import com.google.auto.service.AutoService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -21,11 +20,11 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import in.workarounds.autorickshaw.annotations.Cargo;
 import in.workarounds.autorickshaw.annotations.Destination;
 import in.workarounds.autorickshaw.annotations.Passenger;
-import in.workarounds.autorickshaw.compiler.generator.TestWriter;
+import in.workarounds.autorickshaw.compiler.model.CargoModel;
 import in.workarounds.autorickshaw.compiler.model.DestinationModel;
-import in.workarounds.autorickshaw.compiler.model.PassengerModel;
 
 @AutoService(Processor.class)
 public class RickshawProcessor extends AbstractProcessor implements Provider {
@@ -55,25 +54,16 @@ public class RickshawProcessor extends AbstractProcessor implements Provider {
             DestinationModel model = new DestinationModel(element, this);
             if(hasErrorOccurred()) return true;
 
-            List<PassengerModel> passengers = new ArrayList<>();
-            for (Element possiblePassenger : element.getEnclosedElements()) {
-                Passenger passenger = possiblePassenger.getAnnotation(Passenger.class);
-                if (passenger != null) {
-                    PassengerModel passengerModel = new PassengerModel(possiblePassenger, this);
-                    passengers.add(passengerModel);
+            List<CargoModel> cargos = new ArrayList<>();
+            for (Element possibleCargo : element.getEnclosedElements()) {
+                Cargo cargo = possibleCargo.getAnnotation(Cargo.class);
+                if (cargo != null) {
+                    CargoModel cargoModel = new CargoModel(possibleCargo, this);
+                    cargos.add(cargoModel);
                 }
             }
 
             if(hasErrorOccurred()) return true;
-
-            TestWriter writer = new TestWriter(this, model, passengers);
-            try {
-                writer.brewKeys().writeTo(filer);
-                writer.brewLoader().writeTo(filer);
-                writer.brewUnLoader().writeTo(filer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         return true;
