@@ -1,5 +1,7 @@
 package in.workarounds.autorickshaw.compiler.util;
 
+import com.squareup.javapoet.ClassName;
+
 import java.util.List;
 
 import javax.lang.model.element.TypeElement;
@@ -79,6 +81,18 @@ public class Utils {
         TypeElement element = getAsElement(typeMirror);
         if(element != null) {
             return element.getSimpleName().toString();
+        }
+        return null;
+    }
+
+    /**
+     * @param typeMirror of the element
+     * @return ClassName of the typemirror if its a declared type else null
+     */
+    public static ClassName getClassName(TypeMirror typeMirror) {
+        String qualifiedName = getQualifiedName(typeMirror);
+        if(qualifiedName != null) {
+            return ClassName.bestGuess(qualifiedName);
         }
         return null;
     }

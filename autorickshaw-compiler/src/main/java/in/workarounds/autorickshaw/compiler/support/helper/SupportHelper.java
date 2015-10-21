@@ -73,7 +73,7 @@ public abstract class SupportHelper {
         return label;
     }
 
-    private TypeName getCorrectedFieldTypeIfArray() {
+    protected TypeName getCorrectedFieldTypeIfArray() {
         if(rootType.isArray()) {
             return ArrayTypeName.of(getFieldType());
         } else {

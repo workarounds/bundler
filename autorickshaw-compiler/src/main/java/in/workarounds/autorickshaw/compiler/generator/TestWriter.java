@@ -80,6 +80,7 @@ public class TestWriter {
 
     public JavaFile brewLoader() {
         MethodSpec from = MethodSpec.methodBuilder("from")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(CommonClasses.CONTEXT, CONTEXT_VAR)
                 .returns(BUILDER_CLASS)
                 .addStatement("return new $T($L)", BUILDER_CLASS, CONTEXT_VAR)
@@ -110,7 +111,7 @@ public class TestWriter {
                         CommonClasses.BUNDLE);
 
         TypeSpec.Builder builder = TypeSpec.classBuilder(BUILDER_NAME)
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(context)
                 .addMethod(constructor);
 
@@ -130,7 +131,7 @@ public class TestWriter {
 
     public JavaFile brewUnLoader() {
         MethodSpec from = MethodSpec.methodBuilder("from")
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(PARSER_CLASS)
                 .addParameter(ParameterSpec.builder(CommonClasses.BUNDLE, BUNDLE_VAR).build())
                 .addStatement("return new $T($L)", PARSER_CLASS, BUNDLE_VAR)
@@ -162,7 +163,7 @@ public class TestWriter {
                 .addParameter(destinationModel.getClassName(), DESTINATION_VAR);
 
         TypeSpec.Builder builder = TypeSpec.classBuilder(PARSER_NAME)
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(bundle)
                 .addMethod(constructor);
 

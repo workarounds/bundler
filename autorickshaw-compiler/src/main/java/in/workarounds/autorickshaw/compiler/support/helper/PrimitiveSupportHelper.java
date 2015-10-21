@@ -39,9 +39,9 @@ public class PrimitiveSupportHelper extends SupportHelper {
     @Override
     public FieldSpec getBuilderField() {
         if (rootType.isArray()) {
-            return FieldSpec.builder(ArrayTypeName.of(support.getType()), label, Modifier.PUBLIC).build();
+            return FieldSpec.builder(ArrayTypeName.of(support.getType()), label, Modifier.PRIVATE).build();
         } else {
-            return FieldSpec.builder(support.getNullableType(), label, Modifier.PUBLIC).build();
+            return FieldSpec.builder(support.getNullableType(), label, Modifier.PRIVATE).build();
         }
     }
 
