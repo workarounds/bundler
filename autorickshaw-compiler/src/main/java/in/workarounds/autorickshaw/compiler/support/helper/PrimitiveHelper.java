@@ -15,13 +15,7 @@ public class PrimitiveHelper extends TypeHelper {
         }
     }
 
-    @Override
-    public String getIntentKey() {
-        return StringUtils.getConstantName(label)
-                + "_" + StringUtils.getConstantName(type.toString());
-    }
-
-    @Override
+   @Override
     public String getBundleMethodSuffix() {
         return StringUtils.getClassName(type.toString());
     }

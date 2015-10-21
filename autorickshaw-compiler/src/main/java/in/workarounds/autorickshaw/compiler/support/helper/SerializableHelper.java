@@ -6,7 +6,6 @@ import javax.lang.model.util.Elements;
 
 import in.workarounds.autorickshaw.compiler.model.CargoModel;
 import in.workarounds.autorickshaw.compiler.support.SupportResolver;
-import in.workarounds.autorickshaw.compiler.util.StringUtils;
 
 /**
  * Created by madki on 21/10/15.
@@ -20,12 +19,7 @@ public class SerializableHelper extends TypeHelper {
         }
     }
 
-    @Override
-    public String getIntentKey() {
-        return StringUtils.getConstantName(label) + "_" + StringUtils.getConstantName(((ClassName) type).simpleName());
-    }
-
-    @Override
+   @Override
     public String getBundleMethodSuffix() {
         return "Serializable";
     }

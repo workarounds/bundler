@@ -24,13 +24,7 @@ public class PrimitiveArrayHelper extends TypeHelper {
         }
     }
 
-    @Override
-    public String getIntentKey() {
-        return StringUtils.getConstantName(label)
-                + "_" + StringUtils.getConstantName(componentType.toString()) + "_ARRAY";
-    }
-
-    @Override
+   @Override
     public String getBundleMethodSuffix() {
         return StringUtils.getClassName(componentType.toString()) + "Array";
     }
