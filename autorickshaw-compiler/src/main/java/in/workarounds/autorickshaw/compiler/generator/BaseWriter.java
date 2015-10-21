@@ -53,8 +53,14 @@ public class BaseWriter {
         this.cargoList = cargoList;
         this.typeHelpers = new ArrayList<>();
 
+        TypeHelper helper;
         for (CargoModel cargo : cargoList) {
-            typeHelpers.add(SupportResolver.getHelper(cargo));
+            helper = SupportResolver.getHelper(cargo, provider.elementUtils());
+            if(helper != null) {
+                typeHelpers.add(helper);
+            } else {
+                throw new IllegalStateException(String.format("No helper found for %s %s", cargo.getTypeName(), cargo.getLabel()));
+            }
         }
 
         LOADER_SIMPLE_NAME = LOADER_PREFIX + destinationModel.getSimpleName();
@@ -205,7 +211,7 @@ public class BaseWriter {
 
             hasMethod = HAS_PREFIX + StringUtils.getClassName(label);
             builder.addMethod(getParserHasMethod(hasMethod, typeHelpers.get(i).getIntentKey()));
-            builder.addMethod(getParserGetterMethod(type, label, typeHelpers.get(i)));
+            builder.addMethod(getParserGetterMethod(type, label, hasMethod, typeHelpers.get(i)));
 
             intoBuilder.beginControlFlow("if($L())", hasMethod);
             if (type.isPrimitive()) {
@@ -230,7 +236,7 @@ public class BaseWriter {
                 .build();
     }
 
-    private MethodSpec getParserGetterMethod(TypeName type, String label, TypeHelper helper) {
+    private MethodSpec getParserGetterMethod(TypeName type, String label, String hasMethod, TypeHelper helper) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(type);
@@ -247,6 +253,17 @@ public class BaseWriter {
                     helper.getIntentKey(),
                     DEFAULT_VAR
             );
+        } else if(helper.requiresCasting()) {
+            getterMethodBuilder.beginControlFlow("if($L())", hasMethod);
+            getterMethodBuilder.addStatement("return ($T) $L.get$L($T.$L)",
+                    type,
+                    BUNDLE_VAR,
+                    helper.getBundleMethodSuffix(),
+                    KEYS_CLASS,
+                    helper.getIntentKey()
+            );
+            getterMethodBuilder.endControlFlow();
+            getterMethodBuilder.addStatement("return null");
         } else {
             getterMethodBuilder.addStatement("return $L.get$L($T.$L)",
                     BUNDLE_VAR,
@@ -255,6 +272,8 @@ public class BaseWriter {
                     helper.getIntentKey()
             );
         }
+
+
         return getterMethodBuilder.build();
     }
 }

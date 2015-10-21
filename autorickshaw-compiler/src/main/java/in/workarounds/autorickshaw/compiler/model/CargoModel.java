@@ -41,7 +41,7 @@ public class CargoModel {
     }
 
     private void checkIfValidType(Element element) {
-        if(!SupportResolver.isSupportedType(typeName)) {
+        if(!SupportResolver.isSupportedType(typeName, provider.elementUtils())) {
             provider.error(element, "Error at: %s, Unsupported type %s", label, typeName);
             provider.reportError();
         }

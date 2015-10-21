@@ -43,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
     short shortNumber;
     @Cargo
     short[] shortArray;
+    @Cargo
+    String string;
+    @Cargo
+    Integer some;
+    @Cargo
+    Bundle random;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -10,6 +10,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 
 /**
  * Created by madki on 17/10/15.
@@ -97,6 +98,11 @@ public class Utils {
             return ClassName.bestGuess(qualifiedName);
         }
         return null;
+    }
+
+    public static TypeMirror getTypeMirror(ClassName className, Elements elementUtils) {
+        TypeElement element = elementUtils.getTypeElement(className.toString());
+        return element.asType();
     }
 
     public static boolean isPrimitiveArray(TypeName typeName) {

@@ -18,4 +18,5 @@ public abstract class TypeHelper {
 
     public abstract String getIntentKey();
     public abstract String getBundleMethodSuffix();
+    public abstract boolean requiresCasting();
 }

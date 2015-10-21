@@ -34,4 +34,9 @@ public class PrimitiveArrayHelper extends TypeHelper {
     public String getBundleMethodSuffix() {
         return StringUtils.getClassName(componentType.toString()) + "Array";
     }
+
+    @Override
+    public boolean requiresCasting() {
+        return false;
+    }
 }

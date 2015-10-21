@@ -25,4 +25,9 @@ public class PrimitiveHelper extends TypeHelper {
     public String getBundleMethodSuffix() {
         return StringUtils.getClassName(type.toString());
     }
+
+    @Override
+    public boolean requiresCasting() {
+        return false;
+    }
 }
