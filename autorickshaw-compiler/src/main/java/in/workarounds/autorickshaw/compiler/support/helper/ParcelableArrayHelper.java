@@ -1,6 +1,7 @@
 package in.workarounds.autorickshaw.compiler.support.helper;
 
 import com.squareup.javapoet.ArrayTypeName;
+import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.util.Elements;
 
@@ -14,7 +15,7 @@ public class ParcelableArrayHelper extends TypeHelper {
 
     public ParcelableArrayHelper(CargoModel cargo, Elements elementUtils) {
         super(cargo);
-        if (!(type instanceof ArrayTypeName) || !SupportResolver.isParcelable(((ArrayTypeName) type).componentType, elementUtils)) {
+        if (!isParcelableArray(type, elementUtils)) {
             throw new IllegalStateException("ParcelableArrayHelper used for a non ParcelableArray type");
         }
     }
@@ -27,5 +28,14 @@ public class ParcelableArrayHelper extends TypeHelper {
     @Override
     public boolean requiresCasting() {
         return true;
+    }
+
+    public static boolean isParcelableArray(TypeName typeName, Elements elementUtils) {
+        return (typeName instanceof ArrayTypeName)
+                &&
+                SupportResolver.isParcelable(
+                        ((ArrayTypeName) typeName).componentType,
+                        elementUtils
+                );
     }
 }

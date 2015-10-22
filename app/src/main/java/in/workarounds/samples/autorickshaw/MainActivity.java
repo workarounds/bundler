@@ -2,6 +2,8 @@ package in.workarounds.samples.autorickshaw;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 
@@ -59,13 +61,40 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<SomeObject> objects;
     @Cargo
     ArrayList<Integer>[][] randObjects;
+    @Cargo
+    CharSequence charSequence;
+    @Cargo
+    CharSequence[] charArray;
+    @Cargo
+    String[] strings;
+    @Cargo
+    ArrayList<String> stringArrayList;
+    @Cargo
+    ArrayList<Integer> integerArrayList;
+    @Cargo
+    SparseArray<Bundle> sparseArray;
+    @Cargo
+    ArrayList<Bundle> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Bundle dummy = new Bundle();
+        dummy.putInt("i", 1);
+
         Bundle bundle = new Bundle();
+        arrayList = new ArrayList<>();
+        arrayList.add(dummy);
+        arrayList.add(dummy);
+        arrayList.add(dummy);
+        bundle.putParcelableArrayList("k", arrayList);
+
+        ArrayList<Bundle> bundles = bundle.getParcelableArrayList("k");
+        for (Bundle b: bundles) {
+            Log.d("MA", "i: " + b.getInt("i"));
+        }
     }
 
     public static class SomeObject {

@@ -12,8 +12,10 @@ import java.io.Serializable;
 import javax.lang.model.util.Elements;
 
 import in.workarounds.autorickshaw.compiler.model.CargoModel;
+import in.workarounds.autorickshaw.compiler.support.helper.KnownTypeHelper;
 import in.workarounds.autorickshaw.compiler.support.helper.ParcelableArrayHelper;
 import in.workarounds.autorickshaw.compiler.support.helper.ParcelableHelper;
+import in.workarounds.autorickshaw.compiler.support.helper.ParcelableTypeVariableHelper;
 import in.workarounds.autorickshaw.compiler.support.helper.PrimitiveArrayHelper;
 import in.workarounds.autorickshaw.compiler.support.helper.PrimitiveHelper;
 import in.workarounds.autorickshaw.compiler.support.helper.SerializableHelper;
@@ -35,31 +37,24 @@ public class SupportResolver {
             return new PrimitiveHelper(cargo);
         }
 
+        if (KnownTypeHelper.isKnownType(type)) {
+            return new KnownTypeHelper(cargo);
+        }
+
         if (isParcelable(type, elementUtils)) {
             return new ParcelableHelper(cargo, elementUtils);
         }
 
-        if (type instanceof ClassName) {
-            ClassName className = (ClassName) type;
-            // TODO add support for known types i.e CharSequence, Binder, String?
+        if (PrimitiveArrayHelper.isPrimitiveArray(type)) {
+            return new PrimitiveArrayHelper(cargo);
         }
 
-        if (type instanceof ArrayTypeName) {
-            TypeName componentType = ((ArrayTypeName) type).componentType;
-            if (componentType.isPrimitive()) {
-                return new PrimitiveArrayHelper(cargo);
-            }
-            if (isParcelable(componentType, elementUtils)) {
-                return new ParcelableArrayHelper(cargo, elementUtils);
-            }
-            if (componentType instanceof ClassName) {
-                // TODO check if known array type i.e CharSequence[], String[]
-            }
+        if (ParcelableArrayHelper.isParcelableArray(type, elementUtils)) {
+            return new ParcelableArrayHelper(cargo, elementUtils);
         }
 
-        if (type instanceof ParameterizedTypeName) {
-            ClassName rawType = ((ParameterizedTypeName) type).rawType;
-            // TODO check if rawType is recognized ArrayList, SparseArrayList and check if typeVariable is parcelable
+        if (ParcelableTypeVariableHelper.isKnownParcelableTypeVariable(type, elementUtils)) {
+            return new ParcelableTypeVariableHelper(cargo, elementUtils);
         }
 
         if (isSerializable(type, elementUtils)) {

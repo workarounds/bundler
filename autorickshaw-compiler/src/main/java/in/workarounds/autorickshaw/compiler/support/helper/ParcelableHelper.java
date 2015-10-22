@@ -24,6 +24,6 @@ public class ParcelableHelper extends TypeHelper {
 
     @Override
     public boolean requiresCasting() {
-        return true;
+        return false;
     }
 }
