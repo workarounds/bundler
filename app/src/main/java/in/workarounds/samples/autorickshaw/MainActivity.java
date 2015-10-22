@@ -3,6 +3,8 @@ package in.workarounds.samples.autorickshaw;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 import in.workarounds.autorickshaw.annotations.Cargo;
 import in.workarounds.autorickshaw.annotations.Destination;
 
@@ -49,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
     Integer some;
     @Cargo
     Bundle random;
+    @Cargo
+    Bundle[] bundles;
+    @Cargo
+    Integer[][] integers;
+    @Cargo
+    ArrayList<SomeObject> objects;
+    @Cargo
+    ArrayList<Integer>[][] randObjects;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
     }
 
-    private static class SomeObject {
+    public static class SomeObject {
         public int one;
         public String two;
 

@@ -1,7 +1,5 @@
 package in.workarounds.autorickshaw.compiler.support.helper;
 
-import com.squareup.javapoet.ClassName;
-
 import javax.lang.model.util.Elements;
 
 import in.workarounds.autorickshaw.compiler.model.CargoModel;
@@ -14,7 +12,7 @@ public class ParcelableHelper extends TypeHelper {
 
     public ParcelableHelper(CargoModel cargo, Elements elementUtils) {
         super(cargo);
-        if (!(type instanceof ClassName) || !SupportResolver.isParcelable((ClassName) type, elementUtils)) {
+        if (!SupportResolver.isParcelable(type, elementUtils)) {
             throw new IllegalStateException("ParcelableHelper used for a non parcelable");
         }
     }
