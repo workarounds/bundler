@@ -23,7 +23,6 @@ import javax.tools.Diagnostic;
 
 import in.workarounds.autorickshaw.annotations.Cargo;
 import in.workarounds.autorickshaw.annotations.Destination;
-import in.workarounds.autorickshaw.annotations.Passenger;
 import in.workarounds.autorickshaw.compiler.generator.BaseWriter;
 import in.workarounds.autorickshaw.compiler.model.CargoModel;
 import in.workarounds.autorickshaw.compiler.model.DestinationModel;
@@ -90,7 +89,7 @@ public class RickshawProcessor extends AbstractProcessor implements Provider {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<String>();
 
-        annotations.add(Passenger.class.getCanonicalName());
+        annotations.add(Cargo.class.getCanonicalName());
         annotations.add(Destination.class.getCanonicalName());
 
         return annotations;
