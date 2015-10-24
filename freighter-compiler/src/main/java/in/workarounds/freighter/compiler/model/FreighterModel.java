@@ -89,7 +89,7 @@ public class FreighterModel {
         return className;
     }
 
-    enum VARIETY {
+    public enum VARIETY {
         ACTIVITY,
         FRAGMENT,
         FRAGMENT_V4,

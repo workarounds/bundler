@@ -24,32 +24,47 @@ import in.workarounds.freighter.compiler.util.StringUtils;
 /**
  * Created by madki on 19/10/15.
  */
-public class BaseWriter {
-    private Provider provider;
-    private FreighterModel freighterModel;
-    private List<CargoModel> cargoList;
-    private List<TypeHelper> typeHelpers;
-    private static final String FILE_PREFIX = "Freighter";
-    private static final String LOADER_PREFIX = "Load";
-    private static final String UN_LOADER_PREFIX = "UnLoad";
-    private static final String KEYS_NAME = "Keys";
-    private static final String BUILDER_NAME = "Loader";
-    private static final String PARSER_NAME = "UnLoader";
+public class Writer {
+    protected Provider provider;
+    protected FreighterModel freighterModel;
+    protected List<CargoModel> cargoList;
+    protected List<TypeHelper> typeHelpers;
+    protected static final String FILE_PREFIX      = "Freighter";
+    protected static final String KEYS_SIMPLE_NAME = "Keys";
+    protected static final String LOADER_NAME      = "Loader";
+    protected static final String UN_LOADER_NAME   = "UnLoader";
+    protected static final String LOAD_METHOD      = "load";
+    protected static final String UNLOAD_METHOD    = "unload";
+    protected static final String INTO_METHOD      = "into";
+    protected static final String BUNDLE_METHOD    = "bundle";
+    protected static final String INTENT_METHOD    = "intent";
+    protected static final String START_METHOD     = "start";
+    protected static final String CREATE_METHOD    = "create";
 
-    private String LOADER_SIMPLE_NAME;
-    private String UN_LOADER_SIMPLE_NAME;
-    private String FILE_SIMPLE_NAME;
-    private ClassName BUILDER_CLASS;
-    private ClassName PARSER_CLASS;
+    protected String FILE_SIMPLE_NAME;
+    protected ClassName LOADER_CLASS;
+    protected ClassName UN_LOADER_CLASS;
 
-    private String KEYS_SIMPLE_NAME;
-    private ClassName KEYS_CLASS;
+    protected ClassName KEYS_CLASS;
 
-    private String CONTEXT_VAR = "context";
-    private String BUNDLE_VAR = "bundle";
-    private String DEFAULT_VAR = "defaultValue";
+    protected String CONTEXT_VAR = "context";
+    protected String BUNDLE_VAR = "bundle";
+    protected String DEFAULT_VAR = "defaultValue";
+    protected static final String INTENT_VAR = "intent";
 
-    public BaseWriter(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
+    public static Writer from(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
+        switch (freighterModel.getVariety()) {
+            case ACTIVITY:
+                return new ActivityWriter(provider, freighterModel, cargoList);
+            case SERVICE:
+                return new ServiceWriter(provider, freighterModel, cargoList);
+            default:
+                return new Writer(provider, freighterModel, cargoList);
+        }
+    }
+
+
+    protected Writer(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
         this.provider = provider;
         this.freighterModel = freighterModel;
         this.cargoList = cargoList;
@@ -66,24 +81,45 @@ public class BaseWriter {
         }
 
         FILE_SIMPLE_NAME = FILE_PREFIX + freighterModel.getSimpleName();
-        LOADER_SIMPLE_NAME = LOADER_PREFIX + freighterModel.getSimpleName();
-        UN_LOADER_SIMPLE_NAME = UN_LOADER_PREFIX + freighterModel.getSimpleName();
 
         String FILE_NAME = freighterModel.getPackageName() + "." + FILE_SIMPLE_NAME;
-        BUILDER_CLASS = ClassName.bestGuess(FILE_NAME + "." + BUILDER_NAME);
-        PARSER_CLASS = ClassName.bestGuess(FILE_NAME + "." + PARSER_NAME);
+        LOADER_CLASS = ClassName.bestGuess(FILE_NAME + "." + LOADER_NAME);
+        UN_LOADER_CLASS = ClassName.bestGuess(FILE_NAME + "." + UN_LOADER_NAME);
+        KEYS_CLASS = ClassName.bestGuess(FILE_NAME + "." + KEYS_SIMPLE_NAME);
 
-        KEYS_SIMPLE_NAME = KEYS_NAME + freighterModel.getSimpleName();
-        KEYS_CLASS = ClassName.get(freighterModel.getPackageName(), KEYS_SIMPLE_NAME);
     }
 
     public JavaFile brewJava() {
         TypeSpec generatedClass = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
+                .addMethod(loadMethod())
+                .addMethod(unloadBundleMethod())
+                .addMethods(getAdditionalHelperMethods())
                 .addType(createLoaderClass())
                 .addType(createUnLoaderClass())
                 .addType(createKeysInterface())
                 .build();
         return JavaFile.builder(freighterModel.getPackageName(), generatedClass).build();
+    }
+
+    protected MethodSpec loadMethod() {
+        return MethodSpec.methodBuilder(LOAD_METHOD)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(LOADER_CLASS)
+                .addStatement("return new $T()", LOADER_CLASS)
+                .build();
+    }
+
+    protected MethodSpec unloadBundleMethod() {
+        return MethodSpec.methodBuilder(UNLOAD_METHOD)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
+                .returns(UN_LOADER_CLASS)
+                .addStatement("return new $T($L)", UN_LOADER_CLASS, BUNDLE_VAR)
+                .build();
+    }
+
+    protected List<MethodSpec> getAdditionalHelperMethods() {
+        return new ArrayList<>();
     }
 
     public TypeSpec createKeysInterface() {
@@ -103,7 +139,7 @@ public class BaseWriter {
                 .addModifiers(Modifier.PRIVATE)
                 .build();
 
-        MethodSpec.Builder bundleBuilder = MethodSpec.methodBuilder("bundle")
+        MethodSpec.Builder bundleBuilder = MethodSpec.methodBuilder(BUNDLE_METHOD)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(CommonClasses.BUNDLE)
                 .addStatement("$T $L = new $T()",
@@ -111,7 +147,7 @@ public class BaseWriter {
                         BUNDLE_VAR,
                         CommonClasses.BUNDLE);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(BUILDER_NAME)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(LOADER_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addMethod(constructor);
 
@@ -141,14 +177,19 @@ public class BaseWriter {
 
         bundleBuilder.addStatement("return $L", BUNDLE_VAR);
         builder.addMethod(bundleBuilder.build());
+        builder.addMethods(getAdditionalLoaderMethods());
 
         return builder.build();
+    }
+
+    protected List<MethodSpec> getAdditionalLoaderMethods() {
+        return new ArrayList<>();
     }
 
     private MethodSpec loaderSetterMethod(TypeName type, String label) {
         return MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(BUILDER_CLASS)
+                .returns(LOADER_CLASS)
                 .addParameter(type, label)
                 .addStatement("this.$L = $L", label, label)
                 .addStatement("return this")
@@ -167,11 +208,11 @@ public class BaseWriter {
                 .addStatement("this.$L = $L", BUNDLE_VAR, BUNDLE_VAR)
                 .build();
 
-        MethodSpec.Builder intoBuilder = MethodSpec.methodBuilder("into")
+        MethodSpec.Builder intoBuilder = MethodSpec.methodBuilder(INTO_METHOD)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(freighterModel.getClassName(), DESTINATION_VAR);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(PARSER_NAME)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(UN_LOADER_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(bundle)
                 .addMethod(constructor);

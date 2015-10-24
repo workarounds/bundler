@@ -23,7 +23,7 @@ import javax.tools.Diagnostic;
 
 import in.workarounds.freighter.annotations.Cargo;
 import in.workarounds.freighter.annotations.Freighter;
-import in.workarounds.freighter.compiler.generator.BaseWriter;
+import in.workarounds.freighter.compiler.generator.Writer;
 import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 
@@ -66,7 +66,7 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
 
             if(hasErrorOccurred()) return true;
 
-            BaseWriter writer = new BaseWriter(this, model, cargos);
+            Writer writer = Writer.from(this, model, cargos);
 
             try {
                 writer.brewJava().writeTo(filer);
