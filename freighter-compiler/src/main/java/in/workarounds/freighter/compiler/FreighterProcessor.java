@@ -69,9 +69,7 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
             BaseWriter writer = new BaseWriter(this, model, cargos);
 
             try {
-                writer.brewKeys().writeTo(filer);
-                writer.brewLoader().writeTo(filer);
-                writer.brewUnLoader().writeTo(filer);
+                writer.brewJava().writeTo(filer);
             } catch (IOException e) {
                 e.printStackTrace();
             }
