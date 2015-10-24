@@ -58,6 +58,9 @@ public class Writer {
                 return new ActivityWriter(provider, freighterModel, cargoList);
             case SERVICE:
                 return new ServiceWriter(provider, freighterModel, cargoList);
+            case FRAGMENT:
+            case FRAGMENT_V4:
+                return new FragmentWriter(provider, freighterModel, cargoList);
             default:
                 return new Writer(provider, freighterModel, cargoList);
         }
