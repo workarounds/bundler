@@ -1,4 +1,4 @@
-package in.workarounds.samples.autorickshaw;
+package in.workarounds.samples.freighter;
 
 import org.junit.Test;
 

@@ -10,8 +10,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/autorickshaw-annotations" />
-            <option value="$PROJECT_DIR$/autorickshaw-compiler" />
+            <option value="$PROJECT_DIR$/freighter-annotations" />
+            <option value="$PROJECT_DIR$/freighter-compiler" />
           </set>
         </option>
       </GradleProjectSettings>
