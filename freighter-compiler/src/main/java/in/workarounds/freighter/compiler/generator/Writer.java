@@ -63,7 +63,7 @@ public class Writer {
             case FRAGMENT_V4:
                 return new FragmentWriter(provider, freighterModel, cargoList);
             default:
-                return new Writer(provider, freighterModel, cargoList);
+                return new OtherWriter(provider, freighterModel, cargoList);
         }
     }
 
