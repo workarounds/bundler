@@ -41,6 +41,7 @@ public class Writer {
     protected static final String START_METHOD     = "start";
     protected static final String CREATE_METHOD    = "create";
     protected static final String INJECT_METHOD    = "inject";
+    protected static final String RETRIEVER_VAR    = "retriever";
 
     protected String FILE_SIMPLE_NAME;
     protected ClassName SUPPLIER_CLASS;
@@ -118,7 +119,12 @@ public class Writer {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
                 .returns(RETRIEVER_CLASS)
+                .beginControlFlow("if($L != null)", BUNDLE_VAR)
                 .addStatement("return new $T($L)", RETRIEVER_CLASS, BUNDLE_VAR)
+                .endControlFlow()
+                .beginControlFlow("else")
+                .addStatement("return null")
+                .endControlFlow()
                 .build();
     }
 
@@ -181,12 +187,12 @@ public class Writer {
 
         bundleBuilder.addStatement("return $L", BUNDLE_VAR);
         builder.addMethod(bundleBuilder.build());
-        builder.addMethods(getAdditionalLoaderMethods());
+        builder.addMethods(getAdditionalSupplierMethods());
 
         return builder.build();
     }
 
-    protected List<MethodSpec> getAdditionalLoaderMethods() {
+    protected List<MethodSpec> getAdditionalSupplierMethods() {
         return new ArrayList<>();
     }
 

@@ -27,8 +27,9 @@ public class FragmentWriter extends Writer {
                 MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(freighterModel.getClassName(), FRAGMENT_VAR)
-                        .beginControlFlow("if($L.getArguments() != null)", FRAGMENT_VAR)
-                        .addStatement("$L($L.getArguments()).$L($L)", RETRIEVE_METHOD, FRAGMENT_VAR, INTO_METHOD, FRAGMENT_VAR)
+                        .addStatement("$T $L = $L($L.getArguments())", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, FRAGMENT_VAR)
+                        .beginControlFlow("if($L != null)", RETRIEVER_VAR)
+                        .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, FRAGMENT_VAR)
                         .endControlFlow()
                         .build()
         );
@@ -36,8 +37,8 @@ public class FragmentWriter extends Writer {
     }
 
     @Override
-    protected List<MethodSpec> getAdditionalLoaderMethods() {
-        List<MethodSpec> methods = super.getAdditionalLoaderMethods();
+    protected List<MethodSpec> getAdditionalSupplierMethods() {
+        List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
                 MethodSpec.methodBuilder(CREATE_METHOD)
                         .addModifiers(Modifier.PUBLIC)

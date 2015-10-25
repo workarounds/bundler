@@ -29,15 +29,21 @@ public class ActivityWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(CommonClasses.INTENT, INTENT_VAR)
                         .returns(RETRIEVER_CLASS)
+                        .beginControlFlow("if($L != null)", INTENT_VAR)
                         .addStatement("return $L($L.getExtras())", RETRIEVE_METHOD, INTENT_VAR)
+                        .endControlFlow()
+                        .beginControlFlow("else")
+                        .addStatement("return null")
+                        .endControlFlow()
                         .build()
         );
         methods.add(
                 MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(freighterModel.getClassName(), ACTIVITY_VAR)
-                        .beginControlFlow("if($L.getIntent() != null)", ACTIVITY_VAR)
-                        .addStatement("$L($L.getIntent()).$L($L)", RETRIEVE_METHOD, ACTIVITY_VAR, INTO_METHOD, ACTIVITY_VAR)
+                        .addStatement("$T $L = $L($L.getIntent())", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, ACTIVITY_VAR)
+                        .beginControlFlow("if($L != null)", RETRIEVER_VAR)
+                        .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, ACTIVITY_VAR)
                         .endControlFlow()
                         .build()
         );
@@ -45,8 +51,8 @@ public class ActivityWriter extends Writer {
     }
 
     @Override
-    protected List<MethodSpec> getAdditionalLoaderMethods() {
-        List<MethodSpec> methods = super.getAdditionalLoaderMethods();
+    protected List<MethodSpec> getAdditionalSupplierMethods() {
+        List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
                 MethodSpec.methodBuilder(INTENT_METHOD)
                         .addModifiers(Modifier.PUBLIC)

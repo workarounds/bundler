@@ -37,8 +37,9 @@ public class ServiceWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(freighterModel.getClassName(), SERVICE_VAR)
                         .addParameter(CommonClasses.INTENT, INTENT_VAR)
-                        .beginControlFlow("if($L != null)", INTENT_VAR)
-                        .addStatement("$L($L).$L($L)", RETRIEVE_METHOD, INTENT_VAR, INTO_METHOD, SERVICE_VAR)
+                        .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, INTENT_VAR)
+                        .beginControlFlow("if($L != null)", RETRIEVER_VAR)
+                        .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, SERVICE_VAR)
                         .endControlFlow()
                         .build()
         );
@@ -46,8 +47,8 @@ public class ServiceWriter extends Writer {
     }
 
     @Override
-    protected List<MethodSpec> getAdditionalLoaderMethods() {
-        List<MethodSpec> methods = super.getAdditionalLoaderMethods();
+    protected List<MethodSpec> getAdditionalSupplierMethods() {
+        List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
                 MethodSpec.methodBuilder(INTENT_METHOD)
                         .addModifiers(Modifier.PUBLIC)

@@ -30,8 +30,9 @@ public class OtherWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(freighterModel.getClassName(), FREIGHTER_VAR)
                         .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
-                        .beginControlFlow("if($L != null)", BUNDLE_VAR)
-                        .addStatement("$L($L).$L($L)", RETRIEVE_METHOD, BUNDLE_VAR, INTO_METHOD, FREIGHTER_VAR)
+                        .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, BUNDLE_VAR)
+                        .beginControlFlow("if($L != null)", RETRIEVER_VAR)
+                        .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, FREIGHTER_VAR)
                         .endControlFlow()
                         .build()
         );
