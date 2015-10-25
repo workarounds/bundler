@@ -31,24 +31,25 @@ public class Writer {
     protected List<TypeHelper> typeHelpers;
     protected static final String FILE_PREFIX      = "Freighter";
     protected static final String KEYS_SIMPLE_NAME = "Keys";
-    protected static final String LOADER_NAME      = "Loader";
-    protected static final String UN_LOADER_NAME   = "UnLoader";
-    protected static final String LOAD_METHOD      = "load";
-    protected static final String UNLOAD_METHOD    = "unload";
+    protected static final String SUPPLIER_NAME    = "Supplier";
+    protected static final String RETRIEVER_NAME   = "Retriever";
+    protected static final String SUPPLY_METHOD    = "supply";
+    protected static final String RETRIEVE_METHOD  = "retrieve";
     protected static final String INTO_METHOD      = "into";
     protected static final String BUNDLE_METHOD    = "bundle";
     protected static final String INTENT_METHOD    = "intent";
     protected static final String START_METHOD     = "start";
     protected static final String CREATE_METHOD    = "create";
+    protected static final String INJECT_METHOD    = "inject";
 
     protected String FILE_SIMPLE_NAME;
-    protected ClassName LOADER_CLASS;
-    protected ClassName UN_LOADER_CLASS;
+    protected ClassName SUPPLIER_CLASS;
+    protected ClassName RETRIEVER_CLASS;
 
     protected ClassName KEYS_CLASS;
 
     protected String CONTEXT_VAR = "context";
-    protected String BUNDLE_VAR = "bundle";
+    protected String BUNDLE_VAR  = "bundle";
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
@@ -86,38 +87,38 @@ public class Writer {
         FILE_SIMPLE_NAME = FILE_PREFIX + freighterModel.getSimpleName();
 
         String FILE_NAME = freighterModel.getPackageName() + "." + FILE_SIMPLE_NAME;
-        LOADER_CLASS = ClassName.bestGuess(FILE_NAME + "." + LOADER_NAME);
-        UN_LOADER_CLASS = ClassName.bestGuess(FILE_NAME + "." + UN_LOADER_NAME);
+        SUPPLIER_CLASS = ClassName.bestGuess(FILE_NAME + "." + SUPPLIER_NAME);
+        RETRIEVER_CLASS = ClassName.bestGuess(FILE_NAME + "." + RETRIEVER_NAME);
         KEYS_CLASS = ClassName.bestGuess(FILE_NAME + "." + KEYS_SIMPLE_NAME);
 
     }
 
     public JavaFile brewJava() {
         TypeSpec generatedClass = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
-                .addMethod(loadMethod())
-                .addMethod(unloadBundleMethod())
+                .addMethod(supplyMethod())
+                .addMethod(retrieveBundleMethod())
                 .addMethods(getAdditionalHelperMethods())
-                .addType(createLoaderClass())
-                .addType(createUnLoaderClass())
+                .addType(createSupplierClass())
+                .addType(createRetrieverClass())
                 .addType(createKeysInterface())
                 .build();
         return JavaFile.builder(freighterModel.getPackageName(), generatedClass).build();
     }
 
-    protected MethodSpec loadMethod() {
-        return MethodSpec.methodBuilder(LOAD_METHOD)
+    protected MethodSpec supplyMethod() {
+        return MethodSpec.methodBuilder(SUPPLY_METHOD)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(LOADER_CLASS)
-                .addStatement("return new $T()", LOADER_CLASS)
+                .returns(SUPPLIER_CLASS)
+                .addStatement("return new $T()", SUPPLIER_CLASS)
                 .build();
     }
 
-    protected MethodSpec unloadBundleMethod() {
-        return MethodSpec.methodBuilder(UNLOAD_METHOD)
+    protected MethodSpec retrieveBundleMethod() {
+        return MethodSpec.methodBuilder(RETRIEVE_METHOD)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
-                .returns(UN_LOADER_CLASS)
-                .addStatement("return new $T($L)", UN_LOADER_CLASS, BUNDLE_VAR)
+                .returns(RETRIEVER_CLASS)
+                .addStatement("return new $T($L)", RETRIEVER_CLASS, BUNDLE_VAR)
                 .build();
     }
 
@@ -137,7 +138,7 @@ public class Writer {
         return keyBuilder.build();
     }
 
-    private TypeSpec createLoaderClass() {
+    private TypeSpec createSupplierClass() {
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
                 .build();
@@ -150,7 +151,7 @@ public class Writer {
                         BUNDLE_VAR,
                         CommonClasses.BUNDLE);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(LOADER_NAME)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(SUPPLIER_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addMethod(constructor);
 
@@ -175,7 +176,7 @@ public class Writer {
                     label);
             bundleBuilder.endControlFlow();
 
-            builder.addMethod(loaderSetterMethod(type, label));
+            builder.addMethod(supplierSetterMethod(type, label));
         }
 
         bundleBuilder.addStatement("return $L", BUNDLE_VAR);
@@ -189,17 +190,17 @@ public class Writer {
         return new ArrayList<>();
     }
 
-    private MethodSpec loaderSetterMethod(TypeName type, String label) {
+    private MethodSpec supplierSetterMethod(TypeName type, String label) {
         return MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(LOADER_CLASS)
+                .returns(SUPPLIER_CLASS)
                 .addParameter(type, label)
                 .addStatement("this.$L = $L", label, label)
                 .addStatement("return this")
                 .build();
     }
 
-    private TypeSpec createUnLoaderClass() {
+    private TypeSpec createRetrieverClass() {
         String DESTINATION_VAR = StringUtils.getVariableName(freighterModel.getSimpleName());
         String HAS_PREFIX = "has";
 
@@ -215,7 +216,7 @@ public class Writer {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(freighterModel.getClassName(), DESTINATION_VAR);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(UN_LOADER_NAME)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(RETRIEVER_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(bundle)
                 .addMethod(constructor);
@@ -228,8 +229,8 @@ public class Writer {
             type = cargoList.get(i).getTypeName();
 
             hasMethod = HAS_PREFIX + StringUtils.getClassName(label);
-            builder.addMethod(unLoaderHasMethod(hasMethod, typeHelpers.get(i).getIntentKey()));
-            builder.addMethod(unLoaderGetterMethod(type, label, hasMethod, typeHelpers.get(i)));
+            builder.addMethod(retrieverHasMethod(hasMethod, typeHelpers.get(i).getIntentKey()));
+            builder.addMethod(retrieverGetterMethod(type, label, hasMethod, typeHelpers.get(i)));
 
             intoBuilder.beginControlFlow("if($L())", hasMethod);
             if (type.isPrimitive()) {
@@ -246,7 +247,7 @@ public class Writer {
         return builder.build();
     }
 
-    private MethodSpec unLoaderHasMethod(String hasMethod, String intentKey) {
+    private MethodSpec retrieverHasMethod(String hasMethod, String intentKey) {
         return MethodSpec.methodBuilder(hasMethod)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(boolean.class)
@@ -254,7 +255,7 @@ public class Writer {
                 .build();
     }
 
-    private MethodSpec unLoaderGetterMethod(TypeName type, String label, String hasMethod, TypeHelper helper) {
+    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, TypeHelper helper) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(type);

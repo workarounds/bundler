@@ -25,19 +25,21 @@ public class ServiceWriter extends Writer {
     protected List<MethodSpec> getAdditionalHelperMethods() {
         List<MethodSpec> methods = super.getAdditionalHelperMethods();
         methods.add(
-                MethodSpec.methodBuilder(UNLOAD_METHOD)
+                MethodSpec.methodBuilder(RETRIEVE_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(CommonClasses.INTENT, INTENT_VAR)
-                        .returns(UN_LOADER_CLASS)
-                        .addStatement("return $L($L.getExtras())", UNLOAD_METHOD, INTENT_VAR)
+                        .returns(RETRIEVER_CLASS)
+                        .addStatement("return $L($L.getExtras())", RETRIEVE_METHOD, INTENT_VAR)
                         .build()
         );
         methods.add(
-                MethodSpec.methodBuilder(UNLOAD_METHOD)
+                MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(freighterModel.getClassName(), SERVICE_VAR)
                         .addParameter(CommonClasses.INTENT, INTENT_VAR)
-                        .addStatement("$L($L).$L($L)", UNLOAD_METHOD, INTENT_VAR, INTO_METHOD, SERVICE_VAR)
+                        .beginControlFlow("if($L != null)", INTENT_VAR)
+                        .addStatement("$L($L).$L($L)", RETRIEVE_METHOD, INTENT_VAR, INTO_METHOD, SERVICE_VAR)
+                        .endControlFlow()
                         .build()
         );
         return methods;
