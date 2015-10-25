@@ -10,3 +10,30 @@ dependencies {
     compile deps.autocommon
     compile deps.javapoet
 }
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'freighter-compiler'
+    orgName = 'workarounds'
+
+    publishedGroupId = 'in.workarounds.freighter'
+    libraryName = 'Freighter'
+    artifact = 'freighter-compiler'
+
+    libraryDescription = 'Compiler for freighter library'
+
+    siteUrl = 'https://github.com/workarounds/freighter'
+    gitUrl = 'https://github.com/workarounds/freighter.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'workarounds'
+    developerName = 'Workarounds'
+    developerEmail = 'contact@workarounds.in'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply from: 'https://gist.githubusercontent.com/themadhukiran/6fb1b85f8be3d2bba733/raw/33bbbd3fbc103276cbb48d4a6e3c5e4d12e5f555/installv1.gradle'
+apply from: 'https://gist.githubusercontent.com/themadhukiran/6c9d0a3bc2413d5189a1/raw/c219633b67cd37f732f06fe45040be74bad15af1/bintrayv1java.gradle'
