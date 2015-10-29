@@ -1,5 +1,7 @@
 package in.workarounds.freighter.compiler.support.helper;
 
+import com.squareup.javapoet.TypeName;
+
 import javax.lang.model.util.Elements;
 
 import in.workarounds.freighter.compiler.model.CargoModel;
@@ -10,8 +12,8 @@ import in.workarounds.freighter.compiler.support.SupportResolver;
  */
 public class ParcelableHelper extends TypeHelper {
 
-    public ParcelableHelper(CargoModel cargo, Elements elementUtils) {
-        super(cargo);
+    public ParcelableHelper(TypeName typeName, Elements elementUtils) {
+        super(typeName);
         if (!SupportResolver.isParcelable(type, elementUtils)) {
             throw new IllegalStateException("ParcelableHelper used for a non parcelable");
         }

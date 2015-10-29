@@ -10,6 +10,8 @@ import javax.lang.model.element.Modifier;
 import in.workarounds.freighter.annotations.Cargo;
 import in.workarounds.freighter.compiler.Provider;
 import in.workarounds.freighter.compiler.support.SupportResolver;
+import in.workarounds.freighter.compiler.support.helper.TypeHelper;
+import in.workarounds.freighter.compiler.util.StringUtils;
 
 /**
  * Created by madki on 21/10/15.
@@ -19,12 +21,14 @@ public class CargoModel {
 
     private String label;
     private TypeName typeName;
+    private TypeHelper helper;
 
     public CargoModel(Element element, Provider provider) {
         this.provider = provider;
 
         label = element.getSimpleName().toString();
         typeName = TypeName.get(element.asType());
+        helper = SupportResolver.getHelper(typeName, provider.elementUtils());
         checkModifiers(element);
         checkIfValidType(element);
     }
@@ -41,10 +45,22 @@ public class CargoModel {
     }
 
     private void checkIfValidType(Element element) {
-        if(!SupportResolver.isSupportedType(this, provider.elementUtils())) {
+        if(helper == null) {
             provider.error(element, "Error at: %s, Unsupported type %s", label, typeName);
             provider.reportError();
         }
+    }
+
+    public String getKeyConstant() {
+        return StringUtils.getConstantName(label);
+    }
+
+    public String getBundleMethodSuffix() {
+        return helper.getBundleMethodSuffix();
+    }
+
+    public boolean requiresCasting() {
+        return helper.requiresCasting();
     }
 
     public String getLabel() {
@@ -53,5 +69,9 @@ public class CargoModel {
 
     public TypeName getTypeName() {
         return typeName;
+    }
+
+    public TypeHelper getHelper() {
+        return helper;
     }
 }

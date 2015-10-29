@@ -1,5 +1,7 @@
 package in.workarounds.freighter.compiler.support.helper;
 
+import com.squareup.javapoet.TypeName;
+
 import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.util.StringUtils;
 
@@ -8,8 +10,8 @@ import in.workarounds.freighter.compiler.util.StringUtils;
  */
 public class PrimitiveHelper extends TypeHelper {
 
-    public PrimitiveHelper(CargoModel cargo) {
-        super(cargo);
+    public PrimitiveHelper(TypeName typeName) {
+        super(typeName);
         if (!type.isPrimitive()) {
             throw new IllegalStateException("PrimitiveHelper invoked for a non primitive type");
         }

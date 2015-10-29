@@ -27,38 +27,33 @@ import in.workarounds.freighter.compiler.util.Utils;
  */
 public class SupportResolver {
 
-    public static boolean isSupportedType(CargoModel cargo, Elements elementUtils) {
-        return getHelper(cargo, elementUtils) != null;
-    }
-
-    public static TypeHelper getHelper(CargoModel cargo, Elements elementUtils) {
-        TypeName type = cargo.getTypeName();
+    public static TypeHelper getHelper(TypeName type, Elements elementUtils) {
         if (type.isPrimitive()) {
-            return new PrimitiveHelper(cargo);
+            return new PrimitiveHelper(type);
         }
 
         if (KnownTypeHelper.isKnownType(type)) {
-            return new KnownTypeHelper(cargo);
+            return new KnownTypeHelper(type);
         }
 
         if (isParcelable(type, elementUtils)) {
-            return new ParcelableHelper(cargo, elementUtils);
+            return new ParcelableHelper(type, elementUtils);
         }
 
         if (PrimitiveArrayHelper.isPrimitiveArray(type)) {
-            return new PrimitiveArrayHelper(cargo);
+            return new PrimitiveArrayHelper(type);
         }
 
         if (ParcelableArrayHelper.isParcelableArray(type, elementUtils)) {
-            return new ParcelableArrayHelper(cargo, elementUtils);
+            return new ParcelableArrayHelper(type, elementUtils);
         }
 
         if (ParcelableTypeVariableHelper.isKnownParcelableTypeVariable(type, elementUtils)) {
-            return new ParcelableTypeVariableHelper(cargo, elementUtils);
+            return new ParcelableTypeVariableHelper(type, elementUtils);
         }
 
         if (isSerializable(type, elementUtils)) {
-            return new SerializableHelper(cargo, elementUtils);
+            return new SerializableHelper(type, elementUtils);
         }
         return null;
     }

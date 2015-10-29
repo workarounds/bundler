@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,8 +28,8 @@ public class KnownTypeHelper extends TypeHelper {
             ParameterizedTypeName.get(ArrayList.class, Integer.class)
     );
 
-    public KnownTypeHelper(CargoModel cargo) {
-        super(cargo);
+    public KnownTypeHelper(TypeName typeName) {
+        super(typeName);
         if(!isKnownType(type)) {
             throw new IllegalStateException("KnownTypeHelper used for an unrecognized type");
         }

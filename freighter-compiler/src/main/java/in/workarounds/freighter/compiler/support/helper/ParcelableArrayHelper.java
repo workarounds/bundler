@@ -13,8 +13,8 @@ import in.workarounds.freighter.compiler.support.SupportResolver;
  */
 public class ParcelableArrayHelper extends TypeHelper {
 
-    public ParcelableArrayHelper(CargoModel cargo, Elements elementUtils) {
-        super(cargo);
+    public ParcelableArrayHelper(TypeName typeName, Elements elementUtils) {
+        super(typeName);
         if (!isParcelableArray(type, elementUtils)) {
             throw new IllegalStateException("ParcelableArrayHelper used for a non ParcelableArray type");
         }

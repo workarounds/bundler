@@ -3,15 +3,18 @@ package in.workarounds.freighter.compiler.support.helper;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.TypeName;
 
+import java.lang.reflect.Type;
+
 import in.workarounds.freighter.compiler.model.CargoModel;
+import in.workarounds.freighter.compiler.util.StringUtils;
 
 /**
  * Created by madki on 21/10/15.
  */
 public class PrimitiveArrayHelper extends TypeHelper {
 
-    public PrimitiveArrayHelper(CargoModel cargo) {
-        super(cargo);
+    public PrimitiveArrayHelper(TypeName typeName) {
+        super(typeName);
         if(!isPrimitiveArray(type)) {
             throw new IllegalStateException("PrimitiveArrayHelper used for a non PrimitiveArray");
         }
@@ -19,7 +22,7 @@ public class PrimitiveArrayHelper extends TypeHelper {
 
    @Override
     public String getBundleMethodSuffix() {
-        return in.workarounds.freighter.compiler.util.StringUtils.getClassName(((ArrayTypeName) type).componentType.toString()) + "Array";
+        return StringUtils.getClassName(((ArrayTypeName) type).componentType.toString()) + "Array";
     }
 
     @Override

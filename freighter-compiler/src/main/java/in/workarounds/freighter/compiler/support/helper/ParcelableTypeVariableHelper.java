@@ -22,8 +22,8 @@ public class ParcelableTypeVariableHelper extends TypeHelper {
             SPARSE_ARRAY_CLASS
     );
 
-    public ParcelableTypeVariableHelper(CargoModel cargo, Elements elementUtils) {
-        super(cargo);
+    public ParcelableTypeVariableHelper(TypeName typeName, Elements elementUtils) {
+        super(typeName);
         if(!isKnownParcelableTypeVariable(type, elementUtils)) {
             throw new IllegalStateException("ParcelableTypeVariableHelper used for an unsupported type");
         }

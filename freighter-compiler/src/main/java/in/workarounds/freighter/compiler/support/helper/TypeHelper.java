@@ -10,15 +10,9 @@ import in.workarounds.freighter.compiler.util.StringUtils;
  */
 public abstract class TypeHelper {
     protected TypeName type;
-    protected String label;
 
-    public TypeHelper(CargoModel cargo) {
-        this.type = cargo.getTypeName();
-        this.label = cargo.getLabel();
-    }
-
-    public String getIntentKey() {
-        return StringUtils.getConstantName(label);
+    public TypeHelper(TypeName type) {
+        this.type = type;
     }
 
     public abstract String getBundleMethodSuffix();

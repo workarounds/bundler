@@ -28,7 +28,6 @@ public class Writer {
     protected Provider provider;
     protected FreighterModel freighterModel;
     protected List<CargoModel> cargoList;
-    protected List<TypeHelper> typeHelpers;
     protected static final String FILE_PREFIX      = "Freighter";
     protected static final String KEYS_SIMPLE_NAME = "Keys";
     protected static final String SUPPLIER_NAME    = "Supplier";
@@ -73,17 +72,6 @@ public class Writer {
         this.provider = provider;
         this.freighterModel = freighterModel;
         this.cargoList = cargoList;
-        this.typeHelpers = new ArrayList<>();
-
-        TypeHelper helper;
-        for (CargoModel cargo : cargoList) {
-            helper = SupportResolver.getHelper(cargo, provider.elementUtils());
-            if(helper != null) {
-                typeHelpers.add(helper);
-            } else {
-                throw new IllegalStateException(String.format("No helper found for %s %s", cargo.getTypeName(), cargo.getLabel()));
-            }
-        }
 
         FILE_SIMPLE_NAME = FILE_PREFIX + freighterModel.getSimpleName();
 
@@ -136,9 +124,9 @@ public class Writer {
     public TypeSpec createKeysInterface() {
         TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(KEYS_SIMPLE_NAME)
                 .addModifiers(Modifier.PUBLIC);
-        for (TypeHelper helper : typeHelpers) {
-            FieldSpec fieldSpec = FieldSpec.builder(String.class, helper.getIntentKey(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                    .initializer("$S", helper.getIntentKey().toLowerCase())
+        for (CargoModel cargo : cargoList) {
+            FieldSpec fieldSpec = FieldSpec.builder(String.class, cargo.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                    .initializer("$S", cargo.getKeyConstant().toLowerCase())
                     .build();
             keyBuilder.addField(fieldSpec);
         }
@@ -164,9 +152,9 @@ public class Writer {
 
         TypeName type;
         String label;
-        for (int i = 0; i < cargoList.size(); i++) {
-            type = cargoList.get(i).getTypeName();
-            label = cargoList.get(i).getLabel();
+        for (CargoModel cargo : cargoList) {
+            type = cargo.getTypeName();
+            label = cargo.getLabel();
 
             if (type.isPrimitive()) {
                 builder.addField(type.box(), label, Modifier.PRIVATE);
@@ -177,9 +165,9 @@ public class Writer {
             bundleBuilder.beginControlFlow("if($L != null)", label);
             bundleBuilder.addStatement("$L.put$L($T.$L, $L)",
                     BUNDLE_VAR,
-                    typeHelpers.get(i).getBundleMethodSuffix(),
+                    cargo.getBundleMethodSuffix(),
                     KEYS_CLASS,
-                    typeHelpers.get(i).getIntentKey(),
+                    cargo.getKeyConstant(),
                     label);
             bundleBuilder.endControlFlow();
 
@@ -231,13 +219,13 @@ public class Writer {
         String label;
         TypeName type;
         String hasMethod;
-        for (int i = 0; i < cargoList.size(); i++) {
-            label = cargoList.get(i).getLabel();
-            type = cargoList.get(i).getTypeName();
+        for (CargoModel cargo: cargoList) {
+            label = cargo.getLabel();
+            type = cargo.getTypeName();
 
             hasMethod = HAS_PREFIX + StringUtils.getClassName(label);
-            builder.addMethod(retrieverHasMethod(hasMethod, typeHelpers.get(i).getIntentKey()));
-            builder.addMethod(retrieverGetterMethod(type, label, hasMethod, typeHelpers.get(i)));
+            builder.addMethod(retrieverHasMethod(hasMethod, cargo.getKeyConstant()));
+            builder.addMethod(retrieverGetterMethod(type, label, hasMethod, cargo));
 
             intoBuilder.beginControlFlow("if($L())", hasMethod);
             if (type.isPrimitive()) {
@@ -262,7 +250,7 @@ public class Writer {
                 .build();
     }
 
-    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, TypeHelper helper) {
+    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, CargoModel cargo) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(type);
@@ -274,28 +262,28 @@ public class Writer {
         if (type.isPrimitive()) {
             getterMethodBuilder.addStatement("return $L.get$L($T.$L, $L)",
                     BUNDLE_VAR,
-                    helper.getBundleMethodSuffix(),
+                    cargo.getBundleMethodSuffix(),
                     KEYS_CLASS,
-                    helper.getIntentKey(),
+                    cargo.getKeyConstant(),
                     DEFAULT_VAR
             );
-        } else if(helper.requiresCasting()) {
+        } else if(cargo.requiresCasting()) {
             getterMethodBuilder.beginControlFlow("if($L())", hasMethod);
             getterMethodBuilder.addStatement("return ($T) $L.get$L($T.$L)",
                     type,
                     BUNDLE_VAR,
-                    helper.getBundleMethodSuffix(),
+                    cargo.getBundleMethodSuffix(),
                     KEYS_CLASS,
-                    helper.getIntentKey()
+                    cargo.getKeyConstant()
             );
             getterMethodBuilder.endControlFlow();
             getterMethodBuilder.addStatement("return null");
         } else {
             getterMethodBuilder.addStatement("return $L.get$L($T.$L)",
                     BUNDLE_VAR,
-                    helper.getBundleMethodSuffix(),
+                    cargo.getBundleMethodSuffix(),
                     KEYS_CLASS,
-                    helper.getIntentKey()
+                    cargo.getKeyConstant()
             );
         }
 
