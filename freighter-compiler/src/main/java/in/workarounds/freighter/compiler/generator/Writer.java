@@ -26,6 +26,7 @@ public class Writer {
     protected Provider provider;
     protected FreighterModel freighterModel;
     protected List<AnnotatedField> cargoList;
+    protected List<AnnotatedField> states;
     protected static final String FILE_PREFIX      = "Freighter";
     protected static final String KEYS_SIMPLE_NAME = "Keys";
     protected static final String SUPPLIER_NAME    = "Supplier";
@@ -51,25 +52,26 @@ public class Writer {
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
-    public static Writer from(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
+    public static Writer from(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
         switch (freighterModel.getVariety()) {
             case ACTIVITY:
-                return new ActivityWriter(provider, freighterModel, cargoList);
+                return new ActivityWriter(provider, freighterModel, cargoList, states);
             case SERVICE:
-                return new ServiceWriter(provider, freighterModel, cargoList);
+                return new ServiceWriter(provider, freighterModel, cargoList, states);
             case FRAGMENT:
             case FRAGMENT_V4:
-                return new FragmentWriter(provider, freighterModel, cargoList);
+                return new FragmentWriter(provider, freighterModel, cargoList, states);
             default:
-                return new OtherWriter(provider, freighterModel, cargoList);
+                return new OtherWriter(provider, freighterModel, cargoList, states);
         }
     }
 
 
-    protected Writer(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
+    protected Writer(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
         this.provider = provider;
         this.freighterModel = freighterModel;
         this.cargoList = cargoList;
+        this.states = states;
 
         FILE_SIMPLE_NAME = FILE_PREFIX + freighterModel.getSimpleName();
 

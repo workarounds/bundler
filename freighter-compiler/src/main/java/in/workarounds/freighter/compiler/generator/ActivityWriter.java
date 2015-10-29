@@ -17,8 +17,8 @@ import in.workarounds.freighter.compiler.util.CommonClasses;
 public class ActivityWriter extends Writer {
     protected static final String ACTIVITY_VAR = "activity";
 
-    protected ActivityWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
-        super(provider, freighterModel, cargoList);
+    protected ActivityWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
+        super(provider, freighterModel, cargoList, states);
     }
 
     @Override

@@ -17,8 +17,8 @@ import in.workarounds.freighter.compiler.util.CommonClasses;
 public class OtherWriter extends Writer {
     protected static final String FREIGHTER_VAR = "freighter";
 
-    protected OtherWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
-        super(provider, freighterModel, cargoList);
+    protected OtherWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
+        super(provider, freighterModel, cargoList, states);
     }
 
 

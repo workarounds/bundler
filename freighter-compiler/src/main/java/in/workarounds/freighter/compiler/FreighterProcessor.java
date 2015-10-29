@@ -56,18 +56,27 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
             FreighterModel model = new FreighterModel(element, this);
             if(hasErrorOccurred()) return true;
 
-            List<AnnotatedField> cargos = new ArrayList<>();
+            List<AnnotatedField> cargoList = new ArrayList<>();
             for (Element possibleCargo : element.getEnclosedElements()) {
                 Cargo cargo = possibleCargo.getAnnotation(Cargo.class);
                 if (cargo != null) {
-                    AnnotatedField cargoModel = new AnnotatedField(possibleCargo, this);
-                    cargos.add(cargoModel);
+                    AnnotatedField cargoModel = new AnnotatedField(possibleCargo, this, Cargo.class);
+                    cargoList.add(cargoModel);
+                }
+            }
+
+            List<AnnotatedField> states = new ArrayList<>();
+            for (Element possibleState : element.getEnclosedElements()) {
+                State cargo = possibleState.getAnnotation(State.class);
+                if (cargo != null) {
+                    AnnotatedField state = new AnnotatedField(possibleState, this, State.class);
+                    cargoList.add(state);
                 }
             }
 
             if(hasErrorOccurred()) return true;
 
-            Writer writer = Writer.from(this, model, cargos);
+            Writer writer = Writer.from(this, model, cargoList);
 
             try {
                 writer.brewJava().writeTo(filer);

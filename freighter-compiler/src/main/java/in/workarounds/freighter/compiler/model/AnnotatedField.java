@@ -22,10 +22,12 @@ public class AnnotatedField {
     private String label;
     private TypeName typeName;
     private TypeHelper helper;
+    private Class<?> annotation;
 
-    public AnnotatedField(Element element, Provider provider) {
+    public AnnotatedField(Element element, Provider provider, Class<?> annotation) {
         this.provider = provider;
 
+        this.annotation = annotation;
         label = element.getSimpleName().toString();
         typeName = TypeName.get(element.asType());
         helper = SupportResolver.getHelper(typeName, provider.elementUtils());
@@ -39,14 +41,14 @@ public class AnnotatedField {
                 || modifiers.contains(Modifier.PROTECTED)
                 || modifiers.contains(Modifier.PRIVATE)
                 ) {
-            provider.error(element, "Error at: %s, Fields annotated with @%s should not be final and should be public.", label, Cargo.class.getSimpleName());
+            provider.error(element, "Error at: %s, Fields annotated with @%s should not be final and should be public.", label, annotation.getSimpleName());
             provider.reportError();
         }
     }
 
     private void checkIfValidType(Element element) {
         if(helper == null) {
-            provider.error(element, "Error at: %s, Unsupported type %s", label, typeName);
+            provider.error(element, "Error at: %s, Unsupported type %s annotated with @%s", label, typeName, annotation.getSimpleName());
             provider.reportError();
         }
     }
@@ -71,7 +73,4 @@ public class AnnotatedField {
         return typeName;
     }
 
-    public TypeHelper getHelper() {
-        return helper;
-    }
 }

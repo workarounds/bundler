@@ -17,8 +17,8 @@ import in.workarounds.freighter.compiler.util.CommonClasses;
 public class ServiceWriter extends Writer {
     protected static final String SERVICE_VAR = "service";
 
-    protected ServiceWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
-        super(provider, freighterModel, cargoList);
+    protected ServiceWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
+        super(provider, freighterModel, cargoList, states);
     }
 
     @Override
