@@ -23,6 +23,7 @@ import javax.tools.Diagnostic;
 
 import in.workarounds.freighter.annotations.Cargo;
 import in.workarounds.freighter.annotations.Freighter;
+import in.workarounds.freighter.annotations.State;
 import in.workarounds.freighter.compiler.generator.Writer;
 import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.model.FreighterModel;
@@ -89,6 +90,7 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
 
         annotations.add(Cargo.class.getCanonicalName());
         annotations.add(Freighter.class.getCanonicalName());
+        annotations.add(State.class.getCanonicalName());
 
         return annotations;
     }
