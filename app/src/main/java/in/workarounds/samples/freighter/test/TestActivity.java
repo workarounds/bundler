@@ -1,21 +1,27 @@
-package in.workarounds.samples.freighter;
+package in.workarounds.samples.freighter.test;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import in.workarounds.freighter.annotations.Cargo;
 import in.workarounds.freighter.annotations.Freighter;
+import in.workarounds.samples.freighter.R;
 
 /**
  * Created by madki on 16/10/15.
  */
 @Freighter
-public class MainActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity {
     @Cargo
     int integer;
     @Cargo
@@ -96,6 +102,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public String toString() {
             return "one = " + one + ", two = " + two;
+        }
+    }
+
+    @Freighter
+    public static class TestFragment extends Fragment {
+        @Cargo
+        int one;
+
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            return super.onCreateView(inflater, container, savedInstanceState);
         }
     }
 }

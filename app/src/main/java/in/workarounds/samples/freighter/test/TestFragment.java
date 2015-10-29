@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter;
+package in.workarounds.samples.freighter.test;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +14,7 @@ import in.workarounds.freighter.annotations.Freighter;
  * Created by madki on 25/10/15.
  */
 @Freighter
-public class SampleFragment extends Fragment {
+public class TestFragment extends Fragment {
     @Cargo
     int one;
     @Cargo

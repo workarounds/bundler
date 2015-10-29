@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter;
+package in.workarounds.samples.freighter.test;
 
 import android.app.Service;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import in.workarounds.freighter.annotations.Freighter;
  * Created by madki on 24/10/15.
  */
 @Freighter
-public class SampleService extends Service {
+public class TestService extends Service {
     @Cargo
     int one;
     @Cargo

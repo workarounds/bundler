@@ -96,6 +96,7 @@ public class Writer {
 
     public JavaFile brewJava() {
         TypeSpec generatedClass = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
+                .addModifiers(Modifier.PUBLIC)
                 .addMethod(supplyMethod())
                 .addMethod(retrieveBundleMethod())
                 .addMethods(getAdditionalHelperMethods())

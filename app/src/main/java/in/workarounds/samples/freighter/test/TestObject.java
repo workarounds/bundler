@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter;
+package in.workarounds.samples.freighter.test;
 
 import android.os.Bundle;
 
@@ -9,11 +9,11 @@ import in.workarounds.freighter.annotations.Freighter;
  * Created by madki on 25/10/15.
  */
 @Freighter
-public class RandomObject {
+public class TestObject {
     @Cargo
     int one;
 
-    public RandomObject() {
+    public TestObject() {
     }
 
 }
