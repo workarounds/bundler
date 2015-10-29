@@ -7,7 +7,7 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.freighter.compiler.Provider;
-import in.workarounds.freighter.compiler.model.CargoModel;
+import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 
 /**
@@ -16,7 +16,7 @@ import in.workarounds.freighter.compiler.model.FreighterModel;
 public class FragmentWriter extends Writer {
     protected static final String FRAGMENT_VAR = "fragment";
 
-    protected FragmentWriter(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
+    protected FragmentWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
         super(provider, freighterModel, cargoList);
     }
 

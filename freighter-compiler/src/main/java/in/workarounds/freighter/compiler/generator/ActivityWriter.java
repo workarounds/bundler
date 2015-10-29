@@ -7,7 +7,7 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.freighter.compiler.Provider;
-import in.workarounds.freighter.compiler.model.CargoModel;
+import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 import in.workarounds.freighter.compiler.util.CommonClasses;
 
@@ -17,7 +17,7 @@ import in.workarounds.freighter.compiler.util.CommonClasses;
 public class ActivityWriter extends Writer {
     protected static final String ACTIVITY_VAR = "activity";
 
-    protected ActivityWriter(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
+    protected ActivityWriter(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
         super(provider, freighterModel, cargoList);
     }
 

@@ -2,7 +2,6 @@ package in.workarounds.freighter.compiler.support.helper;
 
 import com.squareup.javapoet.TypeName;
 
-import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.util.StringUtils;
 
 /**

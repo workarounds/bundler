@@ -11,7 +11,6 @@ import java.io.Serializable;
 
 import javax.lang.model.util.Elements;
 
-import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.support.helper.KnownTypeHelper;
 import in.workarounds.freighter.compiler.support.helper.ParcelableArrayHelper;
 import in.workarounds.freighter.compiler.support.helper.ParcelableHelper;

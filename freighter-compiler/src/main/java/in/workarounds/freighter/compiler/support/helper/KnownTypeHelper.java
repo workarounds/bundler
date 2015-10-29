@@ -5,12 +5,10 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.util.CommonClasses;
 
 /**

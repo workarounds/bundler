@@ -3,9 +3,6 @@ package in.workarounds.freighter.compiler.support.helper;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.TypeName;
 
-import java.lang.reflect.Type;
-
-import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.util.StringUtils;
 
 /**

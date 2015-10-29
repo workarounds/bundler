@@ -4,7 +4,6 @@ import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.util.Elements;
 
-import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.support.SupportResolver;
 
 /**

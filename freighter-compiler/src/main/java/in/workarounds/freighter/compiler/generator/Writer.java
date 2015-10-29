@@ -14,10 +14,8 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.freighter.compiler.Provider;
-import in.workarounds.freighter.compiler.model.CargoModel;
+import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.FreighterModel;
-import in.workarounds.freighter.compiler.support.SupportResolver;
-import in.workarounds.freighter.compiler.support.helper.TypeHelper;
 import in.workarounds.freighter.compiler.util.CommonClasses;
 import in.workarounds.freighter.compiler.util.StringUtils;
 
@@ -27,7 +25,7 @@ import in.workarounds.freighter.compiler.util.StringUtils;
 public class Writer {
     protected Provider provider;
     protected FreighterModel freighterModel;
-    protected List<CargoModel> cargoList;
+    protected List<AnnotatedField> cargoList;
     protected static final String FILE_PREFIX      = "Freighter";
     protected static final String KEYS_SIMPLE_NAME = "Keys";
     protected static final String SUPPLIER_NAME    = "Supplier";
@@ -53,7 +51,7 @@ public class Writer {
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
-    public static Writer from(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
+    public static Writer from(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
         switch (freighterModel.getVariety()) {
             case ACTIVITY:
                 return new ActivityWriter(provider, freighterModel, cargoList);
@@ -68,7 +66,7 @@ public class Writer {
     }
 
 
-    protected Writer(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList) {
+    protected Writer(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList) {
         this.provider = provider;
         this.freighterModel = freighterModel;
         this.cargoList = cargoList;
@@ -124,7 +122,7 @@ public class Writer {
     public TypeSpec createKeysInterface() {
         TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(KEYS_SIMPLE_NAME)
                 .addModifiers(Modifier.PUBLIC);
-        for (CargoModel cargo : cargoList) {
+        for (AnnotatedField cargo : cargoList) {
             FieldSpec fieldSpec = FieldSpec.builder(String.class, cargo.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$S", cargo.getKeyConstant().toLowerCase())
                     .build();
@@ -152,7 +150,7 @@ public class Writer {
 
         TypeName type;
         String label;
-        for (CargoModel cargo : cargoList) {
+        for (AnnotatedField cargo : cargoList) {
             type = cargo.getTypeName();
             label = cargo.getLabel();
 
@@ -219,7 +217,7 @@ public class Writer {
         String label;
         TypeName type;
         String hasMethod;
-        for (CargoModel cargo: cargoList) {
+        for (AnnotatedField cargo: cargoList) {
             label = cargo.getLabel();
             type = cargo.getTypeName();
 
@@ -250,7 +248,7 @@ public class Writer {
                 .build();
     }
 
-    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, CargoModel cargo) {
+    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, AnnotatedField cargo) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(type);

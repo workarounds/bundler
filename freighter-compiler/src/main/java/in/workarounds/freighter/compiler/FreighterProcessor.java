@@ -25,7 +25,7 @@ import in.workarounds.freighter.annotations.Cargo;
 import in.workarounds.freighter.annotations.Freighter;
 import in.workarounds.freighter.annotations.State;
 import in.workarounds.freighter.compiler.generator.Writer;
-import in.workarounds.freighter.compiler.model.CargoModel;
+import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 
 @AutoService(Processor.class)
@@ -56,11 +56,11 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
             FreighterModel model = new FreighterModel(element, this);
             if(hasErrorOccurred()) return true;
 
-            List<CargoModel> cargos = new ArrayList<>();
+            List<AnnotatedField> cargos = new ArrayList<>();
             for (Element possibleCargo : element.getEnclosedElements()) {
                 Cargo cargo = possibleCargo.getAnnotation(Cargo.class);
                 if (cargo != null) {
-                    CargoModel cargoModel = new CargoModel(possibleCargo, this);
+                    AnnotatedField cargoModel = new AnnotatedField(possibleCargo, this);
                     cargos.add(cargoModel);
                 }
             }

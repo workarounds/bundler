@@ -10,8 +10,6 @@ import java.util.List;
 
 import javax.lang.model.util.Elements;
 
-import in.workarounds.freighter.compiler.model.CargoModel;
-
 /**
  * Created by madki on 22/10/15.
  */

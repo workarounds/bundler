@@ -16,14 +16,14 @@ import in.workarounds.freighter.compiler.util.StringUtils;
 /**
  * Created by madki on 21/10/15.
  */
-public class CargoModel {
+public class AnnotatedField {
     private Provider provider;
 
     private String label;
     private TypeName typeName;
     private TypeHelper helper;
 
-    public CargoModel(Element element, Provider provider) {
+    public AnnotatedField(Element element, Provider provider) {
         this.provider = provider;
 
         label = element.getSimpleName().toString();
