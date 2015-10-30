@@ -23,7 +23,7 @@ import javax.tools.Diagnostic;
 
 import in.workarounds.freighter.annotations.Cargo;
 import in.workarounds.freighter.annotations.Freighter;
-import in.workarounds.freighter.annotations.State;
+import in.workarounds.freighter.annotations.InstanceState;
 import in.workarounds.freighter.compiler.generator.Writer;
 import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.FreighterModel;
@@ -67,16 +67,16 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
 
             List<AnnotatedField> states = new ArrayList<>();
             for (Element possibleState : element.getEnclosedElements()) {
-                State cargo = possibleState.getAnnotation(State.class);
+                InstanceState cargo = possibleState.getAnnotation(InstanceState.class);
                 if (cargo != null) {
-                    AnnotatedField state = new AnnotatedField(possibleState, this, State.class);
-                    cargoList.add(state);
+                    AnnotatedField state = new AnnotatedField(possibleState, this, InstanceState.class);
+                    states.add(state);
                 }
             }
 
             if(hasErrorOccurred()) return true;
 
-            Writer writer = Writer.from(this, model, cargoList);
+            Writer writer = Writer.from(this, model, cargoList, states);
 
             try {
                 writer.brewJava().writeTo(filer);
@@ -99,7 +99,7 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
 
         annotations.add(Cargo.class.getCanonicalName());
         annotations.add(Freighter.class.getCanonicalName());
-        annotations.add(State.class.getCanonicalName());
+        annotations.add(InstanceState.class.getCanonicalName());
 
         return annotations;
     }

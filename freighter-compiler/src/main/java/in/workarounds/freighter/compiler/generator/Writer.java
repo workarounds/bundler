@@ -27,20 +27,24 @@ public class Writer {
     protected FreighterModel freighterModel;
     protected List<AnnotatedField> cargoList;
     protected List<AnnotatedField> states;
-    protected static final String FILE_PREFIX      = "Freighter";
+    protected static final String FILE_PREFIX = "Freighter";
     protected static final String KEYS_SIMPLE_NAME = "Keys";
-    protected static final String SUPPLIER_NAME    = "Supplier";
-    protected static final String RETRIEVER_NAME   = "Retriever";
-    protected static final String SUPPLY_METHOD    = "supply";
-    protected static final String RETRIEVE_METHOD  = "retrieve";
-    protected static final String INTO_METHOD      = "into";
-    protected static final String BUNDLE_METHOD    = "bundle";
-    protected static final String INTENT_METHOD    = "intent";
-    protected static final String START_METHOD     = "start";
-    protected static final String CREATE_METHOD    = "create";
-    protected static final String INJECT_METHOD    = "inject";
-    protected static final String RETRIEVER_VAR    = "retriever";
+    protected static final String SUPPLIER_NAME = "Supplier";
+    protected static final String RETRIEVER_NAME = "Retriever";
+    protected static final String SUPPLY_METHOD = "supply";
+    protected static final String RETRIEVE_METHOD = "retrieve";
+    protected static final String INTO_METHOD = "into";
+    protected static final String BUNDLE_METHOD = "bundle";
+    protected static final String INTENT_METHOD = "intent";
+    protected static final String START_METHOD = "start";
+    protected static final String CREATE_METHOD = "create";
+    protected static final String INJECT_METHOD = "inject";
+    protected static final String SAVE_METHOD = "saveState";
+    protected static final String RESTORE_METHOD = "restoreState";
+    protected static final String RETRIEVER_VAR = "retriever";
 
+
+    protected String DESTINATION_VAR;
     protected String FILE_SIMPLE_NAME;
     protected ClassName SUPPLIER_CLASS;
     protected ClassName RETRIEVER_CLASS;
@@ -48,7 +52,7 @@ public class Writer {
     protected ClassName KEYS_CLASS;
 
     protected String CONTEXT_VAR = "context";
-    protected String BUNDLE_VAR  = "bundle";
+    protected String BUNDLE_VAR = "bundle";
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
@@ -73,6 +77,7 @@ public class Writer {
         this.cargoList = cargoList;
         this.states = states;
 
+        DESTINATION_VAR = StringUtils.getVariableName(freighterModel.getSimpleName());
         FILE_SIMPLE_NAME = FILE_PREFIX + freighterModel.getSimpleName();
 
         String FILE_NAME = freighterModel.getPackageName() + "." + FILE_SIMPLE_NAME;
@@ -83,16 +88,83 @@ public class Writer {
     }
 
     public JavaFile brewJava() {
-        TypeSpec generatedClass = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
-                .addModifiers(Modifier.PUBLIC)
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
+                .addModifiers(Modifier.PUBLIC);
+        // save, restore
+        classBuilder
+                .addMethod(saveMethod())
+                .addMethod(restoreMethod());
+        // supply, retrieve
+        classBuilder
                 .addMethod(supplyMethod())
                 .addMethod(retrieveBundleMethod())
                 .addMethods(getAdditionalHelperMethods())
                 .addType(createSupplierClass())
                 .addType(createRetrieverClass())
-                .addType(createKeysInterface())
-                .build();
-        return JavaFile.builder(freighterModel.getPackageName(), generatedClass).build();
+                .addType(createKeysInterface());
+        return JavaFile.builder(freighterModel.getPackageName(), classBuilder.build()).build();
+    }
+
+    protected MethodSpec saveMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(SAVE_METHOD)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(freighterModel.getClassName(), DESTINATION_VAR)
+                .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
+                .beginControlFlow("if($L == null)", BUNDLE_VAR)
+                .addStatement("$L = new $T()", BUNDLE_VAR, CommonClasses.BUNDLE)
+                .endControlFlow();
+
+        String label;
+        TypeName type;
+        for (AnnotatedField state : states) {
+            label = state.getLabel();
+            type = state.getTypeName();
+
+            if (type.isPrimitive()) {
+                builder.addStatement("$L.put$L($S, $L.$L)",
+                        BUNDLE_VAR, state.getBundleMethodSuffix(), label, DESTINATION_VAR, label);
+            } else {
+                builder.beginControlFlow("if($L.$L != null)", DESTINATION_VAR, label)
+                        .addStatement("$L.put$L($S, $L.$L)",
+                                BUNDLE_VAR, state.getBundleMethodSuffix(), label, DESTINATION_VAR, label)
+                        .endControlFlow();
+            }
+        }
+        return builder.build();
+    }
+
+    protected MethodSpec restoreMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(RESTORE_METHOD)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(freighterModel.getClassName(), DESTINATION_VAR)
+                .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
+                .beginControlFlow("if($L == null)", BUNDLE_VAR)
+                .addStatement("return")
+                .endControlFlow();
+
+        String label;
+        TypeName type;
+        for (AnnotatedField state : states) {
+            label = state.getLabel();
+            type = state.getTypeName();
+
+            if (type.isPrimitive()) {
+                builder.addStatement("$L.$L = $L.get$L($S, $L.$L)",
+                        DESTINATION_VAR, label, BUNDLE_VAR, state.getBundleMethodSuffix(), label, DESTINATION_VAR, label);
+            } else {
+                builder.beginControlFlow("if($L.containsKey($S))", BUNDLE_VAR, label);
+                if (state.requiresCasting()) {
+                    builder.addStatement("$L.$L = ($T) $L.get$L($S)",
+                            DESTINATION_VAR, label, type, BUNDLE_VAR, state.getBundleMethodSuffix(), label);
+                } else {
+                    builder.addStatement("$L.$L = $L.get$L($S)",
+                            DESTINATION_VAR, label, BUNDLE_VAR, state.getBundleMethodSuffix(), label);
+                }
+                builder.endControlFlow();
+            }
+        }
+
+        return builder.build();
     }
 
     protected MethodSpec supplyMethod() {
@@ -196,7 +268,6 @@ public class Writer {
     }
 
     private TypeSpec createRetrieverClass() {
-        String DESTINATION_VAR = StringUtils.getVariableName(freighterModel.getSimpleName());
         String HAS_PREFIX = "has";
 
         FieldSpec bundle = FieldSpec.builder(CommonClasses.BUNDLE, BUNDLE_VAR, Modifier.PRIVATE)
@@ -219,7 +290,7 @@ public class Writer {
         String label;
         TypeName type;
         String hasMethod;
-        for (AnnotatedField cargo: cargoList) {
+        for (AnnotatedField cargo : cargoList) {
             label = cargo.getLabel();
             type = cargo.getTypeName();
 
@@ -267,7 +338,7 @@ public class Writer {
                     cargo.getKeyConstant(),
                     DEFAULT_VAR
             );
-        } else if(cargo.requiresCasting()) {
+        } else if (cargo.requiresCasting()) {
             getterMethodBuilder.beginControlFlow("if($L())", hasMethod);
             getterMethodBuilder.addStatement("return ($T) $L.get$L($T.$L)",
                     type,

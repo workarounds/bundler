@@ -10,5 +10,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * Created by madki on 30/10/15.
  */
 @Target(FIELD) @Retention(CLASS)
-public @interface State {
+public @interface InstanceState {
 }
