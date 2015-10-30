@@ -23,6 +23,7 @@ public class Utils {
      * @return true is the type defined by typeMirror implements the given interface
      */
     public static boolean implementsInterface(TypeMirror typeMirror, String interfaceName) {
+        if(typeMirror == null) return false;
         TypeElement type = getAsElement(typeMirror);
         if (type != null) {
             List<? extends TypeMirror> interfaces = type.getInterfaces();
@@ -42,6 +43,7 @@ public class Utils {
      * @return true if the interface defined by typeMirror extends the interface defined by qualifiedName
      */
     public static boolean isSubInterface(TypeMirror t, String qualifiedName) {
+        if(t == null) return false;
         TypeElement typeElement = getAsElement(t);
         if (typeElement != null) {
             if (typeElement.getQualifiedName().contentEquals(qualifiedName)) {
@@ -58,6 +60,7 @@ public class Utils {
      * @return typeElement representation of typeMirror if it's a declaredType null otherwise
      */
     public static TypeElement getAsElement(TypeMirror typeMirror) {
+        if(typeMirror == null) return null;
         if (typeMirror.getKind() == TypeKind.DECLARED) {
             return (TypeElement) ((DeclaredType) typeMirror).asElement();
         }
@@ -69,6 +72,7 @@ public class Utils {
      * @return qualified name if the typeMirror is of declared type else null
      */
     public static String getQualifiedName(TypeMirror typeMirror) {
+        if(typeMirror == null) return null;
         TypeElement element = getAsElement(typeMirror);
         if(element != null) {
             return element.getQualifiedName().toString();
@@ -81,6 +85,7 @@ public class Utils {
      * @return simple name if the typeMirror is of declared type else null
      */
     public static String getSimpleName(TypeMirror typeMirror) {
+        if(typeMirror == null) return null;
         TypeElement element = getAsElement(typeMirror);
         if(element != null) {
             return element.getSimpleName().toString();
@@ -93,6 +98,7 @@ public class Utils {
      * @return ClassName of the typemirror if its a declared type else null
      */
     public static ClassName getClassName(TypeMirror typeMirror) {
+        if(typeMirror == null) return null;
         String qualifiedName = getQualifiedName(typeMirror);
         if(qualifiedName != null) {
             return ClassName.bestGuess(qualifiedName);
@@ -110,6 +116,26 @@ public class Utils {
             return ((ArrayTypeName) typeName).componentType.isPrimitive();
         }
         return false;
+    }
+
+    public static TypeMirror getSuperClass(TypeMirror typeMirror) {
+        if(typeMirror == null) return null;
+        TypeElement element = getAsElement(typeMirror);
+        if(element != null) {
+            return element.getSuperclass();
+        }
+        return null;
+    }
+
+    public static boolean isSupportAnnotation(TypeMirror typeMirror) {
+        if(typeMirror == null) return false;
+
+        String qualifiedName = getQualifiedName(typeMirror);
+        if(qualifiedName != null && qualifiedName.contains("android.support.annotations")) {
+            return true;
+        }
+
+        return isSupportAnnotation(getSuperClass(typeMirror));
     }
 
 }

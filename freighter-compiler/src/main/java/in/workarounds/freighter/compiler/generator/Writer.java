@@ -12,10 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Modifier;
+import javax.swing.plaf.nimbus.State;
 
 import in.workarounds.freighter.compiler.Provider;
 import in.workarounds.freighter.compiler.model.AnnotatedField;
+import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.model.FreighterModel;
+import in.workarounds.freighter.compiler.model.StateModel;
 import in.workarounds.freighter.compiler.util.CommonClasses;
 import in.workarounds.freighter.compiler.util.StringUtils;
 
@@ -25,8 +28,8 @@ import in.workarounds.freighter.compiler.util.StringUtils;
 public class Writer {
     protected Provider provider;
     protected FreighterModel freighterModel;
-    protected List<AnnotatedField> cargoList;
-    protected List<AnnotatedField> states;
+    protected List<CargoModel> cargoList;
+    protected List<StateModel> states;
     protected static final String FILE_PREFIX = "Freighter";
     protected static final String KEYS_SIMPLE_NAME = "Keys";
     protected static final String SUPPLIER_NAME = "Supplier";
@@ -56,7 +59,7 @@ public class Writer {
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
-    public static Writer from(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
+    public static Writer from(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList, List<StateModel> states) {
         switch (freighterModel.getVariety()) {
             case ACTIVITY:
                 return new ActivityWriter(provider, freighterModel, cargoList, states);
@@ -71,7 +74,7 @@ public class Writer {
     }
 
 
-    protected Writer(Provider provider, FreighterModel freighterModel, List<AnnotatedField> cargoList, List<AnnotatedField> states) {
+    protected Writer(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList, List<StateModel> states) {
         this.provider = provider;
         this.freighterModel = freighterModel;
         this.cargoList = cargoList;
