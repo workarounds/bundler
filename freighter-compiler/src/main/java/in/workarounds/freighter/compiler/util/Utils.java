@@ -4,8 +4,10 @@ import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -127,15 +129,32 @@ public class Utils {
         return null;
     }
 
-    public static boolean isSupportAnnotation(TypeMirror typeMirror) {
-        if(typeMirror == null) return false;
+    public static boolean isSupportAnnotation(AnnotationMirror annotationMirror) {
+        if(annotationMirror == null) return false;
 
-        String qualifiedName = getQualifiedName(typeMirror);
-        if(qualifiedName != null && qualifiedName.contains("android.support.annotations")) {
+        TypeMirror typeMirror = annotationMirror.getAnnotationType();
+        if(checkIfSupportAnnotation(typeMirror)) {
             return true;
         }
 
-        return isSupportAnnotation(getSuperClass(typeMirror));
+        TypeElement element = getAsElement(typeMirror);
+        List<? extends AnnotationMirror> annotationMirrors = element.getAnnotationMirrors();
+        for(AnnotationMirror aMirror: annotationMirrors) {
+            if(checkIfSupportAnnotation(aMirror.getAnnotationType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean checkIfSupportAnnotation(TypeMirror typeMirror) {
+        if(typeMirror == null) return false;
+
+        String qualifiedName = getQualifiedName(typeMirror);
+        if(qualifiedName != null && qualifiedName.contains("android.support.annotation")) {
+            return true;
+        }
+        return false;
     }
 
 }

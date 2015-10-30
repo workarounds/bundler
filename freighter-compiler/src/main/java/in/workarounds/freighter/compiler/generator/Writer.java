@@ -1,5 +1,6 @@
 package in.workarounds.freighter.compiler.generator;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -12,10 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Modifier;
-import javax.swing.plaf.nimbus.State;
 
 import in.workarounds.freighter.compiler.Provider;
-import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 import in.workarounds.freighter.compiler.model.StateModel;
@@ -119,7 +118,7 @@ public class Writer {
 
         String label;
         TypeName type;
-        for (AnnotatedField state : states) {
+        for (StateModel state : states) {
             label = state.getLabel();
             type = state.getTypeName();
 
@@ -147,7 +146,7 @@ public class Writer {
 
         String label;
         TypeName type;
-        for (AnnotatedField state : states) {
+        for (StateModel state : states) {
             label = state.getLabel();
             type = state.getTypeName();
 
@@ -199,7 +198,7 @@ public class Writer {
     public TypeSpec createKeysInterface() {
         TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(KEYS_SIMPLE_NAME)
                 .addModifiers(Modifier.PUBLIC);
-        for (AnnotatedField cargo : cargoList) {
+        for (CargoModel cargo : cargoList) {
             FieldSpec fieldSpec = FieldSpec.builder(String.class, cargo.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$S", cargo.getKeyConstant().toLowerCase())
                     .build();
@@ -227,15 +226,18 @@ public class Writer {
 
         TypeName type;
         String label;
-        for (AnnotatedField cargo : cargoList) {
+        for (CargoModel cargo : cargoList) {
             type = cargo.getTypeName();
             label = cargo.getLabel();
 
+            FieldSpec.Builder fieldBuilder;
             if (type.isPrimitive()) {
-                builder.addField(type.box(), label, Modifier.PRIVATE);
+                fieldBuilder = FieldSpec.builder(type.box(), label, Modifier.PRIVATE);
             } else {
-                builder.addField(type, label, Modifier.PRIVATE);
+                fieldBuilder = FieldSpec.builder(type, label, Modifier.PRIVATE);
             }
+            fieldBuilder.addAnnotations(cargo.getSupportAnnotations());
+            builder.addField(fieldBuilder.build());
 
             bundleBuilder.beginControlFlow("if($L != null)", label);
             bundleBuilder.addStatement("$L.put$L($T.$L, $L)",
@@ -246,7 +248,7 @@ public class Writer {
                     label);
             bundleBuilder.endControlFlow();
 
-            builder.addMethod(supplierSetterMethod(type, label));
+            builder.addMethod(supplierSetterMethod(type, label, cargo.getSupportAnnotations()));
         }
 
         bundleBuilder.addStatement("return $L", BUNDLE_VAR);
@@ -260,11 +262,11 @@ public class Writer {
         return new ArrayList<>();
     }
 
-    private MethodSpec supplierSetterMethod(TypeName type, String label) {
+    private MethodSpec supplierSetterMethod(TypeName type, String label, List<AnnotationSpec> annotationSpecs) {
         return MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(SUPPLIER_CLASS)
-                .addParameter(type, label)
+                .addParameter(ParameterSpec.builder(type, label).addAnnotations(annotationSpecs).build())
                 .addStatement("this.$L = $L", label, label)
                 .addStatement("return this")
                 .build();
@@ -293,7 +295,7 @@ public class Writer {
         String label;
         TypeName type;
         String hasMethod;
-        for (AnnotatedField cargo : cargoList) {
+        for (CargoModel cargo : cargoList) {
             label = cargo.getLabel();
             type = cargo.getTypeName();
 
@@ -324,9 +326,10 @@ public class Writer {
                 .build();
     }
 
-    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, AnnotatedField cargo) {
+    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, CargoModel cargo) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
+                .addAnnotations(cargo.getSupportAnnotations())
                 .returns(type);
 
         if (type.isPrimitive()) {

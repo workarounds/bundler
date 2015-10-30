@@ -23,7 +23,7 @@ public class CargoModel extends AnnotatedField {
 
         supportAnnotations = new ArrayList<>();
         for(AnnotationMirror annotationMirror: element.getAnnotationMirrors()) {
-           if(Utils.isSupportAnnotation(annotationMirror.getAnnotationType())) {
+           if(Utils.isSupportAnnotation(annotationMirror)) {
                supportAnnotations.add(AnnotationSpec.get(annotationMirror));
            }
         }
