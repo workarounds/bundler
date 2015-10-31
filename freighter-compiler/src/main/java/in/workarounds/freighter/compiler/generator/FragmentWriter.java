@@ -7,7 +7,6 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.freighter.compiler.Provider;
-import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 import in.workarounds.freighter.compiler.model.StateModel;
@@ -30,7 +29,7 @@ public class FragmentWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(freighterModel.getClassName(), FRAGMENT_VAR)
                         .addStatement("$T $L = $L($L.getArguments())", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, FRAGMENT_VAR)
-                        .beginControlFlow("if($L != null)", RETRIEVER_VAR)
+                        .beginControlFlow("if($L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
                         .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, FRAGMENT_VAR)
                         .endControlFlow()
                         .build()

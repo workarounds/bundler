@@ -43,6 +43,7 @@ public class Writer {
     protected static final String INJECT_METHOD = "inject";
     protected static final String SAVE_METHOD = "saveState";
     protected static final String RESTORE_METHOD = "restoreState";
+    protected static final String IS_NULL_METHOD = "isNull";
     protected static final String RETRIEVER_VAR = "retriever";
 
 
@@ -182,12 +183,7 @@ public class Writer {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
                 .returns(RETRIEVER_CLASS)
-                .beginControlFlow("if($L != null)", BUNDLE_VAR)
                 .addStatement("return new $T($L)", RETRIEVER_CLASS, BUNDLE_VAR)
-                .endControlFlow()
-                .beginControlFlow("else")
-                .addStatement("return null")
-                .endControlFlow()
                 .build();
     }
 
@@ -283,6 +279,12 @@ public class Writer {
                 .addStatement("this.$L = $L", BUNDLE_VAR, BUNDLE_VAR)
                 .build();
 
+        MethodSpec isNull = MethodSpec.methodBuilder(IS_NULL_METHOD)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(boolean.class)
+                .addStatement("return $L == null", BUNDLE_VAR)
+                .build();
+
         MethodSpec.Builder intoBuilder = MethodSpec.methodBuilder(INTO_METHOD)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(freighterModel.getClassName(), DESTINATION_VAR);
@@ -290,7 +292,8 @@ public class Writer {
         TypeSpec.Builder builder = TypeSpec.classBuilder(RETRIEVER_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(bundle)
-                .addMethod(constructor);
+                .addMethod(constructor)
+                .addMethod(isNull);
 
         String label;
         TypeName type;
@@ -322,7 +325,7 @@ public class Writer {
         return MethodSpec.methodBuilder(hasMethod)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(boolean.class)
-                .addStatement("return $L.containsKey($T.$L)", BUNDLE_VAR, KEYS_CLASS, intentKey)
+                .addStatement("return !$L() && $L.containsKey($T.$L)", IS_NULL_METHOD, BUNDLE_VAR, KEYS_CLASS, intentKey)
                 .build();
     }
 
@@ -332,11 +335,12 @@ public class Writer {
                 .addAnnotations(cargo.getSupportAnnotations())
                 .returns(type);
 
-        if (type.isPrimitive()) {
-            getterMethodBuilder.addParameter(type, DEFAULT_VAR);
-        }
 
         if (type.isPrimitive()) {
+            getterMethodBuilder.addParameter(type, DEFAULT_VAR);
+            getterMethodBuilder.beginControlFlow("if($L())", IS_NULL_METHOD)
+                    .addStatement("return $L", DEFAULT_VAR)
+                    .endControlFlow();
             getterMethodBuilder.addStatement("return $L.get$L($T.$L, $L)",
                     BUNDLE_VAR,
                     cargo.getBundleMethodSuffix(),
@@ -356,6 +360,9 @@ public class Writer {
             getterMethodBuilder.endControlFlow();
             getterMethodBuilder.addStatement("return null");
         } else {
+            getterMethodBuilder.beginControlFlow("if($L())", IS_NULL_METHOD)
+                    .addStatement("return null")
+                    .endControlFlow();
             getterMethodBuilder.addStatement("return $L.get$L($T.$L)",
                     BUNDLE_VAR,
                     cargo.getBundleMethodSuffix(),

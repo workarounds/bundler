@@ -7,7 +7,6 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.freighter.compiler.Provider;
-import in.workarounds.freighter.compiler.model.AnnotatedField;
 import in.workarounds.freighter.compiler.model.CargoModel;
 import in.workarounds.freighter.compiler.model.FreighterModel;
 import in.workarounds.freighter.compiler.model.StateModel;
@@ -33,7 +32,7 @@ public class OtherWriter extends Writer {
                         .addParameter(freighterModel.getClassName(), FREIGHTER_VAR)
                         .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
                         .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, BUNDLE_VAR)
-                        .beginControlFlow("if($L != null)", RETRIEVER_VAR)
+                        .beginControlFlow("if($L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
                         .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, FREIGHTER_VAR)
                         .endControlFlow()
                         .build()

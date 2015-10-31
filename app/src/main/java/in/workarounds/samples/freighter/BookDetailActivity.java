@@ -1,5 +1,6 @@
 package in.workarounds.samples.freighter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -47,7 +48,8 @@ public class BookDetailActivity extends AppCompatActivity {
         FreighterBookDetailActivity.restoreState(this, savedInstanceState);
 
         setContentView(R.layout.activity_book_detail);
-        FreighterBookDetailActivity.inject(this);
+        Intent intent = null;
+        FreighterBookDetailActivity.retrieve(intent).into(this);
 
         TextView bookName = (TextView) findViewById(R.id.tv_book_name);
         bookName.setText(book);
