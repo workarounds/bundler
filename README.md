@@ -75,8 +75,8 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'in.workarounds.freighter:freighter-annotations:0.0.1'
-  apt 'in.workarounds.freighter:freighter-compiler:0.0.1'
+  compile 'in.workarounds.freighter:freighter-annotations:0.0.2'
+  apt 'in.workarounds.freighter:freighter-compiler:0.0.3'
 }
 ```
 
