@@ -24,7 +24,7 @@ ext {
     siteUrl = 'https://github.com/workarounds/freighter'
     gitUrl = 'https://github.com/workarounds/freighter.git'
 
-    libraryVersion = '0.0.2'
+    libraryVersion = '0.0.3'
 
     developerId = 'workarounds'
     developerName = 'Workarounds'
