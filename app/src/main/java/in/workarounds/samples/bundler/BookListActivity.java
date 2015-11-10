@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter;
+package in.workarounds.samples.bundler;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,12 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.zip.Inflater;
 
 /**
  * Created by madki on 29/10/15.
@@ -31,11 +28,6 @@ public class BookListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                FreighterBookDetailActivity.supply()
-                        .author(authors[position])
-                        .book(books[position])
-                        .id(ids[position])
-                        .start(BookListActivity.this);
             }
         });
     }

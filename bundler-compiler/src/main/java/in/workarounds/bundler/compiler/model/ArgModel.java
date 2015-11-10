@@ -8,18 +8,18 @@ import java.util.List;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
-import in.workarounds.bundler.annotations.Cargo;
+import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.util.Utils;
 
 /**
  * Created by madki on 30/10/15.
  */
-public class CargoModel extends AnnotatedField {
+public class ArgModel extends AnnotatedField {
     private List<AnnotationSpec> supportAnnotations;
 
-    public CargoModel(Element element, Provider provider) {
-        super(element, provider, Cargo.class);
+    public ArgModel(Element element, Provider provider) {
+        super(element, provider, Arg.class);
 
         supportAnnotations = new ArrayList<>();
         for(AnnotationMirror annotationMirror: element.getAnnotationMirrors()) {

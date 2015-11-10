@@ -21,16 +21,16 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
-import in.workarounds.bundler.annotations.Cargo;
-import in.workarounds.bundler.annotations.Freighter;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.InstanceState;
 import in.workarounds.bundler.compiler.generator.Writer;
-import in.workarounds.bundler.compiler.model.CargoModel;
-import in.workarounds.bundler.compiler.model.FreighterModel;
+import in.workarounds.bundler.compiler.model.ArgModel;
+import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
 
 @AutoService(Processor.class)
-public class FreighterProcessor extends AbstractProcessor implements Provider {
+public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     private Types typeUtils;
     private Elements elementUtils;
@@ -53,23 +53,24 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        for (Element element : roundEnv.getElementsAnnotatedWith(Freighter.class)) {
-            FreighterModel model = new FreighterModel(element, this);
+        message(null, "######process called in BundlerProcessor");
+        for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
+            ReqBundlerModel model = new ReqBundlerModel(element, this);
             if(hasErrorOccurred()) return true;
 
-            List<CargoModel> cargoList = new ArrayList<>();
+            List<ArgModel> argList = new ArrayList<>();
             for (Element possibleCargo : element.getEnclosedElements()) {
-                Cargo cargo = possibleCargo.getAnnotation(Cargo.class);
-                if (cargo != null) {
-                    CargoModel cargoModel = new CargoModel(possibleCargo, this);
-                    cargoList.add(cargoModel);
+                Arg arg = possibleCargo.getAnnotation(Arg.class);
+                if (arg != null) {
+                    ArgModel argModel = new ArgModel(possibleCargo, this);
+                    argList.add(argModel);
                 }
             }
 
             List<StateModel> states = new ArrayList<>();
             for (Element possibleState : element.getEnclosedElements()) {
-                InstanceState cargo = possibleState.getAnnotation(InstanceState.class);
-                if (cargo != null) {
+                InstanceState instanceState = possibleState.getAnnotation(InstanceState.class);
+                if (instanceState != null) {
                     StateModel state = new StateModel(possibleState, this);
                     states.add(state);
                 }
@@ -77,7 +78,7 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
 
             if(hasErrorOccurred()) return true;
 
-            Writer writer = Writer.from(this, model, cargoList, states);
+            Writer writer = Writer.from(this, model, argList, states);
 
             try {
                 writer.brewJava().writeTo(filer);
@@ -98,8 +99,8 @@ public class FreighterProcessor extends AbstractProcessor implements Provider {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<String>();
 
-        annotations.add(Cargo.class.getCanonicalName());
-        annotations.add(Freighter.class.getCanonicalName());
+        annotations.add(Arg.class.getCanonicalName());
+        annotations.add(RequireBundler.class.getCanonicalName());
         annotations.add(InstanceState.class.getCanonicalName());
 
         return annotations;

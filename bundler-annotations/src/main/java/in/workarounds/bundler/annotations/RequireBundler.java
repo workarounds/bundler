@@ -10,5 +10,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * Created by madki on 16/10/15.
  */
 @Retention(CLASS) @Target(TYPE)
-public @interface Freighter {
+public @interface RequireBundler {
 }

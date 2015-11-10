@@ -7,8 +7,8 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.bundler.compiler.Provider;
-import in.workarounds.bundler.compiler.model.CargoModel;
-import in.workarounds.bundler.compiler.model.FreighterModel;
+import in.workarounds.bundler.compiler.model.ArgModel;
+import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
 import in.workarounds.bundler.compiler.util.CommonClasses;
 
@@ -18,8 +18,8 @@ import in.workarounds.bundler.compiler.util.CommonClasses;
 public class ActivityWriter extends Writer {
     protected static final String ACTIVITY_VAR = "activity";
 
-    protected ActivityWriter(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList, List<StateModel> states) {
-        super(provider, freighterModel, cargoList, states);
+    protected ActivityWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+        super(provider, reqBundlerModel, cargoList, states);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ActivityWriter extends Writer {
         methods.add(
                 MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(freighterModel.getClassName(), ACTIVITY_VAR)
+                        .addParameter(reqBundlerModel.getClassName(), ACTIVITY_VAR)
                         .addStatement("$T $L = $L($L.getIntent())", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, ACTIVITY_VAR)
                         .beginControlFlow("if(!$L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
                         .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, ACTIVITY_VAR)
@@ -57,7 +57,7 @@ public class ActivityWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(CommonClasses.CONTEXT, CONTEXT_VAR)
                         .returns(CommonClasses.INTENT)
-                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, INTENT_VAR, CommonClasses.INTENT, CONTEXT_VAR, freighterModel.getClassName())
+                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, INTENT_VAR, CommonClasses.INTENT, CONTEXT_VAR, reqBundlerModel.getClassName())
                         .addStatement("$L.putExtras($L())", INTENT_VAR, BUNDLE_METHOD)
                         .addStatement("return $L", INTENT_VAR)
                         .build()

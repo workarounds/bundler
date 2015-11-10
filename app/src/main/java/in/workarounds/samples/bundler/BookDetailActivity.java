@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter;
+package in.workarounds.samples.bundler;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,32 +12,32 @@ import android.widget.TextView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import in.workarounds.bundler.annotations.Cargo;
-import in.workarounds.bundler.annotations.Freighter;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.InstanceState;
 
 /**
  * Created by madki on 29/10/15.
  */
-@Freighter
+@RequireBundler
 public class BookDetailActivity extends AppCompatActivity {
     private static final String TAG = "BookDetailActivity";
     public static final int BOOK_TYPE_FICTION = 1;
     public static final int BOOK_TYPE_NON_FICTION = 2;
 
 
-    @Cargo
+    @Arg
     @InstanceState
     int id;
     @NonNull
-    @Cargo
+    @Arg
     @InstanceState
     String book;
     @Nullable
-    @Cargo
+    @Arg
     @InstanceState
     String author;
-    @Cargo
+    @Arg
     @InstanceState
     @BookType
     int type;
@@ -45,11 +45,9 @@ public class BookDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FreighterBookDetailActivity.restoreState(this, savedInstanceState);
 
         setContentView(R.layout.activity_book_detail);
         Intent intent = null;
-        FreighterBookDetailActivity.retrieve(intent).into(this);
 
         TextView bookName = (TextView) findViewById(R.id.tv_book_name);
         bookName.setText(book);
@@ -57,18 +55,17 @@ public class BookDetailActivity extends AppCompatActivity {
         TextView writer = (TextView) findViewById(R.id.tv_book_writer);
         writer.setText(author);
 
+
         Log.d(TAG, "book id = " + id);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        FreighterBookDetailActivity.restoreState(this, savedInstanceState);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        FreighterBookDetailActivity.saveState(this, outState);
         super.onSaveInstanceState(outState);
     }
 

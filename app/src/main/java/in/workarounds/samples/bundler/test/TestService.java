@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter.test;
+package in.workarounds.samples.bundler.test;
 
 import android.app.Service;
 import android.content.Intent;
@@ -6,19 +6,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import in.workarounds.bundler.annotations.Cargo;
-import in.workarounds.bundler.annotations.Freighter;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
  * Created by madki on 24/10/15.
  */
-@Freighter
+@RequireBundler
 public class TestService extends Service {
-    @Cargo
+    @Arg
     int one;
-    @Cargo
+    @Arg
     String two;
-    @Cargo
+    @Arg
     Bundle three;
 
     @Nullable

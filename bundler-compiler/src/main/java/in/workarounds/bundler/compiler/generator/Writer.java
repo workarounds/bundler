@@ -15,8 +15,8 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.bundler.compiler.Provider;
-import in.workarounds.bundler.compiler.model.CargoModel;
-import in.workarounds.bundler.compiler.model.FreighterModel;
+import in.workarounds.bundler.compiler.model.ArgModel;
+import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
 import in.workarounds.bundler.compiler.util.CommonClasses;
 import in.workarounds.bundler.compiler.util.StringUtils;
@@ -26,15 +26,15 @@ import in.workarounds.bundler.compiler.util.StringUtils;
  */
 public class Writer {
     protected Provider provider;
-    protected FreighterModel freighterModel;
-    protected List<CargoModel> cargoList;
+    protected ReqBundlerModel reqBundlerModel;
+    protected List<ArgModel> argList;
     protected List<StateModel> states;
-    protected static final String FILE_PREFIX = "Freighter";
-    protected static final String KEYS_SIMPLE_NAME = "Keys";
-    protected static final String SUPPLIER_NAME = "Supplier";
-    protected static final String RETRIEVER_NAME = "Retriever";
-    protected static final String SUPPLY_METHOD = "supply";
-    protected static final String RETRIEVE_METHOD = "retrieve";
+    protected static final String FILE_PREFIX = "Bundler";
+    protected String KEYS_SIMPLE_NAME = "Keys";
+    protected String SUPPLIER_NAME = "Supplier";
+    protected String RETRIEVER_NAME = "Retriever";
+    protected String SUPPLY_METHOD = "";
+    protected String RETRIEVE_METHOD = "retrieve";
     protected static final String INTO_METHOD = "into";
     protected static final String BUNDLE_METHOD = "bundle";
     protected static final String INTENT_METHOD = "intent";
@@ -59,31 +59,37 @@ public class Writer {
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
-    public static Writer from(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList, List<StateModel> states) {
-        switch (freighterModel.getVariety()) {
+    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+        switch (reqBundlerModel.getVariety()) {
             case ACTIVITY:
-                return new ActivityWriter(provider, freighterModel, cargoList, states);
+                return new ActivityWriter(provider, reqBundlerModel, cargoList, states);
             case SERVICE:
-                return new ServiceWriter(provider, freighterModel, cargoList, states);
+                return new ServiceWriter(provider, reqBundlerModel, cargoList, states);
             case FRAGMENT:
             case FRAGMENT_V4:
-                return new FragmentWriter(provider, freighterModel, cargoList, states);
+                return new FragmentWriter(provider, reqBundlerModel, cargoList, states);
             default:
-                return new OtherWriter(provider, freighterModel, cargoList, states);
+                return new OtherWriter(provider, reqBundlerModel, cargoList, states);
         }
     }
 
 
-    protected Writer(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList, List<StateModel> states) {
+    protected Writer(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> argList, List<StateModel> states) {
         this.provider = provider;
-        this.freighterModel = freighterModel;
-        this.cargoList = cargoList;
+        this.reqBundlerModel = reqBundlerModel;
+        this.argList = argList;
         this.states = states;
 
-        DESTINATION_VAR = StringUtils.getVariableName(freighterModel.getSimpleName());
-        FILE_SIMPLE_NAME = FILE_PREFIX + freighterModel.getSimpleName();
+        DESTINATION_VAR = StringUtils.getVariableName(reqBundlerModel.getSimpleName());
+        FILE_SIMPLE_NAME = FILE_PREFIX + reqBundlerModel.getSimpleName();
 
-        String FILE_NAME = freighterModel.getPackageName() + "." + FILE_SIMPLE_NAME;
+        SUPPLY_METHOD = DESTINATION_VAR;
+        RETRIEVE_METHOD = RESTORE_METHOD + reqBundlerModel.getSimpleName();
+        SUPPLIER_NAME = reqBundlerModel.getSimpleName() + SUPPLIER_NAME;
+        RETRIEVER_NAME = reqBundlerModel.getSimpleName() + RETRIEVER_NAME;
+        KEYS_SIMPLE_NAME = reqBundlerModel.getSimpleName() + KEYS_SIMPLE_NAME;
+
+        String FILE_NAME = reqBundlerModel.getPackageName() + "." + FILE_SIMPLE_NAME;
         SUPPLIER_CLASS = ClassName.bestGuess(FILE_NAME + "." + SUPPLIER_NAME);
         RETRIEVER_CLASS = ClassName.bestGuess(FILE_NAME + "." + RETRIEVER_NAME);
         KEYS_CLASS = ClassName.bestGuess(FILE_NAME + "." + KEYS_SIMPLE_NAME);
@@ -91,6 +97,8 @@ public class Writer {
     }
 
     public JavaFile brewJava() {
+        provider.message(null, "brewJava called");
+
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
                 .addModifiers(Modifier.PUBLIC);
         // save, restore
@@ -105,13 +113,13 @@ public class Writer {
                 .addType(createSupplierClass())
                 .addType(createRetrieverClass())
                 .addType(createKeysInterface());
-        return JavaFile.builder(freighterModel.getPackageName(), classBuilder.build()).build();
+        return JavaFile.builder(reqBundlerModel.getPackageName(), classBuilder.build()).build();
     }
 
     protected MethodSpec saveMethod() {
         MethodSpec.Builder builder = MethodSpec.methodBuilder(SAVE_METHOD)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(freighterModel.getClassName(), DESTINATION_VAR)
+                .addParameter(reqBundlerModel.getClassName(), DESTINATION_VAR)
                 .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
                 .beginControlFlow("if($L == null)", BUNDLE_VAR)
                 .addStatement("$L = new $T()", BUNDLE_VAR, CommonClasses.BUNDLE)
@@ -139,7 +147,7 @@ public class Writer {
     protected MethodSpec restoreMethod() {
         MethodSpec.Builder builder = MethodSpec.methodBuilder(RESTORE_METHOD)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(freighterModel.getClassName(), DESTINATION_VAR)
+                .addParameter(reqBundlerModel.getClassName(), DESTINATION_VAR)
                 .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
                 .beginControlFlow("if($L == null)", BUNDLE_VAR)
                 .addStatement("return")
@@ -194,7 +202,7 @@ public class Writer {
     public TypeSpec createKeysInterface() {
         TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(KEYS_SIMPLE_NAME)
                 .addModifiers(Modifier.PUBLIC);
-        for (CargoModel cargo : cargoList) {
+        for (ArgModel cargo : argList) {
             FieldSpec fieldSpec = FieldSpec.builder(String.class, cargo.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$S", cargo.getKeyConstant().toLowerCase())
                     .build();
@@ -222,7 +230,7 @@ public class Writer {
 
         TypeName type;
         String label;
-        for (CargoModel cargo : cargoList) {
+        for (ArgModel cargo : argList) {
             type = cargo.getTypeName();
             label = cargo.getLabel();
 
@@ -287,7 +295,7 @@ public class Writer {
 
         MethodSpec.Builder intoBuilder = MethodSpec.methodBuilder(INTO_METHOD)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(freighterModel.getClassName(), DESTINATION_VAR);
+                .addParameter(reqBundlerModel.getClassName(), DESTINATION_VAR);
 
         TypeSpec.Builder builder = TypeSpec.classBuilder(RETRIEVER_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -298,7 +306,7 @@ public class Writer {
         String label;
         TypeName type;
         String hasMethod;
-        for (CargoModel cargo : cargoList) {
+        for (ArgModel cargo : argList) {
             label = cargo.getLabel();
             type = cargo.getTypeName();
 
@@ -329,7 +337,7 @@ public class Writer {
                 .build();
     }
 
-    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, CargoModel cargo) {
+    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, ArgModel cargo) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotations(cargo.getSupportAnnotations())

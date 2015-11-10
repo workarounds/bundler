@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter.test;
+package in.workarounds.samples.bundler.test;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,17 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import in.workarounds.bundler.annotations.Cargo;
-import in.workarounds.bundler.annotations.Freighter;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
  * Created by madki on 25/10/15.
  */
-@Freighter
+@RequireBundler
 public class TestFragment extends Fragment {
-    @Cargo
+    @Arg
     int one;
-    @Cargo
+    @Arg
     String two;
 
     @Nullable

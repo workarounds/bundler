@@ -1,4 +1,4 @@
-package in.workarounds.samples.freighter.test;
+package in.workarounds.samples.bundler.test;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,74 +11,74 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import in.workarounds.bundler.annotations.Cargo;
-import in.workarounds.bundler.annotations.Freighter;
-import in.workarounds.samples.freighter.R;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.samples.bundler.R;
 
 /**
  * Created by madki on 16/10/15.
  */
-@Freighter
+@RequireBundler
 public class TestActivity extends AppCompatActivity {
-    @Cargo
+    @Arg
     int integer;
-    @Cargo
+    @Arg
     int[] integerArray;
-    @Cargo
+    @Arg
     boolean bool;
-    @Cargo
+    @Arg
     boolean[] boolArray;
-    @Cargo
+    @Arg
     char character;
-    @Cargo
+    @Arg
     char[] characterArray;
-    @Cargo
+    @Arg
     long longNumber;
-    @Cargo
+    @Arg
     long[] longArray;
-    @Cargo
+    @Arg
     double doubleNumber;
-    @Cargo
+    @Arg
     double[] doubleArray;
-    @Cargo
+    @Arg
     byte aByte;
-    @Cargo
+    @Arg
     byte[] byteArray;
-    @Cargo
+    @Arg
     float floatNumber;
-    @Cargo
+    @Arg
     float[] floatArray;
-    @Cargo
+    @Arg
     short shortNumber;
-    @Cargo
+    @Arg
     short[] shortArray;
-    @Cargo
+    @Arg
     String string;
-    @Cargo
+    @Arg
     Integer some;
-    @Cargo
+    @Arg
     Bundle random;
-    @Cargo
+    @Arg
     Bundle[] bundles;
-    @Cargo
+    @Arg
     Integer[][] integers;
-    @Cargo
+    @Arg
     ArrayList<SomeObject> objects;
-    @Cargo
+    @Arg
     ArrayList<Integer>[][] randObjects;
-    @Cargo
+    @Arg
     CharSequence charSequence;
-    @Cargo
+    @Arg
     CharSequence[] charArray;
-    @Cargo
+    @Arg
     String[] strings;
-    @Cargo
+    @Arg
     ArrayList<String> stringArrayList;
-    @Cargo
+    @Arg
     ArrayList<Integer> integerArrayList;
-    @Cargo
+    @Arg
     SparseArray<Bundle> sparseArray;
-    @Cargo
+    @Arg
     ArrayList<Bundle> arrayList;
 
     @Override
@@ -103,9 +103,9 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
-    @Freighter
+    @RequireBundler
     public static class TestFragment extends Fragment {
-        @Cargo
+        @Arg
         int one;
 
         @Nullable

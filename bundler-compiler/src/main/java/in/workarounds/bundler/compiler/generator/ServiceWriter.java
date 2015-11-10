@@ -7,8 +7,8 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.bundler.compiler.Provider;
-import in.workarounds.bundler.compiler.model.CargoModel;
-import in.workarounds.bundler.compiler.model.FreighterModel;
+import in.workarounds.bundler.compiler.model.ArgModel;
+import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
 import in.workarounds.bundler.compiler.util.CommonClasses;
 
@@ -18,8 +18,8 @@ import in.workarounds.bundler.compiler.util.CommonClasses;
 public class ServiceWriter extends Writer {
     protected static final String SERVICE_VAR = "service";
 
-    protected ServiceWriter(Provider provider, FreighterModel freighterModel, List<CargoModel> cargoList, List<StateModel> states) {
-        super(provider, freighterModel, cargoList, states);
+    protected ServiceWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+        super(provider, reqBundlerModel, cargoList, states);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ServiceWriter extends Writer {
         methods.add(
                 MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(freighterModel.getClassName(), SERVICE_VAR)
+                        .addParameter(reqBundlerModel.getClassName(), SERVICE_VAR)
                         .addParameter(CommonClasses.INTENT, INTENT_VAR)
                         .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, INTENT_VAR)
                         .beginControlFlow("if(!$L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
@@ -58,7 +58,7 @@ public class ServiceWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(CommonClasses.CONTEXT, CONTEXT_VAR)
                         .returns(CommonClasses.INTENT)
-                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, INTENT_VAR, CommonClasses.INTENT, CONTEXT_VAR, freighterModel.getClassName())
+                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, INTENT_VAR, CommonClasses.INTENT, CONTEXT_VAR, reqBundlerModel.getClassName())
                         .addStatement("$L.putExtras($L())", INTENT_VAR, BUNDLE_METHOD)
                         .addStatement("return $L", INTENT_VAR)
                         .build()

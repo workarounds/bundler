@@ -11,7 +11,7 @@ ext {
     orgName = 'workarounds'
 
     publishedGroupId = 'in.workarounds.bundler'
-    libraryName = 'Freighter'
+    libraryName = 'Bundler'
     artifact = 'bundler-annotations'
 
     libraryDescription = 'Annotations for bundler library'

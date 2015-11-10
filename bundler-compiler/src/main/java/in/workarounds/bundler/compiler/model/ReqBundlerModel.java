@@ -9,13 +9,13 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
-import in.workarounds.bundler.annotations.Freighter;
+import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.compiler.Provider;
 
 /**
  * Created by madki on 16/10/15.
  */
-public class FreighterModel {
+public class ReqBundlerModel {
     private static final String ACTIVITY    = "android.app.Activity";
     private static final String FRAGMENT    = "android.app.Fragment";
     private static final String FRAGMENT_V4 = "android.support.v4.app.Fragment";
@@ -24,10 +24,10 @@ public class FreighterModel {
     private VARIETY variety;
     private ClassName className;
 
-    public FreighterModel(Element element, Provider provider) {
+    public ReqBundlerModel(Element element, Provider provider) {
         if(element.getKind() != ElementKind.CLASS) {
             provider.error(element, "@%s annotation used on a non-class element %s",
-                    Freighter.class.getSimpleName(),
+                    RequireBundler.class.getSimpleName(),
                     element.getSimpleName());
             provider.reportError();
             return;
