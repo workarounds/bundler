@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import in.workarounds.freighter.annotations.Cargo;
-import in.workarounds.freighter.annotations.Freighter;
+import in.workarounds.bundler.annotations.Cargo;
+import in.workarounds.bundler.annotations.Freighter;
 
 /**
  * Created by madki on 24/10/15.

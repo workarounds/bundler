@@ -4,17 +4,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import in.workarounds.freighter.annotations.Cargo;
-import in.workarounds.freighter.annotations.Freighter;
+import in.workarounds.bundler.annotations.Cargo;
+import in.workarounds.bundler.annotations.Freighter;
 import in.workarounds.samples.freighter.R;
 
 /**

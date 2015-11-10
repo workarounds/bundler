@@ -1,1 +1,1 @@
-include ':app', ':freighter-compiler', ':freighter-annotations'
+include ':app', ':bundler-compiler', ':bundler-annotations'

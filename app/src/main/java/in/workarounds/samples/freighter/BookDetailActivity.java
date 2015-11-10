@@ -12,9 +12,9 @@ import android.widget.TextView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import in.workarounds.freighter.annotations.Cargo;
-import in.workarounds.freighter.annotations.Freighter;
-import in.workarounds.freighter.annotations.InstanceState;
+import in.workarounds.bundler.annotations.Cargo;
+import in.workarounds.bundler.annotations.Freighter;
+import in.workarounds.bundler.annotations.InstanceState;
 
 /**
  * Created by madki on 29/10/15.

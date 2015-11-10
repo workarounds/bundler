@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import in.workarounds.freighter.annotations.Cargo;
-import in.workarounds.freighter.annotations.Freighter;
+import in.workarounds.bundler.annotations.Cargo;
+import in.workarounds.bundler.annotations.Freighter;
 
 /**
  * Created by madki on 25/10/15.
