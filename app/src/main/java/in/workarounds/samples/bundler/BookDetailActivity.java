@@ -12,9 +12,10 @@ import android.widget.TextView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.BundlerArg;
-import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.InstanceState;
+import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
  * Created by madki on 29/10/15.
@@ -55,7 +56,6 @@ public class BookDetailActivity extends AppCompatActivity {
 
         TextView writer = (TextView) findViewById(R.id.tv_book_writer);
         writer.setText(author);
-
 
         Log.d(TAG, "book id = " + id);
     }

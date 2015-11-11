@@ -11,4 +11,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  */
 @Target(FIELD) @Retention(CLASS)
 public @interface BundlerArg {
+    int[] required() default 1;
 }

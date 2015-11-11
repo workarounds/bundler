@@ -17,6 +17,7 @@ import in.workarounds.bundler.compiler.util.Utils;
  */
 public class ArgModel extends AnnotatedField {
     private List<AnnotationSpec> supportAnnotations;
+    private int[] required;
 
     public ArgModel(Element element, Provider provider) {
         super(element, provider, BundlerArg.class);
@@ -27,9 +28,16 @@ public class ArgModel extends AnnotatedField {
                supportAnnotations.add(AnnotationSpec.get(annotationMirror));
            }
         }
+
+        BundlerArg annotation = element.getAnnotation(BundlerArg.class);
+        required = annotation.required();
     }
 
     public List<AnnotationSpec> getSupportAnnotations() {
         return supportAnnotations;
+    }
+
+    public int[] getRequired() {
+        return required;
     }
 }

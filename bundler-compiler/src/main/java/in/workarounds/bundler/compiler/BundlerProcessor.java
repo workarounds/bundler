@@ -58,6 +58,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        String packageName = "in.workarounds.bundler";
 
         List<ReqBundlerModel> reqBundlerModels = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
@@ -68,7 +69,6 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
         if (reqBundlerModels.size() == 0) return true;
         checkForSameName(reqBundlerModels);
-        String packageName = getBundlerPackageName(reqBundlerModels);
 
         ClassName bundlerClass = ClassName.bestGuess(packageName + "." + Writer.FILE_SIMPLE_NAME);
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass.simpleName())

@@ -30,8 +30,8 @@ public class Writer {
     protected List<StateModel> states;
     public static final String FILE_SIMPLE_NAME = "Bundler";
     protected String KEYS_SIMPLE_NAME = "Keys";
-    protected String BUILDER_NAME = "$$Builder";
-    protected String PARSER_NAME = "$$Parser";
+    protected String BUILDER_NAME = "$Builder";
+    protected String PARSER_NAME = "$Parser";
     protected String BUILD_METHOD = "";
     protected String PARSE_METHOD = "parse";
     protected static final String INTO_METHOD = "into";
