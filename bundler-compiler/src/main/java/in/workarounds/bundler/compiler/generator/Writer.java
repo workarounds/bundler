@@ -30,10 +30,10 @@ public class Writer {
     protected List<StateModel> states;
     public static final String FILE_SIMPLE_NAME = "Bundler";
     protected String KEYS_SIMPLE_NAME = "Keys";
-    protected String SUPPLIER_NAME = "Supplier";
-    protected String RETRIEVER_NAME = "Retriever";
-    protected String SUPPLY_METHOD = "";
-    protected String RETRIEVE_METHOD = "retrieve";
+    protected String BUILDER_NAME = "$$Builder";
+    protected String PARSER_NAME = "$$Parser";
+    protected String BUILD_METHOD = "";
+    protected String PARSE_METHOD = "parse";
     protected static final String INTO_METHOD = "into";
     protected static final String BUNDLE_METHOD = "bundle";
     protected static final String INTENT_METHOD = "intent";
@@ -81,31 +81,31 @@ public class Writer {
 
         DESTINATION_VAR = StringUtils.getVariableName(reqBundlerModel.getSimpleName());
 
-        SUPPLY_METHOD = DESTINATION_VAR;
-        RETRIEVE_METHOD = RESTORE_METHOD + reqBundlerModel.getSimpleName();
-        SUPPLIER_NAME = SUPPLIER_NAME + reqBundlerModel.getSimpleName();
-        RETRIEVER_NAME = RETRIEVER_NAME + reqBundlerModel.getSimpleName();
+        BUILD_METHOD = DESTINATION_VAR;
+        PARSE_METHOD = PARSE_METHOD + reqBundlerModel.getSimpleName();
+        BUILDER_NAME = reqBundlerModel.getSimpleName() + BUILDER_NAME;
+        PARSER_NAME = reqBundlerModel.getSimpleName() + PARSER_NAME;
+
         KEYS_SIMPLE_NAME = KEYS_SIMPLE_NAME + reqBundlerModel.getSimpleName();
 
         String FILE_NAME = bundlerPackageName + "." + FILE_SIMPLE_NAME;
-        SUPPLIER_CLASS = ClassName.bestGuess(FILE_NAME + "." + SUPPLIER_NAME);
-        RETRIEVER_CLASS = ClassName.bestGuess(FILE_NAME + "." + RETRIEVER_NAME);
+
+        SUPPLIER_CLASS = ClassName.bestGuess(reqBundlerModel.getPackageName() + "." + BUILDER_NAME);
+        RETRIEVER_CLASS = ClassName.bestGuess(reqBundlerModel.getPackageName() + "." + PARSER_NAME);
         KEYS_CLASS = ClassName.bestGuess(FILE_NAME + "." + KEYS_SIMPLE_NAME);
 
     }
 
-    public TypeSpec.Builder addMethodsAndTypes(TypeSpec.Builder classBuilder) {
+    public TypeSpec.Builder addToBundler(TypeSpec.Builder classBuilder) {
         // save, restore
         classBuilder
                 .addMethod(saveMethod())
                 .addMethod(restoreMethod());
         // supply, retrieve
         classBuilder
-                .addMethod(supplyMethod())
-                .addMethod(retrieveBundleMethod())
+                .addMethod(buildMethod())
+                .addMethod(parseBundleMethod())
                 .addMethods(getAdditionalHelperMethods())
-                .addType(createSupplierClass())
-                .addType(createRetrieverClass())
                 .addType(createKeysInterface());
         return classBuilder;
     }
@@ -172,16 +172,16 @@ public class Writer {
         return builder.build();
     }
 
-    protected MethodSpec supplyMethod() {
-        return MethodSpec.methodBuilder(SUPPLY_METHOD)
+    protected MethodSpec buildMethod() {
+        return MethodSpec.methodBuilder(BUILD_METHOD)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(SUPPLIER_CLASS)
                 .addStatement("return new $T()", SUPPLIER_CLASS)
                 .build();
     }
 
-    protected MethodSpec retrieveBundleMethod() {
-        return MethodSpec.methodBuilder(RETRIEVE_METHOD)
+    protected MethodSpec parseBundleMethod() {
+        return MethodSpec.methodBuilder(PARSE_METHOD)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
                 .returns(RETRIEVER_CLASS)
@@ -205,9 +205,9 @@ public class Writer {
         return keyBuilder.build();
     }
 
-    private TypeSpec createSupplierClass() {
+    public TypeSpec createBuilderClass() {
         MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(Modifier.PUBLIC)
                 .build();
 
         MethodSpec.Builder bundleBuilder = MethodSpec.methodBuilder(BUNDLE_METHOD)
@@ -218,8 +218,8 @@ public class Writer {
                         BUNDLE_VAR,
                         CommonClasses.BUNDLE);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(SUPPLIER_NAME)
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(BUILDER_NAME)
+                .addModifiers(Modifier.PUBLIC)
                 .addMethod(constructor);
 
         TypeName type;
@@ -246,7 +246,7 @@ public class Writer {
                     label);
             bundleBuilder.endControlFlow();
 
-            builder.addMethod(supplierSetterMethod(type, label, cargo.getSupportAnnotations()));
+            builder.addMethod(builderSetterMethod(type, label, cargo.getSupportAnnotations()));
         }
 
         bundleBuilder.addStatement("return $L", BUNDLE_VAR);
@@ -260,7 +260,7 @@ public class Writer {
         return new ArrayList<>();
     }
 
-    private MethodSpec supplierSetterMethod(TypeName type, String label, List<AnnotationSpec> annotationSpecs) {
+    private MethodSpec builderSetterMethod(TypeName type, String label, List<AnnotationSpec> annotationSpecs) {
         return MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(SUPPLIER_CLASS)
@@ -270,13 +270,14 @@ public class Writer {
                 .build();
     }
 
-    private TypeSpec createRetrieverClass() {
+    public TypeSpec createParserClass() {
         String HAS_PREFIX = "has";
 
         FieldSpec bundle = FieldSpec.builder(CommonClasses.BUNDLE, BUNDLE_VAR, Modifier.PRIVATE)
                 .build();
+
         MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(Modifier.PUBLIC)
                 .addParameter(ParameterSpec.builder(CommonClasses.BUNDLE, BUNDLE_VAR).build())
                 .addStatement("this.$L = $L", BUNDLE_VAR, BUNDLE_VAR)
                 .build();
@@ -291,8 +292,8 @@ public class Writer {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(reqBundlerModel.getClassName(), DESTINATION_VAR);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(RETRIEVER_NAME)
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(PARSER_NAME)
+                .addModifiers(Modifier.PUBLIC)
                 .addField(bundle)
                 .addMethod(constructor)
                 .addMethod(isNull);
@@ -305,8 +306,8 @@ public class Writer {
             type = cargo.getTypeName();
 
             hasMethod = HAS_PREFIX + StringUtils.getClassName(label);
-            builder.addMethod(retrieverHasMethod(hasMethod, cargo.getKeyConstant()));
-            builder.addMethod(retrieverGetterMethod(type, label, hasMethod, cargo));
+            builder.addMethod(parserHasMethod(hasMethod, cargo.getKeyConstant()));
+            builder.addMethod(parserGetterMethod(type, label, hasMethod, cargo));
 
             intoBuilder.beginControlFlow("if($L())", hasMethod);
             if (type.isPrimitive()) {
@@ -323,7 +324,7 @@ public class Writer {
         return builder.build();
     }
 
-    private MethodSpec retrieverHasMethod(String hasMethod, String intentKey) {
+    private MethodSpec parserHasMethod(String hasMethod, String intentKey) {
         return MethodSpec.methodBuilder(hasMethod)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(boolean.class)
@@ -331,7 +332,7 @@ public class Writer {
                 .build();
     }
 
-    private MethodSpec retrieverGetterMethod(TypeName type, String label, String hasMethod, ArgModel cargo) {
+    private MethodSpec parserGetterMethod(TypeName type, String label, String hasMethod, ArgModel cargo) {
         MethodSpec.Builder getterMethodBuilder = MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotations(cargo.getSupportAnnotations())

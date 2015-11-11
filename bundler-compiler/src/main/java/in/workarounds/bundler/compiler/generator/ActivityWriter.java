@@ -26,21 +26,21 @@ public class ActivityWriter extends Writer {
     protected List<MethodSpec> getAdditionalHelperMethods() {
         List<MethodSpec> methods = super.getAdditionalHelperMethods();
         methods.add(
-                MethodSpec.methodBuilder(RETRIEVE_METHOD)
+                MethodSpec.methodBuilder(PARSE_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(CommonClasses.INTENT, INTENT_VAR)
                         .returns(RETRIEVER_CLASS)
                         .beginControlFlow("if($L == null)", INTENT_VAR)
                         .addStatement("return new $T(null)", RETRIEVER_CLASS)
                         .endControlFlow()
-                        .addStatement("return $L($L.getExtras())", RETRIEVE_METHOD, INTENT_VAR)
+                        .addStatement("return $L($L.getExtras())", PARSE_METHOD, INTENT_VAR)
                         .build()
         );
         methods.add(
                 MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(reqBundlerModel.getClassName(), ACTIVITY_VAR)
-                        .addStatement("$T $L = $L($L.getIntent())", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, ACTIVITY_VAR)
+                        .addStatement("$T $L = $L($L.getIntent())", RETRIEVER_CLASS, RETRIEVER_VAR, PARSE_METHOD, ACTIVITY_VAR)
                         .beginControlFlow("if(!$L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
                         .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, ACTIVITY_VAR)
                         .endControlFlow()

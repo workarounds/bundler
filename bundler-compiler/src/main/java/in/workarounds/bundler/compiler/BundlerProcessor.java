@@ -98,7 +98,14 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             if (hasErrorOccurred()) return true;
 
             Writer writer = Writer.from(this, model, argList, states, packageName);
-            writer.addMethodsAndTypes(classBuilder);
+            writer.addToBundler(classBuilder);
+
+            try {
+                JavaFile.builder(model.getPackageName(), writer.createBuilderClass()).build().writeTo(filer);
+                JavaFile.builder(model.getPackageName(), writer.createParserClass()).build().writeTo(filer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         try {

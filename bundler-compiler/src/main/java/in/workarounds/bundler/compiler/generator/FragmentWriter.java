@@ -28,7 +28,7 @@ public class FragmentWriter extends Writer {
                 MethodSpec.methodBuilder(INJECT_METHOD)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(reqBundlerModel.getClassName(), FRAGMENT_VAR)
-                        .addStatement("$T $L = $L($L.getArguments())", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, FRAGMENT_VAR)
+                        .addStatement("$T $L = $L($L.getArguments())", RETRIEVER_CLASS, RETRIEVER_VAR, PARSE_METHOD, FRAGMENT_VAR)
                         .beginControlFlow("if($L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
                         .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, FRAGMENT_VAR)
                         .endControlFlow()

@@ -31,7 +31,7 @@ public class OtherWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(reqBundlerModel.getClassName(), BUNDLER_VAR)
                         .addParameter(CommonClasses.BUNDLE, BUNDLE_VAR)
-                        .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, RETRIEVE_METHOD, BUNDLE_VAR)
+                        .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, PARSE_METHOD, BUNDLE_VAR)
                         .beginControlFlow("if($L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
                         .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, BUNDLER_VAR)
                         .endControlFlow()
