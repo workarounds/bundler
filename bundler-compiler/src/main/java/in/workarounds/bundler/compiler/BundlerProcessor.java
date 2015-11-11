@@ -26,8 +26,8 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
-import in.workarounds.bundler.annotations.BundlerArg;
-import in.workarounds.bundler.annotations.InstanceState;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.compiler.generator.Writer;
 import in.workarounds.bundler.compiler.model.ArgModel;
@@ -79,7 +79,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         for (ReqBundlerModel model : reqBundlerModels) {
             List<ArgModel> argList = new ArrayList<>();
             for (Element possibleCargo : model.getElement().getEnclosedElements()) {
-                BundlerArg arg = possibleCargo.getAnnotation(BundlerArg.class);
+                Arg arg = possibleCargo.getAnnotation(Arg.class);
                 if (arg != null) {
                     ArgModel argModel = new ArgModel(possibleCargo, this);
                     argList.add(argModel);
@@ -88,7 +88,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
             List<StateModel> states = new ArrayList<>();
             for (Element possibleState : model.getElement().getEnclosedElements()) {
-                InstanceState instanceState = possibleState.getAnnotation(InstanceState.class);
+                State instanceState = possibleState.getAnnotation(State.class);
                 if (instanceState != null) {
                     StateModel state = new StateModel(possibleState, this);
                     states.add(state);
@@ -164,9 +164,9 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<String>();
 
-        annotations.add(BundlerArg.class.getCanonicalName());
+        annotations.add(Arg.class.getCanonicalName());
         annotations.add(RequireBundler.class.getCanonicalName());
-        annotations.add(InstanceState.class.getCanonicalName());
+        annotations.add(State.class.getCanonicalName());
 
         return annotations;
     }

@@ -1,6 +1,6 @@
 package in.workarounds.samples.bundler.test;
 
-import in.workarounds.bundler.annotations.BundlerArg;
+import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
@@ -8,7 +8,7 @@ import in.workarounds.bundler.annotations.RequireBundler;
  */
 @RequireBundler
 public class TestObject {
-    @BundlerArg
+    @Arg
     int one;
 
     public TestObject() {

@@ -2,7 +2,7 @@ package in.workarounds.bundler.compiler.model;
 
 import javax.lang.model.element.Element;
 
-import in.workarounds.bundler.annotations.InstanceState;
+import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.Provider;
 
 /**
@@ -11,7 +11,7 @@ import in.workarounds.bundler.compiler.Provider;
 public class StateModel extends AnnotatedField {
 
     public StateModel(Element element, Provider provider) {
-        super(element, provider, InstanceState.class);
+        super(element, provider, State.class);
     }
 
 }

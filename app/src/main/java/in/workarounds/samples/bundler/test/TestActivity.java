@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import in.workarounds.bundler.annotations.BundlerArg;
+import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.samples.bundler.R;
 
@@ -20,65 +20,65 @@ import in.workarounds.samples.bundler.R;
  */
 @RequireBundler
 public class TestActivity extends AppCompatActivity {
-    @BundlerArg
+    @Arg
     int integer;
-    @BundlerArg
+    @Arg
     int[] integerArray;
-    @BundlerArg
+    @Arg
     boolean bool;
-    @BundlerArg
+    @Arg
     boolean[] boolArray;
-    @BundlerArg
+    @Arg
     char character;
-    @BundlerArg
+    @Arg
     char[] characterArray;
-    @BundlerArg
+    @Arg
     long longNumber;
-    @BundlerArg
+    @Arg
     long[] longArray;
-    @BundlerArg
+    @Arg
     double doubleNumber;
-    @BundlerArg
+    @Arg
     double[] doubleArray;
-    @BundlerArg
+    @Arg
     byte aByte;
-    @BundlerArg
+    @Arg
     byte[] byteArray;
-    @BundlerArg
+    @Arg
     float floatNumber;
-    @BundlerArg
+    @Arg
     float[] floatArray;
-    @BundlerArg
+    @Arg
     short shortNumber;
-    @BundlerArg
+    @Arg
     short[] shortArray;
-    @BundlerArg
+    @Arg
     String string;
-    @BundlerArg
+    @Arg
     Integer some;
-    @BundlerArg
+    @Arg
     Bundle random;
-    @BundlerArg
+    @Arg
     Bundle[] bundles;
-    @BundlerArg
+    @Arg
     Integer[][] integers;
-    @BundlerArg
+    @Arg
     ArrayList<SomeObject> objects;
-    @BundlerArg
+    @Arg
     ArrayList<Integer>[][] randObjects;
-    @BundlerArg
+    @Arg
     CharSequence charSequence;
-    @BundlerArg
+    @Arg
     CharSequence[] charArray;
-    @BundlerArg
+    @Arg
     String[] strings;
-    @BundlerArg
+    @Arg
     ArrayList<String> stringArrayList;
-    @BundlerArg
+    @Arg
     ArrayList<Integer> integerArrayList;
-    @BundlerArg
+    @Arg
     SparseArray<Bundle> sparseArray;
-    @BundlerArg
+    @Arg
     ArrayList<Bundle> arrayList;
 
     @Override
@@ -104,7 +104,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
     public static class TestFragment extends Fragment {
-        @BundlerArg
+        @Arg
         int one;
 
         @Nullable

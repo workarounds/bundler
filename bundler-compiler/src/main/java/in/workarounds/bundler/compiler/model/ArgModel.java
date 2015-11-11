@@ -8,7 +8,7 @@ import java.util.List;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
-import in.workarounds.bundler.annotations.BundlerArg;
+import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.util.Utils;
 
@@ -20,7 +20,7 @@ public class ArgModel extends AnnotatedField {
     private int[] required;
 
     public ArgModel(Element element, Provider provider) {
-        super(element, provider, BundlerArg.class);
+        super(element, provider, Arg.class);
 
         supportAnnotations = new ArrayList<>();
         for(AnnotationMirror annotationMirror: element.getAnnotationMirrors()) {
@@ -29,7 +29,7 @@ public class ArgModel extends AnnotatedField {
            }
         }
 
-        BundlerArg annotation = element.getAnnotation(BundlerArg.class);
+        Arg annotation = element.getAnnotation(Arg.class);
         required = annotation.required();
     }
 

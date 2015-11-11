@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import in.workarounds.bundler.annotations.BundlerArg;
+import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
@@ -14,11 +14,11 @@ import in.workarounds.bundler.annotations.RequireBundler;
  */
 @RequireBundler
 public class TestService extends Service {
-    @BundlerArg
+    @Arg
     int one;
-    @BundlerArg
+    @Arg
     String two;
-    @BundlerArg
+    @Arg
     Bundle three;
 
     @Nullable

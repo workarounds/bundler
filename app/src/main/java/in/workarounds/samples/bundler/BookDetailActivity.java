@@ -13,8 +13,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import in.workarounds.bundler.Bundler;
-import in.workarounds.bundler.annotations.BundlerArg;
-import in.workarounds.bundler.annotations.InstanceState;
+import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
@@ -27,19 +27,19 @@ public class BookDetailActivity extends AppCompatActivity {
     public static final int BOOK_TYPE_NON_FICTION = 2;
 
 
-    @BundlerArg
-    @InstanceState
+    @Arg
+    @State
     int id;
     @NonNull
-    @BundlerArg
-    @InstanceState
+    @Arg
+    @State
     String book;
     @Nullable
-    @BundlerArg
-    @InstanceState
+    @Arg
+    @State
     String author;
-    @BundlerArg
-    @InstanceState
+    @Arg
+    @State
     @BookType
     int type;
 
