@@ -18,8 +18,8 @@ import in.workarounds.bundler.compiler.util.CommonClasses;
 public class ServiceWriter extends Writer {
     protected static final String SERVICE_VAR = "service";
 
-    protected ServiceWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
-        super(provider, reqBundlerModel, cargoList, states);
+    protected ServiceWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states, String packageName) {
+        super(provider, reqBundlerModel, cargoList, states, packageName);
     }
 
     @Override

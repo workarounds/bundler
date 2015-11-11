@@ -2,9 +2,12 @@ package in.workarounds.bundler.compiler;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,16 +58,27 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        ClassName bundlerClass = ClassName.bestGuess(Writer.FILE_NAME);
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass.simpleName())
-                .addModifiers(Modifier.PUBLIC);
 
+        List<ReqBundlerModel> reqBundlerModels = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
             ReqBundlerModel model = new ReqBundlerModel(element, this);
             if (hasErrorOccurred()) return true;
+            reqBundlerModels.add(model);
+        }
 
+        if (reqBundlerModels.size() == 0) return true;
+        checkForSameName(reqBundlerModels);
+        String packageName = getBundlerPackageName(reqBundlerModels);
+
+        ClassName bundlerClass = ClassName.bestGuess(packageName + "." + Writer.FILE_SIMPLE_NAME);
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass.simpleName())
+                .addModifiers(Modifier.PUBLIC);
+
+        if (hasErrorOccurred()) return true;
+
+        for (ReqBundlerModel model : reqBundlerModels) {
             List<ArgModel> argList = new ArrayList<>();
-            for (Element possibleCargo : element.getEnclosedElements()) {
+            for (Element possibleCargo : model.getElement().getEnclosedElements()) {
                 BundlerArg arg = possibleCargo.getAnnotation(BundlerArg.class);
                 if (arg != null) {
                     ArgModel argModel = new ArgModel(possibleCargo, this);
@@ -73,7 +87,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             }
 
             List<StateModel> states = new ArrayList<>();
-            for (Element possibleState : element.getEnclosedElements()) {
+            for (Element possibleState : model.getElement().getEnclosedElements()) {
                 InstanceState instanceState = possibleState.getAnnotation(InstanceState.class);
                 if (instanceState != null) {
                     StateModel state = new StateModel(possibleState, this);
@@ -83,18 +97,55 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
             if (hasErrorOccurred()) return true;
 
-            Writer writer = Writer.from(this, model, argList, states);
+            Writer writer = Writer.from(this, model, argList, states, packageName);
             writer.addMethodsAndTypes(classBuilder);
         }
 
-//        try {
-//            JavaFile.builder(bundlerClass.packageName(), classBuilder.build())
-//                    .build()
-//                    .writeTo(filer);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            JavaFile.builder(packageName, classBuilder.build())
+                    .build()
+                    .writeTo(filer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return true;
+    }
+
+    private void checkForSameName(List<ReqBundlerModel> reqBundlerModels) {
+        final Set<String> set1 = new HashSet<>();
+        for (ReqBundlerModel model : reqBundlerModels) {
+            if (!set1.add(model.getSimpleName())) {
+                error(model.getElement(),
+                        "An object with name '%s' is already annotated with '@%s', Please rename one of them.",
+                        model.getSimpleName(),
+                        ReqBundlerModel.class.getSimpleName()
+                );
+                reportError();
+            }
+        }
+    }
+
+    private String getBundlerPackageName(List<ReqBundlerModel> reqBundlerModels) {
+        String packageName = reqBundlerModels.get(0).getPackageName();
+
+        for (int i = 1; i < reqBundlerModels.size(); i++) {
+            packageName = findCommonPackage(packageName, reqBundlerModels.get(i).getPackageName());
+        }
+
+        return packageName;
+    }
+
+    private String findCommonPackage(String package1, String package2) {
+        String[] pkg1 = package1.split("\\.");
+        String[] pkg2 = package2.split("\\.");
+        String common = "";
+
+        for (int i = 0; i < Math.min(pkg1.length, pkg2.length); i++) {
+            if (pkg1[i].equals(pkg2[i])) {
+                common = common + pkg1[i] + ".";
+            }
+        }
+        return common.isEmpty() ? common : common.substring(0, common.length() - 1);
     }
 
     @Override

@@ -23,6 +23,7 @@ public class ReqBundlerModel {
 
     private VARIETY variety;
     private ClassName className;
+    private Element element;
 
     public ReqBundlerModel(Element element, Provider provider) {
         if(element.getKind() != ElementKind.CLASS) {
@@ -32,6 +33,7 @@ public class ReqBundlerModel {
             provider.reportError();
             return;
         }
+        this.element = element;
         variety = getVariety((TypeElement) element, provider.typeUtils());
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
         className = ClassName.bestGuess(qualifiedName);
@@ -71,6 +73,10 @@ public class ReqBundlerModel {
             default:
                 return VARIETY.OTHER;
         }
+    }
+
+    public Element getElement() {
+        return element;
     }
 
     public VARIETY getVariety() {

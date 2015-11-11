@@ -28,7 +28,7 @@ public class Writer {
     protected ReqBundlerModel reqBundlerModel;
     protected List<ArgModel> argList;
     protected List<StateModel> states;
-    public static final String FILE_NAME = "in.workarounds.bundler.Bundler";
+    public static final String FILE_SIMPLE_NAME = "Bundler";
     protected String KEYS_SIMPLE_NAME = "Keys";
     protected String SUPPLIER_NAME = "Supplier";
     protected String RETRIEVER_NAME = "Retriever";
@@ -45,7 +45,7 @@ public class Writer {
     protected static final String IS_NULL_METHOD = "isNull";
     protected static final String RETRIEVER_VAR = "retriever";
 
-
+    protected String bundlerPackageName;
     protected String DESTINATION_VAR;
     protected ClassName SUPPLIER_CLASS;
     protected ClassName RETRIEVER_CLASS;
@@ -57,35 +57,37 @@ public class Writer {
     protected String DEFAULT_VAR = "defaultValue";
     protected static final String INTENT_VAR = "intent";
 
-    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states, String packageName) {
         switch (reqBundlerModel.getVariety()) {
             case ACTIVITY:
-                return new ActivityWriter(provider, reqBundlerModel, cargoList, states);
+                return new ActivityWriter(provider, reqBundlerModel, cargoList, states, packageName);
             case SERVICE:
-                return new ServiceWriter(provider, reqBundlerModel, cargoList, states);
+                return new ServiceWriter(provider, reqBundlerModel, cargoList, states, packageName);
             case FRAGMENT:
             case FRAGMENT_V4:
-                return new FragmentWriter(provider, reqBundlerModel, cargoList, states);
+                return new FragmentWriter(provider, reqBundlerModel, cargoList, states, packageName);
             default:
-                return new OtherWriter(provider, reqBundlerModel, cargoList, states);
+                return new OtherWriter(provider, reqBundlerModel, cargoList, states, packageName);
         }
     }
 
 
-    protected Writer(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> argList, List<StateModel> states) {
+    protected Writer(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> argList, List<StateModel> states, String packageName) {
         this.provider = provider;
         this.reqBundlerModel = reqBundlerModel;
         this.argList = argList;
         this.states = states;
+        this.bundlerPackageName = packageName;
 
         DESTINATION_VAR = StringUtils.getVariableName(reqBundlerModel.getSimpleName());
 
         SUPPLY_METHOD = DESTINATION_VAR;
         RETRIEVE_METHOD = RESTORE_METHOD + reqBundlerModel.getSimpleName();
-        SUPPLIER_NAME = reqBundlerModel.getSimpleName() + SUPPLIER_NAME;
-        RETRIEVER_NAME = reqBundlerModel.getSimpleName() + RETRIEVER_NAME;
-        KEYS_SIMPLE_NAME = reqBundlerModel.getSimpleName() + KEYS_SIMPLE_NAME;
+        SUPPLIER_NAME = SUPPLIER_NAME + reqBundlerModel.getSimpleName();
+        RETRIEVER_NAME = RETRIEVER_NAME + reqBundlerModel.getSimpleName();
+        KEYS_SIMPLE_NAME = KEYS_SIMPLE_NAME + reqBundlerModel.getSimpleName();
 
+        String FILE_NAME = bundlerPackageName + "." + FILE_SIMPLE_NAME;
         SUPPLIER_CLASS = ClassName.bestGuess(FILE_NAME + "." + SUPPLIER_NAME);
         RETRIEVER_CLASS = ClassName.bestGuess(FILE_NAME + "." + RETRIEVER_NAME);
         KEYS_CLASS = ClassName.bestGuess(FILE_NAME + "." + KEYS_SIMPLE_NAME);
