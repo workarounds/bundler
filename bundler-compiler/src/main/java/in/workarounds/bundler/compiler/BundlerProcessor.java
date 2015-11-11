@@ -1,8 +1,9 @@
 package in.workarounds.bundler.compiler;
 
 import com.google.auto.service.AutoService;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeSpec;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,14 +17,15 @@ import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
-import in.workarounds.bundler.annotations.Arg;
-import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.bundler.annotations.BundlerArg;
 import in.workarounds.bundler.annotations.InstanceState;
+import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.compiler.generator.Writer;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
@@ -53,14 +55,17 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        message(null, "######process called in BundlerProcessor");
+        ClassName bundlerClass = ClassName.bestGuess(Writer.FILE_NAME);
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass.simpleName())
+                .addModifiers(Modifier.PUBLIC);
+
         for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
             ReqBundlerModel model = new ReqBundlerModel(element, this);
-            if(hasErrorOccurred()) return true;
+            if (hasErrorOccurred()) return true;
 
             List<ArgModel> argList = new ArrayList<>();
             for (Element possibleCargo : element.getEnclosedElements()) {
-                Arg arg = possibleCargo.getAnnotation(Arg.class);
+                BundlerArg arg = possibleCargo.getAnnotation(BundlerArg.class);
                 if (arg != null) {
                     ArgModel argModel = new ArgModel(possibleCargo, this);
                     argList.add(argModel);
@@ -76,17 +81,19 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
                 }
             }
 
-            if(hasErrorOccurred()) return true;
+            if (hasErrorOccurred()) return true;
 
             Writer writer = Writer.from(this, model, argList, states);
-
-            try {
-                writer.brewJava().writeTo(filer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            writer.addMethodsAndTypes(classBuilder);
         }
 
+//        try {
+//            JavaFile.builder(bundlerClass.packageName(), classBuilder.build())
+//                    .build()
+//                    .writeTo(filer);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return true;
     }
 
@@ -99,7 +106,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<String>();
 
-        annotations.add(Arg.class.getCanonicalName());
+        annotations.add(BundlerArg.class.getCanonicalName());
         annotations.add(RequireBundler.class.getCanonicalName());
         annotations.add(InstanceState.class.getCanonicalName());
 

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.BundlerArg;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.InstanceState;
 
@@ -26,18 +26,18 @@ public class BookDetailActivity extends AppCompatActivity {
     public static final int BOOK_TYPE_NON_FICTION = 2;
 
 
-    @Arg
+    @BundlerArg
     @InstanceState
     int id;
     @NonNull
-    @Arg
+    @BundlerArg
     @InstanceState
     String book;
     @Nullable
-    @Arg
+    @BundlerArg
     @InstanceState
     String author;
-    @Arg
+    @BundlerArg
     @InstanceState
     @BookType
     int type;

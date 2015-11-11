@@ -3,7 +3,6 @@ package in.workarounds.bundler.compiler.generator;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
@@ -29,7 +28,7 @@ public class Writer {
     protected ReqBundlerModel reqBundlerModel;
     protected List<ArgModel> argList;
     protected List<StateModel> states;
-    protected static final String FILE_PREFIX = "Bundler";
+    public static final String FILE_NAME = "in.workarounds.bundler.Bundler";
     protected String KEYS_SIMPLE_NAME = "Keys";
     protected String SUPPLIER_NAME = "Supplier";
     protected String RETRIEVER_NAME = "Retriever";
@@ -48,7 +47,6 @@ public class Writer {
 
 
     protected String DESTINATION_VAR;
-    protected String FILE_SIMPLE_NAME;
     protected ClassName SUPPLIER_CLASS;
     protected ClassName RETRIEVER_CLASS;
 
@@ -81,7 +79,6 @@ public class Writer {
         this.states = states;
 
         DESTINATION_VAR = StringUtils.getVariableName(reqBundlerModel.getSimpleName());
-        FILE_SIMPLE_NAME = FILE_PREFIX + reqBundlerModel.getSimpleName();
 
         SUPPLY_METHOD = DESTINATION_VAR;
         RETRIEVE_METHOD = RESTORE_METHOD + reqBundlerModel.getSimpleName();
@@ -89,18 +86,13 @@ public class Writer {
         RETRIEVER_NAME = reqBundlerModel.getSimpleName() + RETRIEVER_NAME;
         KEYS_SIMPLE_NAME = reqBundlerModel.getSimpleName() + KEYS_SIMPLE_NAME;
 
-        String FILE_NAME = reqBundlerModel.getPackageName() + "." + FILE_SIMPLE_NAME;
         SUPPLIER_CLASS = ClassName.bestGuess(FILE_NAME + "." + SUPPLIER_NAME);
         RETRIEVER_CLASS = ClassName.bestGuess(FILE_NAME + "." + RETRIEVER_NAME);
         KEYS_CLASS = ClassName.bestGuess(FILE_NAME + "." + KEYS_SIMPLE_NAME);
 
     }
 
-    public JavaFile brewJava() {
-        provider.message(null, "brewJava called");
-
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(FILE_SIMPLE_NAME)
-                .addModifiers(Modifier.PUBLIC);
+    public TypeSpec.Builder addMethodsAndTypes(TypeSpec.Builder classBuilder) {
         // save, restore
         classBuilder
                 .addMethod(saveMethod())
@@ -113,7 +105,7 @@ public class Writer {
                 .addType(createSupplierClass())
                 .addType(createRetrieverClass())
                 .addType(createKeysInterface());
-        return JavaFile.builder(reqBundlerModel.getPackageName(), classBuilder.build()).build();
+        return classBuilder;
     }
 
     protected MethodSpec saveMethod() {

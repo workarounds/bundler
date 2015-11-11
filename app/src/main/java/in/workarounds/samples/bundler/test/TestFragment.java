@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.BundlerArg;
 import in.workarounds.bundler.annotations.RequireBundler;
 
 /**
@@ -15,9 +15,9 @@ import in.workarounds.bundler.annotations.RequireBundler;
  */
 @RequireBundler
 public class TestFragment extends Fragment {
-    @Arg
+    @BundlerArg
     int one;
-    @Arg
+    @BundlerArg
     String two;
 
     @Nullable
