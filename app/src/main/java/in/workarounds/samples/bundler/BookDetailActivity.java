@@ -48,6 +48,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_book_detail);
         Intent intent = null;
+        Bundler.inject(this);
 
         TextView bookName = (TextView) findViewById(R.id.tv_book_name);
         bookName.setText(book);
@@ -62,11 +63,13 @@ public class BookDetailActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        Bundler.restoreState(this, savedInstanceState);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        Bundler.saveState(this, outState);
     }
 
     @IntDef({BOOK_TYPE_FICTION, BOOK_TYPE_NON_FICTION})

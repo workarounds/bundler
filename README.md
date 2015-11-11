@@ -1,49 +1,49 @@
-Freighter
+Bundler
 ============
 
 Generates broilerplate code for intent and bundle builders and parsers. Autogeneration of this code at compile time ensures type-safety.
 Here's an example of this in Action.
 
 ```java
-@Freighter
+@RequiresBundler
 class BookDetailActivity extends Activity {
-  @Cargo int id;
-  @Cargo String name;
-  @Cargo String author;
+  @BundlerArg int id;
+  @BundlerArg String name;
+  @BundlerArg String author;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_book_detail);
-    FreighterBookDetailActivity.inject(this);
+    Bundler.inject(this);
     // TODO Use fields...
   }
 }
 ```
 
-After defining the annotating the activity a class 'FreighterBookDetailActivity' is generated. The above activity can be started as follows:
+After defining the annotating the activity methods are added to the 'Bundler' class which help in building and parsing the intent for the activity. The above activity can be started as follows:
 
 ```java
-  FreighterBookDetailActivity.supply()
+  Bundler.bookDetailActivity()
     .id(1)
     .name("Hitchhiker's guide to galaxy")
     .author("Douglas Adams")
     .start();
 ```
 
-If in future if the field id in BookDetailActivity for some reason has to be changed to type String then the class FreighterBookDetailActivity is regenerated and all the places where an int is being passed to the BookDetailActivity will throw a compile time error compared to the run time error it would have lead to in the normal scenario.
-The process for annotating Fragments and service is similar, but instead of .start() method fragment's builder will have .create() method.
+If in future if the field `id` in `BookDetailActivity` for some reason has to be changed to type `String` then the class `Bundler` is regenerated and all the places where an `int` is being passed to the `BookDetailActivity` will throw a compile time error compared to the run time error it would have lead to in the normal scenario.
+The process for annotating Fragments and service is similar, but instead of `.start()` method fragment's builder will have `.create()` method.
 Here's an example for a fragment
 
 ```java
-@Freighter
+@RequiresBundler
 class BookDetailsFragment extends Fragment {
-  @Cargo int id;
-  @Cargo String book;
-  @Cargo String author;
+  @BundlerArg int id;
+  @BundlerArg String book;
+  @BundlerArg String author;
   
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    FreighterBookDetailFragment.inject(this);
+    Bundler.inject(this);
     // TODO inflate and return the view and use the fields
   }
 }
@@ -52,13 +52,13 @@ class BookDetailsFragment extends Fragment {
 The above fragment can be created as follows:
 
 ```java
-BookDetailsFragment fragment = FreighterBookDetailsFragment.supply()
+BookDetailsFragment fragment = Bundler.bookDetailsFragment()
                                   .id(1)
                                   .name("Harry Potter")
                                   .author("J. K. Rowling")
                                   .create();
 ```
-This would create a BookDetailsFragment that have arguments set to the above values.
+This would create a `BookDetailsFragment` that have arguments set to the above values.
 
 
 
@@ -75,8 +75,8 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'in.workarounds.freighter:freighter-annotations:0.0.2'
-  apt 'in.workarounds.freighter:freighter-compiler:0.0.3'
+  compile 'in.workarounds.bundler:bundler-annotations:0.0.2'
+  apt 'in.workarounds.bundler:bundler-compiler:0.0.3'
 }
 ```
 

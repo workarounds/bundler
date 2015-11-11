@@ -28,6 +28,10 @@ public class BookListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundler.bookDetailActivity()
+                        .author(authors[position])
+                        .book(books[position])
+                        .start(BookListActivity.this);
             }
         });
     }
