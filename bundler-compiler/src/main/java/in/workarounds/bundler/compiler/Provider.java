@@ -1,5 +1,7 @@
 package in.workarounds.bundler.compiler;
 
+import com.squareup.javapoet.ClassName;
+
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -21,4 +23,6 @@ public interface Provider {
 
     void reportError();
     boolean hasErrorOccurred();
+
+    ClassName bundlerClass();
 }

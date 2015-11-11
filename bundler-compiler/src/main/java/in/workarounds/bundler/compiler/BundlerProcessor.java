@@ -70,8 +70,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         if (reqBundlerModels.size() == 0) return true;
         checkForSameName(reqBundlerModels);
 
-        ClassName bundlerClass = ClassName.bestGuess(packageName + "." + Writer.FILE_SIMPLE_NAME);
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass.simpleName())
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass().simpleName())
                 .addModifiers(Modifier.PUBLIC);
 
         if (hasErrorOccurred()) return true;
@@ -101,8 +100,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             writer.addToBundler(classBuilder);
 
             try {
-                JavaFile.builder(model.getPackageName(), writer.createBuilderClass()).build().writeTo(filer);
-                JavaFile.builder(model.getPackageName(), writer.createParserClass()).build().writeTo(filer);
+                writer.brewHelper().writeTo(filer);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -122,37 +120,26 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         final Set<String> set1 = new HashSet<>();
         for (ReqBundlerModel model : reqBundlerModels) {
             if (!set1.add(model.getSimpleName())) {
-                error(model.getElement(),
-                        "An object with name '%s' is already annotated with '@%s', Please rename one of them.",
-                        model.getSimpleName(),
-                        ReqBundlerModel.class.getSimpleName()
-                );
-                reportError();
+                for (ReqBundlerModel duplicate : reqBundlerModels) {
+                    if (duplicate.getSimpleName().equals(model.getSimpleName())) {
+                        error(null,
+                                "Two classes annotated with @%s have same name. Please change one of them.",
+                                RequireBundler.class.getSimpleName()
+                        );
+                        error(duplicate.getElement(),
+                                "%s",
+                                duplicate.getClassName().toString()
+                        );
+                        error(model.getElement(),
+                                "%s",
+                                model.getClassName().toString()
+                        );
+                        reportError();
+                        return;
+                    }
+                }
             }
         }
-    }
-
-    private String getBundlerPackageName(List<ReqBundlerModel> reqBundlerModels) {
-        String packageName = reqBundlerModels.get(0).getPackageName();
-
-        for (int i = 1; i < reqBundlerModels.size(); i++) {
-            packageName = findCommonPackage(packageName, reqBundlerModels.get(i).getPackageName());
-        }
-
-        return packageName;
-    }
-
-    private String findCommonPackage(String package1, String package2) {
-        String[] pkg1 = package1.split("\\.");
-        String[] pkg2 = package2.split("\\.");
-        String common = "";
-
-        for (int i = 0; i < Math.min(pkg1.length, pkg2.length); i++) {
-            if (pkg1[i].equals(pkg2[i])) {
-                common = common + pkg1[i] + ".";
-            }
-        }
-        return common.isEmpty() ? common : common.substring(0, common.length() - 1);
     }
 
     @Override
@@ -228,6 +215,11 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     @Override
     public boolean hasErrorOccurred() {
         return errorOccurred;
+    }
+
+    @Override
+    public ClassName bundlerClass() {
+        return ClassName.get("in.workarounds.bundler", "Bundler");
     }
 
 

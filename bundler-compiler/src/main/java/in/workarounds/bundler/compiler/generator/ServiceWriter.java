@@ -26,24 +26,24 @@ public class ServiceWriter extends Writer {
     protected List<MethodSpec> getAdditionalHelperMethods() {
         List<MethodSpec> methods = super.getAdditionalHelperMethods();
         methods.add(
-                MethodSpec.methodBuilder(PARSE_METHOD)
+                MethodSpec.methodBuilder(model.methods().parse())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(CommonClasses.INTENT, INTENT_VAR)
-                        .returns(RETRIEVER_CLASS)
-                        .beginControlFlow("if($L == null)", INTENT_VAR)
-                        .addStatement("return new $T(null)", RETRIEVER_CLASS)
+                        .addParameter(CommonClasses.INTENT, model.vars().intent())
+                        .returns(model.classes().parser())
+                        .beginControlFlow("if($L == null)", model.vars().intent())
+                        .addStatement("return new $T(null)", model.classes().parser())
                         .endControlFlow()
-                        .addStatement("return $L($L.getExtras())", PARSE_METHOD, INTENT_VAR)
+                        .addStatement("return $L($L.getExtras())", model.methods().parse(), model.vars().intent())
                         .build()
         );
         methods.add(
-                MethodSpec.methodBuilder(INJECT_METHOD)
+                MethodSpec.methodBuilder(model.methods().inject())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(reqBundlerModel.getClassName(), SERVICE_VAR)
-                        .addParameter(CommonClasses.INTENT, INTENT_VAR)
-                        .addStatement("$T $L = $L($L)", RETRIEVER_CLASS, RETRIEVER_VAR, PARSE_METHOD, INTENT_VAR)
-                        .beginControlFlow("if(!$L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
-                        .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, SERVICE_VAR)
+                        .addParameter(model.getClassName(), SERVICE_VAR)
+                        .addParameter(CommonClasses.INTENT, model.vars().intent())
+                        .addStatement("$T $L = $L($L)", model.classes().parser(), model.vars().parser(), model.methods().parse(), model.vars().intent())
+                        .beginControlFlow("if(!$L.$L())", model.vars().parser(), model.methods().isNull())
+                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), SERVICE_VAR)
                         .endControlFlow()
                         .build()
         );
@@ -54,20 +54,20 @@ public class ServiceWriter extends Writer {
     protected List<MethodSpec> getAdditionalSupplierMethods() {
         List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
-                MethodSpec.methodBuilder(INTENT_METHOD)
+                MethodSpec.methodBuilder(model.methods().intent())
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(CommonClasses.CONTEXT, CONTEXT_VAR)
+                        .addParameter(CommonClasses.CONTEXT, model.vars().context())
                         .returns(CommonClasses.INTENT)
-                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, INTENT_VAR, CommonClasses.INTENT, CONTEXT_VAR, reqBundlerModel.getClassName())
-                        .addStatement("$L.putExtras($L())", INTENT_VAR, BUNDLE_METHOD)
-                        .addStatement("return $L", INTENT_VAR)
+                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, model.vars().intent(), CommonClasses.INTENT, model.vars().context(), model.getClassName())
+                        .addStatement("$L.putExtras($L())", model.vars().intent(), model.methods().bundle())
+                        .addStatement("return $L", model.vars().intent())
                         .build()
         );
         methods.add(
-                MethodSpec.methodBuilder(START_METHOD)
+                MethodSpec.methodBuilder(model.methods().start())
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(CommonClasses.CONTEXT, CONTEXT_VAR)
-                        .addStatement("$L.startService($L($L))", CONTEXT_VAR, INTENT_METHOD, CONTEXT_VAR)
+                        .addParameter(CommonClasses.CONTEXT, model.vars().context())
+                        .addStatement("$L.startService($L($L))", model.vars().context(), model.methods().intent(), model.vars().context())
                         .build()
         );
         return methods;

@@ -25,12 +25,12 @@ public class FragmentWriter extends Writer {
     protected List<MethodSpec> getAdditionalHelperMethods() {
         List<MethodSpec> methods = super.getAdditionalHelperMethods();
         methods.add(
-                MethodSpec.methodBuilder(INJECT_METHOD)
+                MethodSpec.methodBuilder(model.methods().inject())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(reqBundlerModel.getClassName(), FRAGMENT_VAR)
-                        .addStatement("$T $L = $L($L.getArguments())", RETRIEVER_CLASS, RETRIEVER_VAR, PARSE_METHOD, FRAGMENT_VAR)
-                        .beginControlFlow("if($L.$L())", RETRIEVER_VAR, IS_NULL_METHOD)
-                        .addStatement("$L.$L($L)", RETRIEVER_VAR, INTO_METHOD, FRAGMENT_VAR)
+                        .addParameter(model.getClassName(), FRAGMENT_VAR)
+                        .addStatement("$T $L = $L($L.getArguments())", model.classes().parser(), model.vars().parser(), model.methods().parse(), FRAGMENT_VAR)
+                        .beginControlFlow("if($L.$L())", model.vars().parser(), model.methods().isNull())
+                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), FRAGMENT_VAR)
                         .endControlFlow()
                         .build()
         );
@@ -41,11 +41,11 @@ public class FragmentWriter extends Writer {
     protected List<MethodSpec> getAdditionalSupplierMethods() {
         List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
-                MethodSpec.methodBuilder(CREATE_METHOD)
+                MethodSpec.methodBuilder(model.methods().create())
                         .addModifiers(Modifier.PUBLIC)
-                        .returns(reqBundlerModel.getClassName())
-                        .addStatement("$T $L = new $T()", reqBundlerModel.getClassName(), FRAGMENT_VAR, reqBundlerModel.getClassName())
-                        .addStatement("$L.setArguments($L())", FRAGMENT_VAR, BUNDLE_VAR)
+                        .returns(model.getClassName())
+                        .addStatement("$T $L = new $T()", model.getClassName(), FRAGMENT_VAR, model.getClassName())
+                        .addStatement("$L.setArguments($L())", FRAGMENT_VAR, model.vars().bundle())
                         .addStatement("return $L", FRAGMENT_VAR)
                         .build()
         );

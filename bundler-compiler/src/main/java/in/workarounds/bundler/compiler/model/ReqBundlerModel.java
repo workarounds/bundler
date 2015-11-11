@@ -11,22 +11,26 @@ import javax.lang.model.util.Types;
 
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.compiler.Provider;
+import in.workarounds.bundler.compiler.util.StringUtils;
 
 /**
  * Created by madki on 16/10/15.
  */
 public class ReqBundlerModel {
-    private static final String ACTIVITY    = "android.app.Activity";
-    private static final String FRAGMENT    = "android.app.Fragment";
+    private static final String ACTIVITY = "android.app.Activity";
+    private static final String FRAGMENT = "android.app.Fragment";
     private static final String FRAGMENT_V4 = "android.support.v4.app.Fragment";
-    private static final String SERVICE     = "android.app.Service";
+    private static final String SERVICE = "android.app.Service";
 
     private VARIETY variety;
     private ClassName className;
     private Element element;
+    private Methods methods;
+    private Classes classes;
+    private Vars vars;
 
     public ReqBundlerModel(Element element, Provider provider) {
-        if(element.getKind() != ElementKind.CLASS) {
+        if (element.getKind() != ElementKind.CLASS) {
             provider.error(element, "@%s annotation used on a non-class element %s",
                     RequireBundler.class.getSimpleName(),
                     element.getSimpleName());
@@ -37,6 +41,119 @@ public class ReqBundlerModel {
         variety = getVariety((TypeElement) element, provider.typeUtils());
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
         className = ClassName.bestGuess(qualifiedName);
+
+        this.methods = new Methods();
+        this.classes = new Classes(provider);
+        this.vars = new Vars();
+    }
+
+    public class Vars {
+
+        public String target() {
+            return StringUtils.getVariableName(getSimpleName());
+        }
+
+        public String bundle() {
+            return "bundle";
+        }
+
+        public String context() {
+            return "context";
+        }
+
+        public String intent() {
+            return "intent";
+        }
+
+        public String defaultVal() {
+            return "defaultVal";
+        }
+
+        public String parser() {
+            return "parser";
+        }
+    }
+
+    public class Methods {
+
+        public Methods() {
+        }
+
+        public String build() {
+            return StringUtils.getVariableName(getSimpleName());
+        }
+
+        public String parse() {
+            return "parse" + getSimpleName();
+        }
+
+        public String into() {
+            return "into";
+        }
+
+        public String bundle() {
+            return "bundle";
+        }
+
+        public String intent() {
+            return "intent";
+        }
+
+        public String start() {
+            return "start";
+        }
+
+        public String create() {
+            return "create";
+        }
+
+        public String inject() {
+            return "inject";
+        }
+
+        public String saveState() {
+            return "saveState";
+        }
+
+        public String restoreState() {
+            return "restoreState";
+        }
+
+        public String isNull() {
+            return "isNull";
+        }
+    }
+
+    public class Classes {
+        private Provider provider;
+
+        public Classes(Provider provider) {
+            this.provider = provider;
+        }
+
+        public ClassName bundler() {
+            return provider.bundlerClass();
+        }
+
+        public ClassName helper() {
+            return ClassName.bestGuess(getPackageName() + "." + "Helper$$" + getSimpleName());
+        }
+
+        public ClassName parser() {
+            return innerClass(helper(), "Parser");
+        }
+
+        public ClassName builder() {
+            return innerClass(helper(), "Builder");
+        }
+
+        public ClassName keys() {
+            return innerClass(bundler(), "Keys" + getSimpleName());
+        }
+
+        private ClassName innerClass(ClassName superClass, String innerClass) {
+            return ClassName.bestGuess(superClass.toString() + "." + innerClass);
+        }
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -73,6 +190,18 @@ public class ReqBundlerModel {
             default:
                 return VARIETY.OTHER;
         }
+    }
+
+    public Methods methods() {
+        return this.methods;
+    }
+
+    public Classes classes() {
+        return this.classes;
+    }
+
+    public Vars vars() {
+        return this.vars;
     }
 
     public Element getElement() {
