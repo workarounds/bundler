@@ -96,12 +96,12 @@ public class MethodAggregator {
             builder.addParameter(getArgParameter(arg));
         }
 
-        String statement = "return new $L()";
+        String statement = "return $T.$L()";
         for (ArgModel arg : args) {
             statement = statement + String.format(".%s(%s)", arg.getLabel(), arg.getLabel());
         }
 
-        builder.addStatement(statement, model.classes().builder());
+        builder.addStatement(statement, model.classes().helper(), model.methods().build());
         return builder.build();
     }
 

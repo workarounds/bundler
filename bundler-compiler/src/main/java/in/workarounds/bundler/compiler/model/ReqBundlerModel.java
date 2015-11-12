@@ -87,7 +87,7 @@ public class ReqBundlerModel {
         }
 
         public String build() {
-            return StringUtils.getVariableName(getSimpleName());
+            return "build";
         }
 
         public String parse() {

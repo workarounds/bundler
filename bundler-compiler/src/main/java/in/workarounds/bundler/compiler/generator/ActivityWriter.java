@@ -70,7 +70,7 @@ public class ActivityWriter extends Writer {
                 MethodSpec.methodBuilder(model.methods().inject())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(model.getClassName(), ACTIVITY_VAR)
-                        .addStatement("$L $L = $L.$L($L.getIntent())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), ACTIVITY_VAR)
+                        .addStatement("$T $L = $T.$L($L.getIntent())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), ACTIVITY_VAR)
                         .beginControlFlow("if(!$L.$L())", model.vars().parser(), model.methods().isNull())
                         .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), ACTIVITY_VAR)
                         .endControlFlow()

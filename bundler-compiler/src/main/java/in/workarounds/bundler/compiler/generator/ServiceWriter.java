@@ -71,7 +71,7 @@ public class ServiceWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(model.getClassName(), SERVICE_VAR)
                         .addParameter(CommonClasses.INTENT, model.vars().intent())
-                        .addStatement("$L $L = $L.$L($L)", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), model.vars().intent())
+                        .addStatement("$T $L = $T.$L($L)", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), model.vars().intent())
                         .beginControlFlow("if(!$L.$L())", model.vars().parser(), model.methods().isNull())
                         .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), SERVICE_VAR)
                         .endControlFlow()

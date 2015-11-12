@@ -28,7 +28,7 @@ public class FragmentWriter extends Writer {
                 MethodSpec.methodBuilder(model.methods().inject())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(model.getClassName(), FRAGMENT_VAR)
-                        .addStatement("$L $L = $L.$L($L.getArguments())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), FRAGMENT_VAR)
+                        .addStatement("$T $L = $T.$L($L.getArguments())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), FRAGMENT_VAR)
                         .beginControlFlow("if($L.$L())", model.vars().parser(), model.methods().isNull())
                         .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), FRAGMENT_VAR)
                         .endControlFlow()

@@ -70,6 +70,7 @@ public class Writer {
                 .addType(createKeysInterface())
                 .addMethod(saveMethod())
                 .addMethod(restoreMethod())
+                .addMethod(buildMethod())
                 .addMethod(parseBundleMethod())
                 .addMethods(getAdditionalHelperMethods())
                 .build();
@@ -174,6 +175,13 @@ public class Writer {
                 .build();
     }
 
+    protected MethodSpec buildMethod() {
+        return MethodSpec.methodBuilder(model.methods().build())
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(model.classes().builder())
+                .addStatement("return new $T()", model.classes().builder())
+                .build();
+    }
 
     protected List<MethodSpec> getAdditionalHelperMethods() {
         return new ArrayList<>();
@@ -197,7 +205,7 @@ public class Writer {
 
     public TypeSpec createBuilderClass() {
         MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PRIVATE)
                 .build();
 
         MethodSpec.Builder bundleBuilder = MethodSpec.methodBuilder(model.methods().bundle())
@@ -268,7 +276,7 @@ public class Writer {
                 .build();
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PRIVATE)
                 .addParameter(ParameterSpec.builder(CommonClasses.BUNDLE, model.vars().bundle()).build())
                 .addStatement("this.$L = $L", model.vars().bundle(), model.vars().bundle())
                 .build();
