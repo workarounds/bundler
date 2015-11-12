@@ -7,7 +7,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,12 +27,13 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 import in.workarounds.bundler.annotations.Arg;
-import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.generator.Writer;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
+import in.workarounds.bundler.compiler.support.MethodAggregator;
 
 @AutoService(Processor.class)
 public class BundlerProcessor extends AbstractProcessor implements Provider {
@@ -59,6 +60,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         String packageName = "in.workarounds.bundler";
+        MethodAggregator methodAggregator = new MethodAggregator(this);
 
         List<ReqBundlerModel> reqBundlerModels = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
@@ -68,12 +70,9 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         }
 
         if (reqBundlerModels.size() == 0) return true;
-        checkForSameName(reqBundlerModels);
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass().simpleName())
                 .addModifiers(Modifier.PUBLIC);
-
-        if (hasErrorOccurred()) return true;
 
         for (ReqBundlerModel model : reqBundlerModels) {
             List<ArgModel> argList = new ArrayList<>();
@@ -96,6 +95,12 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
             if (hasErrorOccurred()) return true;
 
+            HashMap<String, List<ArgModel>> methodMap = methodAggregator.getMethodMap(model, argList);
+
+            if (hasErrorOccurred()) return true;
+
+            classBuilder.addMethods(methodAggregator.getBundlerBuildMethods(model, methodMap));
+
             Writer writer = Writer.from(this, model, argList, states, packageName);
             writer.addToBundler(classBuilder);
 
@@ -114,32 +119,6 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             e.printStackTrace();
         }
         return true;
-    }
-
-    private void checkForSameName(List<ReqBundlerModel> reqBundlerModels) {
-        final Set<String> set1 = new HashSet<>();
-        for (ReqBundlerModel model : reqBundlerModels) {
-            if (!set1.add(model.getSimpleName())) {
-                for (ReqBundlerModel duplicate : reqBundlerModels) {
-                    if (duplicate.getSimpleName().equals(model.getSimpleName())) {
-                        error(null,
-                                "Two classes annotated with @%s have same name. Please change one of them.",
-                                RequireBundler.class.getSimpleName()
-                        );
-                        error(duplicate.getElement(),
-                                "%s",
-                                duplicate.getClassName().toString()
-                        );
-                        error(model.getElement(),
-                                "%s",
-                                model.getClassName().toString()
-                        );
-                        reportError();
-                        return;
-                    }
-                }
-            }
-        }
     }
 
     @Override

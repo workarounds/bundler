@@ -58,10 +58,7 @@ public class Writer {
                 .addMethod(bundlerRestoreMethod());
         // supply, retrieve
         classBuilder
-                .addMethod(buildMethod())
-                .addMethod(parseBundleMethod())
-                .addMethods(getAdditionalHelperMethods())
-                .addType(createKeysInterface());
+                .addMethods(getAdditionalBundlerMethods());
         return classBuilder;
     }
 
@@ -70,8 +67,11 @@ public class Writer {
                 .addModifiers(Modifier.PUBLIC)
                 .addType(createBuilderClass())
                 .addType(createParserClass())
+                .addType(createKeysInterface())
                 .addMethod(saveMethod())
                 .addMethod(restoreMethod())
+                .addMethod(parseBundleMethod())
+                .addMethods(getAdditionalHelperMethods())
                 .build();
         return JavaFile.builder(model.getPackageName(), helper).build();
     }
@@ -165,14 +165,6 @@ public class Writer {
         return builder.build();
     }
 
-    protected MethodSpec buildMethod() {
-        return MethodSpec.methodBuilder(model.methods().build())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(model.classes().builder())
-                .addStatement("return new $T()", model.classes().builder())
-                .build();
-    }
-
     protected MethodSpec parseBundleMethod() {
         return MethodSpec.methodBuilder(model.methods().parse())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -182,13 +174,18 @@ public class Writer {
                 .build();
     }
 
+
     protected List<MethodSpec> getAdditionalHelperMethods() {
+        return new ArrayList<>();
+    }
+
+    protected List<MethodSpec> getAdditionalBundlerMethods() {
         return new ArrayList<>();
     }
 
     public TypeSpec createKeysInterface() {
         TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(model.classes().keys().simpleName())
-                .addModifiers(Modifier.PUBLIC);
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (ArgModel cargo : argList) {
             FieldSpec fieldSpec = FieldSpec.builder(String.class, cargo.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$S", cargo.getKeyConstant().toLowerCase())
@@ -262,6 +259,7 @@ public class Writer {
                 .addStatement("return this")
                 .build();
     }
+
 
     public TypeSpec createParserClass() {
         String HAS_PREFIX = "has";

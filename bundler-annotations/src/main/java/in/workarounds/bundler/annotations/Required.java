@@ -10,6 +10,6 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * Created by madki on 21/10/15.
  */
 @Target(FIELD) @Retention(CLASS)
-public @interface Arg {
-    String[] value() default "";
+public @interface Required {
+    boolean value() default true;
 }

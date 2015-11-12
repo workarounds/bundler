@@ -10,8 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import in.workarounds.bundler.Bundler;
-
 /**
  * Created by madki on 29/10/15.
  */
@@ -30,10 +28,7 @@ public class BookListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundler.bookDetailActivity()
-                        .author(authors[position])
-                        .book(books[position])
-                        .start(BookListActivity.this);
+
             }
         });
     }

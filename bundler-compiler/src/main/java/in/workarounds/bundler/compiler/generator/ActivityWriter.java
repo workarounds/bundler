@@ -36,16 +36,7 @@ public class ActivityWriter extends Writer {
                         .addStatement("return $L($L.getExtras())", model.methods().parse(), model.vars().intent())
                         .build()
         );
-        methods.add(
-                MethodSpec.methodBuilder(model.methods().inject())
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(model.getClassName(), ACTIVITY_VAR)
-                        .addStatement("$T $L = $L($L.getIntent())", model.classes().parser(), model.vars().parser(), model.methods().parse(), ACTIVITY_VAR)
-                        .beginControlFlow("if(!$L.$L())", model.vars().parser(), model.methods().isNull())
-                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), ACTIVITY_VAR)
-                        .endControlFlow()
-                        .build()
-        );
+
         return methods;
     }
 
@@ -67,6 +58,22 @@ public class ActivityWriter extends Writer {
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(CommonClasses.CONTEXT, model.vars().context())
                         .addStatement("$L.startActivity($L($L))", model.vars().context(), model.methods().intent(), model.vars().context())
+                        .build()
+        );
+        return methods;
+    }
+
+    @Override
+    protected List<MethodSpec> getAdditionalBundlerMethods() {
+        List<MethodSpec> methods = super.getAdditionalBundlerMethods();
+        methods.add(
+                MethodSpec.methodBuilder(model.methods().inject())
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addParameter(model.getClassName(), ACTIVITY_VAR)
+                        .addStatement("$L $L = $L.$L($L.getIntent())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), ACTIVITY_VAR)
+                        .beginControlFlow("if(!$L.$L())", model.vars().parser(), model.methods().isNull())
+                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), ACTIVITY_VAR)
+                        .endControlFlow()
                         .build()
         );
         return methods;

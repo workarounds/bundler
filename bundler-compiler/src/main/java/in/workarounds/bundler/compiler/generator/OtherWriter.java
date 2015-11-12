@@ -24,14 +24,14 @@ public class OtherWriter extends Writer {
 
 
 @Override
-    protected List<MethodSpec> getAdditionalHelperMethods() {
-        List<MethodSpec> methods = super.getAdditionalHelperMethods();
+    protected List<MethodSpec> getAdditionalBundlerMethods() {
+        List<MethodSpec> methods = super.getAdditionalBundlerMethods();
         methods.add(
                 MethodSpec.methodBuilder(model.methods().inject())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(model.getClassName(), BUNDLER_VAR)
                         .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
-                        .addStatement("$T $L = $L($L)", model.classes().parser(), model.vars().parser(), model.methods().parse(), model.vars().bundle())
+                        .addStatement("$L $L = $L.$L($L)", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), model.vars().bundle())
                         .beginControlFlow("if($L.$L())", model.vars().parser(), model.methods().isNull())
                         .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), BUNDLER_VAR)
                         .endControlFlow()

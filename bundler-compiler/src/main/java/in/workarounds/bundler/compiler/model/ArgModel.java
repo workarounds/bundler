@@ -9,6 +9,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
 import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.Required;
 import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.util.Utils;
 
@@ -16,11 +17,14 @@ import in.workarounds.bundler.compiler.util.Utils;
  * Created by madki on 30/10/15.
  */
 public class ArgModel extends AnnotatedField {
+    private Element element;
     private List<AnnotationSpec> supportAnnotations;
-    private int[] required;
+    private Required required;
+    private String[] methods;
 
     public ArgModel(Element element, Provider provider) {
         super(element, provider, Arg.class);
+        this.element = element;
 
         supportAnnotations = new ArrayList<>();
         for(AnnotationMirror annotationMirror: element.getAnnotationMirrors()) {
@@ -30,14 +34,23 @@ public class ArgModel extends AnnotatedField {
         }
 
         Arg annotation = element.getAnnotation(Arg.class);
-        required = annotation.required();
+        required = element.getAnnotation(Required.class);
+        methods = annotation.value();
+    }
+
+    public boolean isRequired(boolean requireAll) {
+        return required == null ? requireAll : required.value();
     }
 
     public List<AnnotationSpec> getSupportAnnotations() {
         return supportAnnotations;
     }
 
-    public int[] getRequired() {
-        return required;
+    public String[] getMethods() {
+        return methods;
+    }
+
+    public Element getElement() {
+        return element;
     }
 }

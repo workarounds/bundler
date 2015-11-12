@@ -25,6 +25,9 @@ public class ReqBundlerModel {
     private VARIETY variety;
     private ClassName className;
     private Element element;
+    private String bundlerMethodName;
+    private boolean requireAll;
+
     private Methods methods;
     private Classes classes;
     private Vars vars;
@@ -38,6 +41,10 @@ public class ReqBundlerModel {
             return;
         }
         this.element = element;
+        RequireBundler annotation = element.getAnnotation(RequireBundler.class);
+        this.bundlerMethodName = annotation.bundlerMethod();
+        this.requireAll = annotation.requireAll();
+
         variety = getVariety((TypeElement) element, provider.typeUtils());
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
         className = ClassName.bestGuess(qualifiedName);
@@ -84,7 +91,7 @@ public class ReqBundlerModel {
         }
 
         public String parse() {
-            return "parse" + getSimpleName();
+            return "parse";
         }
 
         public String into() {
@@ -136,7 +143,7 @@ public class ReqBundlerModel {
         }
 
         public ClassName helper() {
-            return ClassName.bestGuess(getPackageName() + "." + "Helper$$" + getSimpleName());
+            return ClassName.bestGuess(getPackageName() + "." + getSimpleName() + "Bundler");
         }
 
         public ClassName parser() {
@@ -148,7 +155,7 @@ public class ReqBundlerModel {
         }
 
         public ClassName keys() {
-            return innerClass(bundler(), "Keys" + getSimpleName());
+            return innerClass(helper(), "Keys");
         }
 
         private ClassName innerClass(ClassName superClass, String innerClass) {
@@ -190,6 +197,14 @@ public class ReqBundlerModel {
             default:
                 return VARIETY.OTHER;
         }
+    }
+
+    public boolean requireAll() {
+        return this.requireAll;
+    }
+
+    public String getBundlerMethodName() {
+        return this.bundlerMethodName;
     }
 
     public Methods methods() {

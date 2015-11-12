@@ -18,7 +18,7 @@ import in.workarounds.samples.bundler.R;
 /**
  * Created by madki on 16/10/15.
  */
-@RequireBundler
+@RequireBundler(requireAll = false, bundlerMethod = "someTestActivity")
 public class TestActivity extends AppCompatActivity {
     @Arg
     int integer;

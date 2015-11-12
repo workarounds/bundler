@@ -11,4 +11,6 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  */
 @Retention(CLASS) @Target(TYPE)
 public @interface RequireBundler {
+    boolean requireAll() default true;
+    String bundlerMethod() default "";
 }

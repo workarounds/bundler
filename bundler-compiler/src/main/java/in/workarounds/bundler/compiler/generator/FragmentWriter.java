@@ -21,14 +21,14 @@ public class FragmentWriter extends Writer {
         super(provider, reqBundlerModel, cargoList, states, packageName);
     }
 
-        @Override
-    protected List<MethodSpec> getAdditionalHelperMethods() {
-        List<MethodSpec> methods = super.getAdditionalHelperMethods();
+    @Override
+    protected List<MethodSpec> getAdditionalBundlerMethods() {
+        List<MethodSpec> methods = super.getAdditionalBundlerMethods();
         methods.add(
                 MethodSpec.methodBuilder(model.methods().inject())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addParameter(model.getClassName(), FRAGMENT_VAR)
-                        .addStatement("$T $L = $L($L.getArguments())", model.classes().parser(), model.vars().parser(), model.methods().parse(), FRAGMENT_VAR)
+                        .addStatement("$L $L = $L.$L($L.getArguments())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), FRAGMENT_VAR)
                         .beginControlFlow("if($L.$L())", model.vars().parser(), model.methods().isNull())
                         .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), FRAGMENT_VAR)
                         .endControlFlow()

@@ -74,6 +74,6 @@ public class BookDetailActivity extends AppCompatActivity {
 
     @IntDef({BOOK_TYPE_FICTION, BOOK_TYPE_NON_FICTION})
     @Retention(RetentionPolicy.SOURCE)
-    @interface BookType {
+    public @interface BookType {
     }
 }
