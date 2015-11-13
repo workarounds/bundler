@@ -25,17 +25,18 @@ public class BookDetailActivity extends AppCompatActivity {
     private static final String TAG = "BookDetailActivity";
     public static final int BOOK_TYPE_FICTION = 1;
     public static final int BOOK_TYPE_NON_FICTION = 2;
+    private static final String FIRST_WAY = "firstWay";
+    private static final String SECOND_WAY = "secondWay";
 
-
-    @Arg
+    @Arg({FIRST_WAY, SECOND_WAY})
     @State
     int id;
     @NonNull
-    @Arg
+    @Arg({FIRST_WAY})
     @State
     String book;
     @Nullable
-    @Arg
+    @Arg({SECOND_WAY})
     @State
     String author;
     @Arg
