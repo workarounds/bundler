@@ -74,31 +74,12 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
                 .addModifiers(Modifier.PUBLIC);
 
         for (ReqBundlerModel model : reqBundlerModels) {
-            List<ArgModel> argList = new ArrayList<>();
-            for (Element possibleCargo : model.getElement().getEnclosedElements()) {
-                Arg arg = possibleCargo.getAnnotation(Arg.class);
-                if (arg != null) {
-                    ArgModel argModel = new ArgModel(possibleCargo, this);
-                    argList.add(argModel);
-                }
-            }
 
-            List<StateModel> states = new ArrayList<>();
-            for (Element possibleState : model.getElement().getEnclosedElements()) {
-                State instanceState = possibleState.getAnnotation(State.class);
-                if (instanceState != null) {
-                    StateModel state = new StateModel(possibleState, this);
-                    states.add(state);
-                }
-            }
+            classBuilder.addMethod(methodAggregator.getBundlerBuildMethod(model));
 
             if (hasErrorOccurred()) return true;
 
-            classBuilder.addMethod(methodAggregator.getBundlerBuildMethod(model, argList));
-
-            if (hasErrorOccurred()) return true;
-
-            Writer writer = Writer.from(this, model, argList, states);
+            Writer writer = Writer.from(this, model);
             writer.addToBundler(classBuilder);
 
             try {

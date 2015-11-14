@@ -27,11 +27,11 @@ public class MethodAggregator {
         this.provider = provider;
     }
 
-    public MethodSpec getBundlerBuildMethod(ReqBundlerModel model, List<ArgModel> argModels) {
+    public MethodSpec getBundlerBuildMethod(ReqBundlerModel model) {
             boolean requireAll = model.requireAll();
             List<ArgModel> methodArgs = new ArrayList<>();
 
-            for (ArgModel arg: argModels) {
+            for (ArgModel arg: model.getArgs()) {
                 if(arg.isRequired(requireAll)) {
                     methodArgs.add(arg);
                 }

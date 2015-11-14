@@ -31,26 +31,26 @@ public class Writer {
     protected List<ArgModel> argList;
     protected List<StateModel> states;
 
-    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel) {
         switch (reqBundlerModel.getVariety()) {
             case ACTIVITY:
-                return new ActivityWriter(provider, reqBundlerModel, cargoList, states);
+                return new ActivityWriter(provider, reqBundlerModel);
             case SERVICE:
-                return new ServiceWriter(provider, reqBundlerModel, cargoList, states);
+                return new ServiceWriter(provider, reqBundlerModel);
             case FRAGMENT:
             case FRAGMENT_V4:
-                return new FragmentWriter(provider, reqBundlerModel, cargoList, states);
+                return new FragmentWriter(provider, reqBundlerModel);
             default:
-                return new OtherWriter(provider, reqBundlerModel, cargoList, states);
+                return new OtherWriter(provider, reqBundlerModel);
         }
     }
 
 
-    protected Writer(Provider provider, ReqBundlerModel model, List<ArgModel> argList, List<StateModel> states) {
+    protected Writer(Provider provider, ReqBundlerModel model) {
         this.provider = provider;
         this.model = model;
-        this.argList = argList;
-        this.states = states;
+        this.argList = model.getArgs();
+        this.states = model.getStates();
     }
 
     public TypeSpec.Builder addToBundler(TypeSpec.Builder classBuilder) {

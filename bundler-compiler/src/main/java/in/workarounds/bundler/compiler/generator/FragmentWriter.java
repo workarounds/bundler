@@ -7,9 +7,7 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.bundler.compiler.Provider;
-import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
-import in.workarounds.bundler.compiler.model.StateModel;
 import in.workarounds.bundler.compiler.util.names.ClassProvider;
 import in.workarounds.bundler.compiler.util.names.MethodName;
 import in.workarounds.bundler.compiler.util.names.VarName;
@@ -19,8 +17,8 @@ import in.workarounds.bundler.compiler.util.names.VarName;
  */
 public class FragmentWriter extends Writer {
 
-    protected FragmentWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
-        super(provider, reqBundlerModel, cargoList, states);
+    protected FragmentWriter(Provider provider, ReqBundlerModel reqBundlerModel) {
+        super(provider, reqBundlerModel);
     }
 
     @Override

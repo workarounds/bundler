@@ -2,6 +2,9 @@ package in.workarounds.bundler.compiler.model;
 
 import com.squareup.javapoet.ClassName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -9,7 +12,9 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
+import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.Provider;
 
 /**
@@ -27,6 +32,9 @@ public class ReqBundlerModel {
     private String bundlerMethodName;
     private boolean requireAll;
 
+    private List<StateModel> states;
+    private List<ArgModel> args;
+
     public ReqBundlerModel(Element element, Provider provider) {
         if (element.getKind() != ElementKind.CLASS) {
             provider.error(element, "@%s annotation used on a non-class element %s",
@@ -35,6 +43,7 @@ public class ReqBundlerModel {
             provider.reportError();
             return;
         }
+
         this.element = element;
         RequireBundler annotation = element.getAnnotation(RequireBundler.class);
         this.bundlerMethodName = annotation.bundlerMethod();
@@ -43,6 +52,24 @@ public class ReqBundlerModel {
         variety = getVariety((TypeElement) element, provider.typeUtils());
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
         className = ClassName.bestGuess(qualifiedName);
+
+        args = new ArrayList<>();
+        states = new ArrayList<>();
+
+        for (Element enclosedElement : element.getEnclosedElements()) {
+            Arg arg = enclosedElement.getAnnotation(Arg.class);
+            State instanceState = enclosedElement.getAnnotation(State.class);
+
+            if (arg != null) {
+                ArgModel argModel = new ArgModel(enclosedElement, provider);
+                args.add(argModel);
+            }
+
+            if (instanceState != null) {
+                StateModel state = new StateModel(enclosedElement, provider);
+                states.add(state);
+            }
+        }
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -115,5 +142,13 @@ public class ReqBundlerModel {
         FRAGMENT_V4,
         SERVICE,
         OTHER
+    }
+
+    public List<ArgModel> getArgs() {
+        return args;
+    }
+
+    public List<StateModel> getStates() {
+        return states;
     }
 }
