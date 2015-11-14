@@ -4,10 +4,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -29,17 +26,7 @@ public class MethodAggregator {
         this.provider = provider;
     }
 
-    public HashMap<String, List<ArgModel>> getMethodMap(ReqBundlerModel model, List<ArgModel> argModels) {
-        HashMap<String, List<ArgModel>> methodMap = new HashMap<>();
-        for (ArgModel arg : argModels) {
-            for (String s : arg.getMethods()) {
-                if (!s.isEmpty()) {
-                    addToMap(methodMap, s, arg);
-                }
-            }
-        }
-
-        if(methodMap.isEmpty()) {
+    public MethodSpec getBundlerBuildMethod(ReqBundlerModel model, List<ArgModel> argModels) {
             String bundlerMethodName = model.getBundlerMethodName().isEmpty()?
                     StringUtils.getVariableName(model.getSimpleName()) : model.getBundlerMethodName();
             boolean requireAll = model.requireAll();
@@ -50,41 +37,19 @@ public class MethodAggregator {
                     methodArgs.add(arg);
                 }
             }
-            methodMap.put(bundlerMethodName, methodArgs);
-        }
 
-        checkMethodsValidity(methodMap.keySet(), model.getElement());
+        checkMethodsValidity(bundlerMethodName, model.getElement());
 
-        return methodMap;
+        return bundlerBuildMethod(model, bundlerMethodName, methodArgs);
     }
 
-    private void checkMethodsValidity(Set<String> currentMethods, Element element) {
-        for (String method: currentMethods) {
-            if(methods.contains(method)) {
-                provider.error(element, "MethodName already used, please change the method name: %s", method);
+    private void checkMethodsValidity(String bundlerMethodName, Element element) {
+            if(methods.contains(bundlerMethodName)) {
+                provider.error(element, "MethodName already used, please change the method name: %s", bundlerMethodName);
                 provider.reportError();
             } else {
-                methods.add(method);
+                methods.add(bundlerMethodName);
             }
-        }
-    }
-
-    public List<MethodSpec> getBundlerBuildMethods(ReqBundlerModel model, HashMap<String, List<ArgModel>> methodMap) {
-        List<MethodSpec> methods = new ArrayList<>();
-        for(Map.Entry<String, List<ArgModel>> entry: methodMap.entrySet()) {
-            methods.add(bundlerBuildMethod(model, entry.getKey(), entry.getValue()));
-        }
-        return methods;
-    }
-
-    private void addToMap(HashMap<String, List<ArgModel>> methodMap, String method, ArgModel arg) {
-        if(methodMap.containsKey(method)) {
-            methodMap.get(method).add(arg);
-        } else {
-            List<ArgModel> args = new ArrayList<>();
-            args.add(arg);
-            methodMap.put(method, args);
-        }
     }
 
     protected MethodSpec bundlerBuildMethod(ReqBundlerModel model, String methodName, List<ArgModel> args) {

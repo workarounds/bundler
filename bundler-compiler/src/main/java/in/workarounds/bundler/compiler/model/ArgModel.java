@@ -20,7 +20,6 @@ public class ArgModel extends AnnotatedField {
     private Element element;
     private List<AnnotationSpec> supportAnnotations;
     private Required required;
-    private String[] methods;
 
     public ArgModel(Element element, Provider provider) {
         super(element, provider, Arg.class);
@@ -33,9 +32,7 @@ public class ArgModel extends AnnotatedField {
            }
         }
 
-        Arg annotation = element.getAnnotation(Arg.class);
         required = element.getAnnotation(Required.class);
-        methods = annotation.value();
     }
 
     public boolean isRequired(boolean requireAll) {
@@ -44,10 +41,6 @@ public class ArgModel extends AnnotatedField {
 
     public List<AnnotationSpec> getSupportAnnotations() {
         return supportAnnotations;
-    }
-
-    public String[] getMethods() {
-        return methods;
     }
 
     public Element getElement() {

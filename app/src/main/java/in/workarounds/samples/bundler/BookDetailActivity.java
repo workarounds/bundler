@@ -28,15 +28,15 @@ public class BookDetailActivity extends AppCompatActivity {
     private static final String FIRST_WAY = "firstWay";
     private static final String SECOND_WAY = "secondWay";
 
-    @Arg({FIRST_WAY, SECOND_WAY})
+    @Arg
     @State
     int id;
     @NonNull
-    @Arg({FIRST_WAY})
+    @Arg
     @State
     String book;
     @Nullable
-    @Arg({SECOND_WAY})
+    @Arg
     @State
     String author;
     @Arg

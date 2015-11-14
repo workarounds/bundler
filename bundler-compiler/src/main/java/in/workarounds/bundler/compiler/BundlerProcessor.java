@@ -7,7 +7,6 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -95,11 +94,9 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
             if (hasErrorOccurred()) return true;
 
-            HashMap<String, List<ArgModel>> methodMap = methodAggregator.getMethodMap(model, argList);
+            classBuilder.addMethod(methodAggregator.getBundlerBuildMethod(model, argList));
 
             if (hasErrorOccurred()) return true;
-
-            classBuilder.addMethods(methodAggregator.getBundlerBuildMethods(model, methodMap));
 
             Writer writer = Writer.from(this, model, argList, states, packageName);
             writer.addToBundler(classBuilder);

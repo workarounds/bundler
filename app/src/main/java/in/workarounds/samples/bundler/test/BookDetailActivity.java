@@ -9,7 +9,7 @@ import in.workarounds.bundler.annotations.RequireBundler;
 /**
  * Created by madki on 12/11/15.
  */
-@RequireBundler
+@RequireBundler(bundlerMethod = "bookDetailActivity2")
 public class BookDetailActivity extends AppCompatActivity {
     @Arg int one;
     @Arg String two;
