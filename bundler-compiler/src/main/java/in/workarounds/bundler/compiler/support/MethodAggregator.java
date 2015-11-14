@@ -12,7 +12,8 @@ import javax.lang.model.element.Modifier;
 import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
-import in.workarounds.bundler.compiler.util.StringUtils;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
+import in.workarounds.bundler.compiler.util.names.MethodName;
 
 /**
  * Created by madki on 12/11/15.
@@ -27,8 +28,6 @@ public class MethodAggregator {
     }
 
     public MethodSpec getBundlerBuildMethod(ReqBundlerModel model, List<ArgModel> argModels) {
-            String bundlerMethodName = model.getBundlerMethodName().isEmpty()?
-                    StringUtils.getVariableName(model.getSimpleName()) : model.getBundlerMethodName();
             boolean requireAll = model.requireAll();
             List<ArgModel> methodArgs = new ArrayList<>();
 
@@ -38,9 +37,9 @@ public class MethodAggregator {
                 }
             }
 
-        checkMethodsValidity(bundlerMethodName, model.getElement());
+        checkMethodsValidity(MethodName.build(model), model.getElement());
 
-        return bundlerBuildMethod(model, bundlerMethodName, methodArgs);
+        return bundlerBuildMethod(model, methodArgs);
     }
 
     private void checkMethodsValidity(String bundlerMethodName, Element element) {
@@ -52,10 +51,10 @@ public class MethodAggregator {
             }
     }
 
-    protected MethodSpec bundlerBuildMethod(ReqBundlerModel model, String methodName, List<ArgModel> args) {
-        MethodSpec.Builder builder = MethodSpec.methodBuilder(methodName)
+    protected MethodSpec bundlerBuildMethod(ReqBundlerModel model, List<ArgModel> args) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(MethodName.build(model))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(model.classes().builder());
+                .returns(ClassProvider.builder(model));
 
         for (ArgModel arg : args) {
             builder.addParameter(getArgParameter(arg));
@@ -66,7 +65,7 @@ public class MethodAggregator {
             statement = statement + String.format(".%s(%s)", arg.getLabel(), arg.getLabel());
         }
 
-        builder.addStatement(statement, model.classes().helper(), model.methods().build());
+        builder.addStatement(statement, ClassProvider.helper(model), MethodName.build);
         return builder.build();
     }
 

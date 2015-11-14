@@ -11,7 +11,6 @@ import javax.lang.model.util.Types;
 
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.compiler.Provider;
-import in.workarounds.bundler.compiler.util.StringUtils;
 
 /**
  * Created by madki on 16/10/15.
@@ -27,10 +26,6 @@ public class ReqBundlerModel {
     private Element element;
     private String bundlerMethodName;
     private boolean requireAll;
-
-    private Methods methods;
-    private Classes classes;
-    private Vars vars;
 
     public ReqBundlerModel(Element element, Provider provider) {
         if (element.getKind() != ElementKind.CLASS) {
@@ -48,119 +43,6 @@ public class ReqBundlerModel {
         variety = getVariety((TypeElement) element, provider.typeUtils());
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
         className = ClassName.bestGuess(qualifiedName);
-
-        this.methods = new Methods();
-        this.classes = new Classes(provider);
-        this.vars = new Vars();
-    }
-
-    public class Vars {
-
-        public String target() {
-            return StringUtils.getVariableName(getSimpleName());
-        }
-
-        public String bundle() {
-            return "bundle";
-        }
-
-        public String context() {
-            return "context";
-        }
-
-        public String intent() {
-            return "intent";
-        }
-
-        public String defaultVal() {
-            return "defaultVal";
-        }
-
-        public String parser() {
-            return "parser";
-        }
-    }
-
-    public class Methods {
-
-        public Methods() {
-        }
-
-        public String build() {
-            return "build";
-        }
-
-        public String parse() {
-            return "parse";
-        }
-
-        public String into() {
-            return "into";
-        }
-
-        public String bundle() {
-            return "bundle";
-        }
-
-        public String intent() {
-            return "intent";
-        }
-
-        public String start() {
-            return "start";
-        }
-
-        public String create() {
-            return "create";
-        }
-
-        public String inject() {
-            return "inject";
-        }
-
-        public String saveState() {
-            return "saveState";
-        }
-
-        public String restoreState() {
-            return "restoreState";
-        }
-
-        public String isNull() {
-            return "isNull";
-        }
-    }
-
-    public class Classes {
-        private Provider provider;
-
-        public Classes(Provider provider) {
-            this.provider = provider;
-        }
-
-        public ClassName bundler() {
-            return provider.bundlerClass();
-        }
-
-        public ClassName helper() {
-            return ClassName.bestGuess(getPackageName() + "." + getSimpleName() + "Bundler");
-        }
-
-        public ClassName parser() {
-            return innerClass(helper(), "Parser");
-        }
-
-        public ClassName builder() {
-            return innerClass(helper(), "Builder");
-        }
-
-        public ClassName keys() {
-            return innerClass(helper(), "Keys");
-        }
-
-        private ClassName innerClass(ClassName superClass, String innerClass) {
-            return ClassName.bestGuess(superClass.toString() + "." + innerClass);
-        }
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -205,18 +87,6 @@ public class ReqBundlerModel {
 
     public String getBundlerMethodName() {
         return this.bundlerMethodName;
-    }
-
-    public Methods methods() {
-        return this.methods;
-    }
-
-    public Classes classes() {
-        return this.classes;
-    }
-
-    public Vars vars() {
-        return this.vars;
     }
 
     public Element getElement() {

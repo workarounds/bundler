@@ -17,8 +17,10 @@ import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
-import in.workarounds.bundler.compiler.util.CommonClasses;
 import in.workarounds.bundler.compiler.util.StringUtils;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
+import in.workarounds.bundler.compiler.util.names.MethodName;
+import in.workarounds.bundler.compiler.util.names.VarName;
 
 /**
  * Created by madki on 19/10/15.
@@ -29,22 +31,22 @@ public class Writer {
     protected List<ArgModel> argList;
     protected List<StateModel> states;
 
-    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states, String packageName) {
+    public static Writer from(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
         switch (reqBundlerModel.getVariety()) {
             case ACTIVITY:
-                return new ActivityWriter(provider, reqBundlerModel, cargoList, states, packageName);
+                return new ActivityWriter(provider, reqBundlerModel, cargoList, states);
             case SERVICE:
-                return new ServiceWriter(provider, reqBundlerModel, cargoList, states, packageName);
+                return new ServiceWriter(provider, reqBundlerModel, cargoList, states);
             case FRAGMENT:
             case FRAGMENT_V4:
-                return new FragmentWriter(provider, reqBundlerModel, cargoList, states, packageName);
+                return new FragmentWriter(provider, reqBundlerModel, cargoList, states);
             default:
-                return new OtherWriter(provider, reqBundlerModel, cargoList, states, packageName);
+                return new OtherWriter(provider, reqBundlerModel, cargoList, states);
         }
     }
 
 
-    protected Writer(Provider provider, ReqBundlerModel model, List<ArgModel> argList, List<StateModel> states, String packageName) {
+    protected Writer(Provider provider, ReqBundlerModel model, List<ArgModel> argList, List<StateModel> states) {
         this.provider = provider;
         this.model = model;
         this.argList = argList;
@@ -63,7 +65,7 @@ public class Writer {
     }
 
     public JavaFile brewHelper() {
-        TypeSpec helper = TypeSpec.classBuilder(model.classes().helper().simpleName())
+        TypeSpec helper = TypeSpec.classBuilder(ClassProvider.helper(model).simpleName())
                 .addModifiers(Modifier.PUBLIC)
                 .addType(createBuilderClass())
                 .addType(createParserClass())
@@ -78,38 +80,38 @@ public class Writer {
     }
 
     protected MethodSpec bundlerSaveMethod() {
-        return MethodSpec.methodBuilder(model.methods().saveState())
+        return MethodSpec.methodBuilder(MethodName.saveState)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(model.getClassName(), model.vars().target())
-                .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
-                .returns(CommonClasses.BUNDLE)
+                .addParameter(model.getClassName(), VarName.from(model))
+                .addParameter(ClassProvider.bundle, VarName.bundle)
+                .returns(ClassProvider.bundle)
                 .addStatement("return $T.$L($L, $L)",
-                        model.classes().helper(), model.methods().saveState(),
-                        model.vars().target(), model.vars().bundle()
+                        ClassProvider.helper(model), MethodName.saveState,
+                        VarName.from(model), VarName.bundle
                 )
                 .build();
     }
 
     protected MethodSpec bundlerRestoreMethod() {
-        return MethodSpec.methodBuilder(model.methods().restoreState())
+        return MethodSpec.methodBuilder(MethodName.restoreState)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(model.getClassName(), model.vars().target())
-                .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
+                .addParameter(model.getClassName(), VarName.from(model))
+                .addParameter(ClassProvider.bundle, VarName.bundle)
                 .addStatement("$T.$L($L, $L)",
-                        model.classes().helper(), model.methods().restoreState(),
-                        model.vars().target(), model.vars().bundle()
+                        ClassProvider.helper(model), MethodName.restoreState,
+                        VarName.from(model), VarName.bundle
                 )
                 .build();
     }
 
     protected MethodSpec saveMethod() {
-        MethodSpec.Builder builder = MethodSpec.methodBuilder(model.methods().saveState())
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(MethodName.saveState)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(CommonClasses.BUNDLE)
-                .addParameter(model.getClassName(), model.vars().target())
-                .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
-                .beginControlFlow("if($L == null)", model.vars().bundle())
-                .addStatement("$L = new $T()", model.vars().bundle(), CommonClasses.BUNDLE)
+                .returns(ClassProvider.bundle)
+                .addParameter(model.getClassName(), VarName.from(model))
+                .addParameter(ClassProvider.bundle, VarName.bundle)
+                .beginControlFlow("if($L == null)", VarName.bundle)
+                .addStatement("$L = new $T()", VarName.bundle, ClassProvider.bundle)
                 .endControlFlow();
 
         String label;
@@ -120,24 +122,24 @@ public class Writer {
 
             if (type.isPrimitive()) {
                 builder.addStatement("$L.put$L($S, $L.$L)",
-                        model.vars().bundle(), state.getBundleMethodSuffix(), label, model.vars().target(), label);
+                        VarName.bundle, state.getBundleMethodSuffix(), label, VarName.from(model), label);
             } else {
-                builder.beginControlFlow("if($L.$L != null)", model.vars().target(), label)
+                builder.beginControlFlow("if($L.$L != null)", VarName.from(model), label)
                         .addStatement("$L.put$L($S, $L.$L)",
-                                model.vars().bundle(), state.getBundleMethodSuffix(), label, model.vars().target(), label)
+                                VarName.bundle, state.getBundleMethodSuffix(), label, VarName.from(model), label)
                         .endControlFlow();
             }
         }
-        builder.addStatement("return $L", model.vars().bundle());
+        builder.addStatement("return $L", VarName.bundle);
         return builder.build();
     }
 
     protected MethodSpec restoreMethod() {
-        MethodSpec.Builder builder = MethodSpec.methodBuilder(model.methods().restoreState())
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(MethodName.restoreState)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(model.getClassName(), model.vars().target())
-                .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
-                .beginControlFlow("if($L == null)", model.vars().bundle())
+                .addParameter(model.getClassName(), VarName.from(model))
+                .addParameter(ClassProvider.bundle, VarName.bundle)
+                .beginControlFlow("if($L == null)", VarName.bundle)
                 .addStatement("return")
                 .endControlFlow();
 
@@ -149,15 +151,15 @@ public class Writer {
 
             if (type.isPrimitive()) {
                 builder.addStatement("$L.$L = $L.get$L($S, $L.$L)",
-                        model.vars().target(), label, model.vars().bundle(), state.getBundleMethodSuffix(), label, model.vars().target(), label);
+                        VarName.from(model), label, VarName.bundle, state.getBundleMethodSuffix(), label, VarName.from(model), label);
             } else {
-                builder.beginControlFlow("if($L.containsKey($S))", model.vars().bundle(), label);
+                builder.beginControlFlow("if($L.containsKey($S))", VarName.bundle, label);
                 if (state.requiresCasting()) {
                     builder.addStatement("$L.$L = ($T) $L.get$L($S)",
-                            model.vars().target(), label, type, model.vars().bundle(), state.getBundleMethodSuffix(), label);
+                            VarName.from(model), label, type, VarName.bundle, state.getBundleMethodSuffix(), label);
                 } else {
                     builder.addStatement("$L.$L = $L.get$L($S)",
-                            model.vars().target(), label, model.vars().bundle(), state.getBundleMethodSuffix(), label);
+                            VarName.from(model), label, VarName.bundle, state.getBundleMethodSuffix(), label);
                 }
                 builder.endControlFlow();
             }
@@ -167,19 +169,19 @@ public class Writer {
     }
 
     protected MethodSpec parseBundleMethod() {
-        return MethodSpec.methodBuilder(model.methods().parse())
+        return MethodSpec.methodBuilder(MethodName.parse)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
-                .returns(model.classes().parser())
-                .addStatement("return new $T($L)", model.classes().parser(), model.vars().bundle())
+                .addParameter(ClassProvider.bundle, VarName.bundle)
+                .returns(ClassProvider.parser(model))
+                .addStatement("return new $T($L)", ClassProvider.parser(model), VarName.bundle)
                 .build();
     }
 
     protected MethodSpec buildMethod() {
-        return MethodSpec.methodBuilder(model.methods().build())
+        return MethodSpec.methodBuilder(MethodName.build)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(model.classes().builder())
-                .addStatement("return new $T()", model.classes().builder())
+                .returns(ClassProvider.builder(model))
+                .addStatement("return new $T()", ClassProvider.builder(model))
                 .build();
     }
 
@@ -192,7 +194,7 @@ public class Writer {
     }
 
     public TypeSpec createKeysInterface() {
-        TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(model.classes().keys().simpleName())
+        TypeSpec.Builder keyBuilder = TypeSpec.interfaceBuilder(ClassProvider.keys(model).simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (ArgModel cargo : argList) {
             FieldSpec fieldSpec = FieldSpec.builder(String.class, cargo.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -208,15 +210,15 @@ public class Writer {
                 .addModifiers(Modifier.PRIVATE)
                 .build();
 
-        MethodSpec.Builder bundleBuilder = MethodSpec.methodBuilder(model.methods().bundle())
+        MethodSpec.Builder bundleBuilder = MethodSpec.methodBuilder(MethodName.bundle)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(CommonClasses.BUNDLE)
+                .returns(ClassProvider.bundle)
                 .addStatement("$T $L = new $T()",
-                        CommonClasses.BUNDLE,
-                        model.vars().bundle(),
-                        CommonClasses.BUNDLE);
+                        ClassProvider.bundle,
+                        VarName.bundle,
+                        ClassProvider.bundle);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(model.classes().builder().simpleName())
+        TypeSpec.Builder builder = TypeSpec.classBuilder(ClassProvider.builder(model).simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addMethod(constructor);
 
@@ -237,9 +239,9 @@ public class Writer {
 
             bundleBuilder.beginControlFlow("if($L != null)", label);
             bundleBuilder.addStatement("$L.put$L($T.$L, $L)",
-                    model.vars().bundle(),
+                    VarName.bundle,
                     cargo.getBundleMethodSuffix(),
-                    model.classes().keys(),
+                    ClassProvider.keys(model),
                     cargo.getKeyConstant(),
                     label);
             bundleBuilder.endControlFlow();
@@ -247,7 +249,7 @@ public class Writer {
             builder.addMethod(builderSetterMethod(type, label, cargo.getSupportAnnotations()));
         }
 
-        bundleBuilder.addStatement("return $L", model.vars().bundle());
+        bundleBuilder.addStatement("return $L", VarName.bundle);
         builder.addMethod(bundleBuilder.build());
         builder.addMethods(getAdditionalSupplierMethods());
 
@@ -261,7 +263,7 @@ public class Writer {
     private MethodSpec builderSetterMethod(TypeName type, String label, List<AnnotationSpec> annotationSpecs) {
         return MethodSpec.methodBuilder(label)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(model.classes().builder())
+                .returns(ClassProvider.builder(model))
                 .addParameter(ParameterSpec.builder(type, label).addAnnotations(annotationSpecs).build())
                 .addStatement("this.$L = $L", label, label)
                 .addStatement("return this")
@@ -272,26 +274,26 @@ public class Writer {
     public TypeSpec createParserClass() {
         String HAS_PREFIX = "has";
 
-        FieldSpec bundle = FieldSpec.builder(CommonClasses.BUNDLE, model.vars().bundle(), Modifier.PRIVATE)
+        FieldSpec bundle = FieldSpec.builder(ClassProvider.bundle, VarName.bundle, Modifier.PRIVATE)
                 .build();
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
-                .addParameter(ParameterSpec.builder(CommonClasses.BUNDLE, model.vars().bundle()).build())
-                .addStatement("this.$L = $L", model.vars().bundle(), model.vars().bundle())
+                .addParameter(ParameterSpec.builder(ClassProvider.bundle, VarName.bundle).build())
+                .addStatement("this.$L = $L", VarName.bundle, VarName.bundle)
                 .build();
 
-        MethodSpec isNull = MethodSpec.methodBuilder(model.methods().isNull())
+        MethodSpec isNull = MethodSpec.methodBuilder(MethodName.isNull)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(boolean.class)
-                .addStatement("return $L == null", model.vars().bundle())
+                .addStatement("return $L == null", VarName.bundle)
                 .build();
 
-        MethodSpec.Builder intoBuilder = MethodSpec.methodBuilder(model.methods().into())
+        MethodSpec.Builder intoBuilder = MethodSpec.methodBuilder(MethodName.into)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(model.getClassName(), model.vars().target());
+                .addParameter(model.getClassName(), VarName.from(model));
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(model.classes().parser().simpleName())
+        TypeSpec.Builder builder = TypeSpec.classBuilder(ClassProvider.parser(model).simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(bundle)
                 .addMethod(constructor)
@@ -310,10 +312,10 @@ public class Writer {
 
             intoBuilder.beginControlFlow("if($L())", hasMethod);
             if (type.isPrimitive()) {
-                intoBuilder.addStatement("$L.$L = $L($L.$L)", model.vars().target(), label,
-                        label, model.vars().target(), label);
+                intoBuilder.addStatement("$L.$L = $L($L.$L)", VarName.from(model), label,
+                        label, VarName.from(model), label);
             } else {
-                intoBuilder.addStatement("$L.$L = $L()", model.vars().target(), label, label);
+                intoBuilder.addStatement("$L.$L = $L()", VarName.from(model), label, label);
             }
             intoBuilder.endControlFlow();
             // TODO throw exception in else block if @NotEmpty present
@@ -327,7 +329,7 @@ public class Writer {
         return MethodSpec.methodBuilder(hasMethod)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(boolean.class)
-                .addStatement("return !$L() && $L.containsKey($T.$L)", model.methods().isNull(), model.vars().bundle(), model.classes().keys(), intentKey)
+                .addStatement("return !$L() && $L.containsKey($T.$L)", MethodName.isNull, VarName.bundle, ClassProvider.keys(model), intentKey)
                 .build();
     }
 
@@ -339,36 +341,36 @@ public class Writer {
 
 
         if (type.isPrimitive()) {
-            getterMethodBuilder.addParameter(type, model.vars().defaultVal());
-            getterMethodBuilder.beginControlFlow("if($L())", model.methods().isNull())
-                    .addStatement("return $L", model.vars().defaultVal())
+            getterMethodBuilder.addParameter(type, VarName.defaultVal);
+            getterMethodBuilder.beginControlFlow("if($L())", MethodName.isNull)
+                    .addStatement("return $L", VarName.defaultVal)
                     .endControlFlow();
             getterMethodBuilder.addStatement("return $L.get$L($T.$L, $L)",
-                    model.vars().bundle(),
+                    VarName.bundle,
                     cargo.getBundleMethodSuffix(),
-                    model.classes().keys(),
+                    ClassProvider.keys(model),
                     cargo.getKeyConstant(),
-                    model.vars().defaultVal()
+                    VarName.defaultVal
             );
         } else if (cargo.requiresCasting()) {
             getterMethodBuilder.beginControlFlow("if($L())", hasMethod);
             getterMethodBuilder.addStatement("return ($T) $L.get$L($T.$L)",
                     type,
-                    model.vars().bundle(),
+                    VarName.bundle,
                     cargo.getBundleMethodSuffix(),
-                    model.classes().keys(),
+                    ClassProvider.keys(model),
                     cargo.getKeyConstant()
             );
             getterMethodBuilder.endControlFlow();
             getterMethodBuilder.addStatement("return null");
         } else {
-            getterMethodBuilder.beginControlFlow("if($L())", model.methods().isNull())
+            getterMethodBuilder.beginControlFlow("if($L())", MethodName.isNull)
                     .addStatement("return null")
                     .endControlFlow();
             getterMethodBuilder.addStatement("return $L.get$L($T.$L)",
-                    model.vars().bundle(),
+                    VarName.bundle,
                     cargo.getBundleMethodSuffix(),
-                    model.classes().keys(),
+                    ClassProvider.keys(model),
                     cargo.getKeyConstant()
             );
         }

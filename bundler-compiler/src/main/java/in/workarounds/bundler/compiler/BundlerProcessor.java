@@ -33,6 +33,7 @@ import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
 import in.workarounds.bundler.compiler.support.MethodAggregator;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
 
 @AutoService(Processor.class)
 public class BundlerProcessor extends AbstractProcessor implements Provider {
@@ -58,7 +59,6 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        String packageName = "in.workarounds.bundler";
         MethodAggregator methodAggregator = new MethodAggregator(this);
 
         List<ReqBundlerModel> reqBundlerModels = new ArrayList<>();
@@ -98,7 +98,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
             if (hasErrorOccurred()) return true;
 
-            Writer writer = Writer.from(this, model, argList, states, packageName);
+            Writer writer = Writer.from(this, model, argList, states);
             writer.addToBundler(classBuilder);
 
             try {
@@ -109,7 +109,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         }
 
         try {
-            JavaFile.builder(packageName, classBuilder.build())
+            JavaFile.builder(ClassProvider.bundler.packageName(), classBuilder.build())
                     .build()
                     .writeTo(filer);
         } catch (IOException e) {

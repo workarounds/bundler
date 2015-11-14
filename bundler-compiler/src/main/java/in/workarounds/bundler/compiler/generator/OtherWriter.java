@@ -10,16 +10,17 @@ import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
-import in.workarounds.bundler.compiler.util.CommonClasses;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
+import in.workarounds.bundler.compiler.util.names.MethodName;
+import in.workarounds.bundler.compiler.util.names.VarName;
 
 /**
  * Created by madki on 25/10/15.
  */
 public class OtherWriter extends Writer {
-    protected static final String BUNDLER_VAR = "bundler";
 
-    protected OtherWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states, String packageName) {
-        super(provider, reqBundlerModel, cargoList, states, packageName);
+    protected OtherWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+        super(provider, reqBundlerModel, cargoList, states);
     }
 
 
@@ -27,13 +28,13 @@ public class OtherWriter extends Writer {
     protected List<MethodSpec> getAdditionalBundlerMethods() {
         List<MethodSpec> methods = super.getAdditionalBundlerMethods();
         methods.add(
-                MethodSpec.methodBuilder(model.methods().inject())
+                MethodSpec.methodBuilder(MethodName.inject)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(model.getClassName(), BUNDLER_VAR)
-                        .addParameter(CommonClasses.BUNDLE, model.vars().bundle())
-                        .addStatement("$T $L = $T.$L($L)", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), model.vars().bundle())
-                        .beginControlFlow("if($L.$L())", model.vars().parser(), model.methods().isNull())
-                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), BUNDLER_VAR)
+                        .addParameter(model.getClassName(), VarName.from(model))
+                        .addParameter(ClassProvider.bundle, VarName.bundle)
+                        .addStatement("$T $L = $T.$L($L)", ClassProvider.parser(model), VarName.parser, ClassProvider.helper(model), MethodName.parse, VarName.bundle)
+                        .beginControlFlow("if($L.$L())", VarName.parser, MethodName.isNull)
+                        .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
                         .endControlFlow()
                         .build()
         );

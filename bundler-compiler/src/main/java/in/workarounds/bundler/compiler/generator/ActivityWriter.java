@@ -10,30 +10,31 @@ import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
-import in.workarounds.bundler.compiler.util.CommonClasses;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
+import in.workarounds.bundler.compiler.util.names.MethodName;
+import in.workarounds.bundler.compiler.util.names.VarName;
 
 /**
  * Created by madki on 24/10/15.
  */
 public class ActivityWriter extends Writer {
-    protected static final String ACTIVITY_VAR = "activity";
 
-    protected ActivityWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states, String packageName) {
-        super(provider, reqBundlerModel, cargoList, states, packageName);
+    protected ActivityWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+        super(provider, reqBundlerModel, cargoList, states);
     }
 
     @Override
     protected List<MethodSpec> getAdditionalHelperMethods() {
         List<MethodSpec> methods = super.getAdditionalHelperMethods();
         methods.add(
-                MethodSpec.methodBuilder(model.methods().parse())
+                MethodSpec.methodBuilder(MethodName.parse)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(CommonClasses.INTENT, model.vars().intent())
-                        .returns(model.classes().parser())
-                        .beginControlFlow("if($L == null)", model.vars().intent())
-                        .addStatement("return new $T(null)", model.classes().parser())
+                        .addParameter(ClassProvider.intent, VarName.intent)
+                        .returns(ClassProvider.parser(model))
+                        .beginControlFlow("if($L == null)", VarName.intent)
+                        .addStatement("return new $T(null)", ClassProvider.parser(model))
                         .endControlFlow()
-                        .addStatement("return $L($L.getExtras())", model.methods().parse(), model.vars().intent())
+                        .addStatement("return $L($L.getExtras())", MethodName.parse, VarName.intent)
                         .build()
         );
 
@@ -44,20 +45,20 @@ public class ActivityWriter extends Writer {
     protected List<MethodSpec> getAdditionalSupplierMethods() {
         List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
-                MethodSpec.methodBuilder(model.methods().intent())
+                MethodSpec.methodBuilder(MethodName.intent)
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(CommonClasses.CONTEXT, model.vars().context())
-                        .returns(CommonClasses.INTENT)
-                        .addStatement("$T $L = new $T($L, $T.class)", CommonClasses.INTENT, model.vars().intent(), CommonClasses.INTENT, model.vars().context(), model.getClassName())
-                        .addStatement("$L.putExtras($L())", model.vars().intent(), model.methods().bundle())
-                        .addStatement("return $L", model.vars().intent())
+                        .addParameter(ClassProvider.context, VarName.context)
+                        .returns(ClassProvider.intent)
+                        .addStatement("$T $L = new $T($L, $T.class)", ClassProvider.intent, VarName.intent, ClassProvider.intent, VarName.context, model.getClassName())
+                        .addStatement("$L.putExtras($L())", VarName.intent, MethodName.bundle)
+                        .addStatement("return $L", VarName.intent)
                         .build()
         );
         methods.add(
-                MethodSpec.methodBuilder(model.methods().start())
+                MethodSpec.methodBuilder(MethodName.start)
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(CommonClasses.CONTEXT, model.vars().context())
-                        .addStatement("$L.startActivity($L($L))", model.vars().context(), model.methods().intent(), model.vars().context())
+                        .addParameter(ClassProvider.context, VarName.context)
+                        .addStatement("$L.startActivity($L($L))", VarName.context, MethodName.intent, VarName.context)
                         .build()
         );
         return methods;
@@ -67,12 +68,12 @@ public class ActivityWriter extends Writer {
     protected List<MethodSpec> getAdditionalBundlerMethods() {
         List<MethodSpec> methods = super.getAdditionalBundlerMethods();
         methods.add(
-                MethodSpec.methodBuilder(model.methods().inject())
+                MethodSpec.methodBuilder(MethodName.inject)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(model.getClassName(), ACTIVITY_VAR)
-                        .addStatement("$T $L = $T.$L($L.getIntent())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), ACTIVITY_VAR)
-                        .beginControlFlow("if(!$L.$L())", model.vars().parser(), model.methods().isNull())
-                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), ACTIVITY_VAR)
+                        .addParameter(model.getClassName(), VarName.from(model))
+                        .addStatement("$T $L = $T.$L($L.getIntent())", ClassProvider.parser(model), VarName.parser, ClassProvider.helper(model), MethodName.parse, VarName.from(model))
+                        .beginControlFlow("if(!$L.$L())", VarName.parser, MethodName.isNull)
+                        .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
                         .endControlFlow()
                         .build()
         );

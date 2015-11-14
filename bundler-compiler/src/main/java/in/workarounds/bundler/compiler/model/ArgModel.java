@@ -1,12 +1,15 @@
 package in.workarounds.bundler.compiler.model;
 
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.ParameterSpec;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.Required;
@@ -45,5 +48,19 @@ public class ArgModel extends AnnotatedField {
 
     public Element getElement() {
         return element;
+    }
+
+    @Override
+    public ParameterSpec getAsParameter(Modifier... modifiers) {
+        return super.getAsParameter(modifiers).toBuilder()
+                .addAnnotations(getSupportAnnotations())
+                .build();
+    }
+
+    @Override
+    public FieldSpec getAsField(Modifier... modifiers) {
+        return super.getAsField(modifiers).toBuilder()
+                .addAnnotations(getSupportAnnotations())
+                .build();
     }
 }

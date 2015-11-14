@@ -10,27 +10,29 @@ import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.model.StateModel;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
+import in.workarounds.bundler.compiler.util.names.MethodName;
+import in.workarounds.bundler.compiler.util.names.VarName;
 
 /**
  * Created by madki on 24/10/15.
  */
 public class FragmentWriter extends Writer {
-    protected static final String FRAGMENT_VAR = "fragment";
 
-    protected FragmentWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states, String packageName) {
-        super(provider, reqBundlerModel, cargoList, states, packageName);
+    protected FragmentWriter(Provider provider, ReqBundlerModel reqBundlerModel, List<ArgModel> cargoList, List<StateModel> states) {
+        super(provider, reqBundlerModel, cargoList, states);
     }
 
     @Override
     protected List<MethodSpec> getAdditionalBundlerMethods() {
         List<MethodSpec> methods = super.getAdditionalBundlerMethods();
         methods.add(
-                MethodSpec.methodBuilder(model.methods().inject())
+                MethodSpec.methodBuilder(MethodName.inject)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(model.getClassName(), FRAGMENT_VAR)
-                        .addStatement("$T $L = $T.$L($L.getArguments())", model.classes().parser(), model.vars().parser(), model.classes().helper(), model.methods().parse(), FRAGMENT_VAR)
-                        .beginControlFlow("if($L.$L())", model.vars().parser(), model.methods().isNull())
-                        .addStatement("$L.$L($L)", model.vars().parser(), model.methods().into(), FRAGMENT_VAR)
+                        .addParameter(model.getClassName(), VarName.from(model))
+                        .addStatement("$T $L = $T.$L($L.getArguments())", ClassProvider.parser(model), VarName.parser, ClassProvider.helper(model), MethodName.parse, VarName.from(model))
+                        .beginControlFlow("if($L.$L())", VarName.parser, MethodName.isNull)
+                        .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
                         .endControlFlow()
                         .build()
         );
@@ -41,12 +43,12 @@ public class FragmentWriter extends Writer {
     protected List<MethodSpec> getAdditionalSupplierMethods() {
         List<MethodSpec> methods = super.getAdditionalSupplierMethods();
         methods.add(
-                MethodSpec.methodBuilder(model.methods().create())
+                MethodSpec.methodBuilder(MethodName.create)
                         .addModifiers(Modifier.PUBLIC)
                         .returns(model.getClassName())
-                        .addStatement("$T $L = new $T()", model.getClassName(), FRAGMENT_VAR, model.getClassName())
-                        .addStatement("$L.setArguments($L())", FRAGMENT_VAR, model.vars().bundle())
-                        .addStatement("return $L", FRAGMENT_VAR)
+                        .addStatement("$T $L = new $T()", model.getClassName(), VarName.from(model), model.getClassName())
+                        .addStatement("$L.setArguments($L())", VarName.from(model), VarName.bundle)
+                        .addStatement("return $L", VarName.from(model))
                         .build()
         );
         return methods;

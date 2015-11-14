@@ -9,14 +9,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import in.workarounds.bundler.compiler.util.CommonClasses;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
+
 
 /**
  * Created by madki on 22/10/15.
  */
 public class KnownTypeHelper extends TypeHelper {
     private static List<TypeName> knownTypes = Arrays.asList(
-            CommonClasses.BUNDLE,
+            ClassProvider.bundle,
             TypeName.get(String.class),
             TypeName.get(CharSequence.class),
             ArrayTypeName.of(String.class),
