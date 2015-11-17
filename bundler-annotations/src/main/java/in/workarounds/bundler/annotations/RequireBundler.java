@@ -13,4 +13,6 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface RequireBundler {
     boolean requireAll() default true;
     String bundlerMethod() default "";
+    boolean inheritArgs() default true;
+    boolean inheritState() default true;
 }

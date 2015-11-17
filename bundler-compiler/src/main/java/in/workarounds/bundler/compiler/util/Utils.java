@@ -7,6 +7,7 @@ import com.squareup.javapoet.TypeName;
 import java.util.List;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -124,6 +125,13 @@ public class Utils {
         TypeElement element = getAsElement(typeMirror);
         if(element != null) {
             return element.getSuperclass();
+        }
+        return null;
+    }
+
+    public static Element getSuperClass(Element element) {
+        if(element instanceof TypeElement) {
+            return getAsElement(((TypeElement) element).getSuperclass());
         }
         return null;
     }

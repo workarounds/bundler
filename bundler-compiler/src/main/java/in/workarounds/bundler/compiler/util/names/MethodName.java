@@ -28,7 +28,7 @@ public class MethodName {
      * @return the method name to be used in Bundler class for this model
      */
     public static String build(ReqBundlerModel model) {
-        return model.getBundlerMethodName().isEmpty() ?
+        return StringUtils.isEmpty(model.getBundlerMethodName()) ?
                 VarName.from(model) : model.getBundlerMethodName();
     }
 

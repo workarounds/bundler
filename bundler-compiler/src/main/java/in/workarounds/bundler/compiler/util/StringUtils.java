@@ -120,4 +120,12 @@ public class StringUtils {
         String firstChar = Character.toString(className.charAt(0));
         return className.replaceFirst(firstChar, firstChar.toLowerCase());
     }
+
+    /**
+     * @param value String to be verified if empty
+     * @return true if value is either "" or null
+     */
+    public static boolean isEmpty(String value) {
+        return value == null || value.equals("");
+    }
 }

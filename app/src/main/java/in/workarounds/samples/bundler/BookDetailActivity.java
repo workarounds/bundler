@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -14,14 +13,14 @@ import java.lang.annotation.RetentionPolicy;
 
 import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.Arg;
-import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.bundler.annotations.State;
 
 /**
  * Created by madki on 29/10/15.
  */
-@RequireBundler
-public class BookDetailActivity extends AppCompatActivity {
+@RequireBundler(inheritArgs = false)
+public class BookDetailActivity extends BaseActivity {
     private static final String TAG = "BookDetailActivity";
     public static final int BOOK_TYPE_FICTION = 1;
     public static final int BOOK_TYPE_NON_FICTION = 2;
@@ -48,7 +47,6 @@ public class BookDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_book_detail);
         Intent intent = null;
         Bundler.inject(this);
 

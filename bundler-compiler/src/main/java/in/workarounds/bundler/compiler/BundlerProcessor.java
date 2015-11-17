@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.generator.BundlerWriter;
 import in.workarounds.bundler.compiler.generator.HelperWriter;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
+import in.workarounds.bundler.compiler.util.Utils;
 
 @AutoService(Processor.class)
 public class BundlerProcessor extends AbstractProcessor implements Provider {
@@ -54,13 +56,9 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
-        List<ReqBundlerModel> reqBundlerModels = new ArrayList<>();
-        for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
-            ReqBundlerModel model = new ReqBundlerModel(element, this);
-            reqBundlerModels.add(model);
-        }
+        List<ReqBundlerModel> reqBundlerModels = getModels(roundEnv);
 
-        if(hasErrorOccurred()) return true;
+        if (hasErrorOccurred()) return true;
 
         BundlerWriter bundlerWriter = new BundlerWriter(reqBundlerModels);
         bundlerWriter.checkValidity(this);
@@ -69,7 +67,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
         if (reqBundlerModels.size() == 0) return true;
 
-       for (ReqBundlerModel model : reqBundlerModels) {
+        for (ReqBundlerModel model : reqBundlerModels) {
             try {
                 new HelperWriter(model).brewJava().writeTo(filer);
             } catch (IOException e) {
@@ -83,6 +81,50 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private List<ReqBundlerModel> getModels(RoundEnvironment roundEnv) {
+        HashMap<Element, ReqBundlerModel> modelMap = new HashMap<>();
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
+            if (modelMap.containsKey(element)) continue;
+
+            retrieveElement(modelMap, element);
+        }
+        return new ArrayList<>(modelMap.values());
+    }
+
+    private void retrieveElement(HashMap<Element, ReqBundlerModel> modelMap, Element element) {
+        RequireBundler annotation = element.getAnnotation(RequireBundler.class);
+        if (!annotation.inheritArgs() && !annotation.inheritState()) {
+            modelMap.put(element, new ReqBundlerModel(element, this));
+        } else {
+            Element superClass = getAnnotatedSuperClass(element);
+            if (superClass == null) {
+                modelMap.put(element, new ReqBundlerModel(element, this));
+            } else {
+                ReqBundlerModel superModel = modelMap.get(superClass);
+                if (superModel != null) {
+                    modelMap.put(element, new ReqBundlerModel(element, superModel, this));
+                } else {
+                    retrieveElement(modelMap, superClass);
+                    modelMap.put(element, new ReqBundlerModel(element, modelMap.get(superClass), this));
+                }
+            }
+        }
+    }
+
+
+    private Element getAnnotatedSuperClass(Element element) {
+        Element superClass = Utils.getSuperClass(element);
+        if (superClass != null) {
+            RequireBundler annotation = superClass.getAnnotation(RequireBundler.class);
+            if (annotation != null) {
+                return superClass;
+            }
+            return getAnnotatedSuperClass(superClass);
+        }
+        return null;
     }
 
     @Override
@@ -164,6 +206,5 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     public ClassName bundlerClass() {
         return ClassName.get("in.workarounds.bundler", "Bundler");
     }
-
 
 }

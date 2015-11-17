@@ -36,6 +36,30 @@ public class ReqBundlerModel {
     private List<ArgModel> args;
 
     public ReqBundlerModel(Element element, Provider provider) {
+        init(element, provider);
+
+        args = retrieveArgs(element, provider);
+        states = retrieveStates(element, provider);
+   }
+
+    public ReqBundlerModel(Element element, ReqBundlerModel superClass, Provider provider) {
+        init(element, provider);
+
+        RequireBundler annotation = element.getAnnotation(RequireBundler.class);
+        if(annotation.inheritState()) {
+            states = getInheritedFields(retrieveStates(element, provider), superClass.getStates());
+        } else {
+            states = retrieveStates(element, provider);
+        }
+
+        if(annotation.inheritArgs()) {
+            args = getInheritedFields(retrieveArgs(element, provider), superClass.getArgs());
+        } else {
+            args = retrieveArgs(element, provider);
+        }
+    }
+
+    private void init(Element element,Provider provider) {
         if (element.getKind() != ElementKind.CLASS) {
             provider.error(element, "@%s annotation used on a non-class element %s",
                     RequireBundler.class.getSimpleName(),
@@ -53,23 +77,51 @@ public class ReqBundlerModel {
         String qualifiedName = ((TypeElement) element).getQualifiedName().toString();
         className = ClassName.bestGuess(qualifiedName);
 
-        args = new ArrayList<>();
-        states = new ArrayList<>();
+    }
 
+    private <T extends AnnotatedField> List<T> getInheritedFields(List<T> currentFields, List<T> superFields) {
+        List<T> tempFields = new ArrayList<>();
+        tempFields.addAll(superFields);
+
+        for (AnnotatedField field: currentFields) {
+            removeIfLabelPresent(field.getLabel(), tempFields);
+        }
+
+        tempFields.addAll(currentFields);
+
+        return tempFields;
+    }
+
+    private void removeIfLabelPresent(String label, List<? extends AnnotatedField> fields) {
+        for(AnnotatedField field: fields) {
+            if(field.getLabel().equals(label)) fields.remove(field);
+        }
+    }
+
+    private List<StateModel> retrieveStates(Element element, Provider provider) {
+        List<StateModel> tempStates = new ArrayList<>();
         for (Element enclosedElement : element.getEnclosedElements()) {
-            Arg arg = enclosedElement.getAnnotation(Arg.class);
             State instanceState = enclosedElement.getAnnotation(State.class);
-
-            if (arg != null) {
-                ArgModel argModel = new ArgModel(enclosedElement, provider);
-                args.add(argModel);
-            }
 
             if (instanceState != null) {
                 StateModel state = new StateModel(enclosedElement, provider);
-                states.add(state);
+                tempStates.add(state);
             }
         }
+        return tempStates;
+    }
+
+    private List<ArgModel> retrieveArgs(Element element, Provider provider) {
+        List<ArgModel> tempArgs = new ArrayList<>();
+        for (Element enclosedElement : element.getEnclosedElements()) {
+            Arg arg = enclosedElement.getAnnotation(Arg.class);
+
+            if (arg != null) {
+                ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll());
+                tempArgs.add(argModel);
+            }
+        }
+        return tempArgs;
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {
@@ -112,7 +164,7 @@ public class ReqBundlerModel {
         List<ArgModel> requiredArgs = new ArrayList<>();
 
         for (ArgModel arg : getArgs()) {
-            if (arg.isRequired(requireAll)) {
+            if (arg.isRequired()) {
                 requiredArgs.add(arg);
             }
         }

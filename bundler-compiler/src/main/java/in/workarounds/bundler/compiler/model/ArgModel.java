@@ -23,10 +23,12 @@ public class ArgModel extends AnnotatedField {
     private Element element;
     private List<AnnotationSpec> supportAnnotations;
     private Required required;
+    private boolean requireAll;
 
-    public ArgModel(Element element, Provider provider) {
+    public ArgModel(Element element, Provider provider, boolean requireAll) {
         super(element, provider, Arg.class);
         this.element = element;
+        this.requireAll = requireAll;
 
         supportAnnotations = new ArrayList<>();
         for(AnnotationMirror annotationMirror: element.getAnnotationMirrors()) {
@@ -38,7 +40,7 @@ public class ArgModel extends AnnotatedField {
         required = element.getAnnotation(Required.class);
     }
 
-    public boolean isRequired(boolean requireAll) {
+    public boolean isRequired() {
         return required == null ? requireAll : required.value();
     }
 
