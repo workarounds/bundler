@@ -19,7 +19,6 @@ public class MethodName {
     public static final String isNull = "isNull";
     public static final String bundle = "bundle";
     public static final String intent = "intent";
-    public static final String typeWarning = "typeWarning";
 
     private MethodName() {
     }

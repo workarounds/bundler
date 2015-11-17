@@ -116,7 +116,6 @@ public class ReqBundlerModel {
                 requiredArgs.add(arg);
             }
         }
-
         return requiredArgs;
     }
 

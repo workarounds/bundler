@@ -60,6 +60,11 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             reqBundlerModels.add(model);
         }
 
+        if(hasErrorOccurred()) return true;
+
+        BundlerWriter bundlerWriter = new BundlerWriter(reqBundlerModels);
+        bundlerWriter.checkValidity(this);
+
         if (hasErrorOccurred()) return true;
 
         if (reqBundlerModels.size() == 0) return true;
@@ -73,7 +78,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         }
 
         try {
-            new BundlerWriter(reqBundlerModels).brewJava().writeTo(filer);
+            bundlerWriter.brewJava().writeTo(filer);
         } catch (IOException e) {
             e.printStackTrace();
         }

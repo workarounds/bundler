@@ -4,10 +4,15 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.Modifier;
 
+import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.bundler.compiler.Provider;
 import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
 import in.workarounds.bundler.compiler.util.names.ClassProvider;
@@ -24,13 +29,40 @@ public class BundlerWriter {
         this.models = models;
     }
 
+    public void checkValidity(Provider provider) {
+        HashMap<String, List<Integer>> methodMap = new HashMap<>();
+        for (int i = 0; i < models.size(); i++) {
+            String bundleMethod = MethodName.build(models.get(i));
+            if (methodMap.containsKey(bundleMethod)) {
+                methodMap.get(bundleMethod).add(i);
+            } else {
+                List<Integer> list = new ArrayList<>();
+                list.add(i);
+                methodMap.put(bundleMethod, list);
+            }
+        }
+
+        if(models.size() == methodMap.size()) return;
+
+        for (Map.Entry<String, List<Integer>> entry : methodMap.entrySet()) {
+            if (entry.getValue().size() > 1) {
+                provider.reportError();
+                provider.error(null, "The following classes annotated with @%s resolve to the same bundler method: %s",
+                        RequireBundler.class.getSimpleName(), entry.getKey());
+                for (Integer i : entry.getValue()) {
+                    provider.error(null, "Class: %s", models.get(i).getClassName());
+                }
+            }
+        }
+    }
+
     public JavaFile brewJava() {
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(ClassProvider.bundler.simpleName())
                 .addModifiers(Modifier.PUBLIC);
 
         // TODO check data validity, same method names?
 
-        for (ReqBundlerModel model: models) {
+        for (ReqBundlerModel model : models) {
             classBuilder
                     .addMethod(injectMethod(model))
                     .addMethod(buildMethod(model, model.getRequiredArgs()))
@@ -39,7 +71,7 @@ public class BundlerWriter {
         }
 
         return JavaFile.builder(ClassProvider.bundler.packageName(), classBuilder.build()).build();
-     }
+    }
 
     protected MethodSpec saveMethod(ReqBundlerModel model) {
         return MethodSpec.methodBuilder(MethodName.saveState)
@@ -71,7 +103,7 @@ public class BundlerWriter {
             case ACTIVITY:
             case FRAGMENT:
             case FRAGMENT_V4:
-                String getMethodName = model.getVariety() == ReqBundlerModel.VARIETY.ACTIVITY?
+                String getMethodName = model.getVariety() == ReqBundlerModel.VARIETY.ACTIVITY ?
                         "getIntent" : "getArguments";
                 return MethodSpec.methodBuilder(MethodName.inject)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
