@@ -82,7 +82,8 @@ public class AnnotatedField {
     }
 
     public FieldSpec getAsField(Modifier... modifiers) {
-        return FieldSpec.builder(typeName, VarName.from(this))
+        TypeName fieldType = typeName.isPrimitive() ? typeName.box() : typeName;
+        return FieldSpec.builder(fieldType, VarName.from(this))
                 .addModifiers(modifiers)
                 .build();
     }

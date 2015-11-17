@@ -16,6 +16,7 @@ public class ClassProvider {
     public static final ClassName context = ClassName.get("android.content", "Context");
     public static final ClassName bundle = ClassName.get("android.os", "Bundle");
     public static final ClassName intent = ClassName.get("android.content", "Intent");
+    public static final ClassName log = ClassName.get("android.util", "Log");
 
     public static final ClassName bundler = ClassName.get("in.workarounds.bundler", "Bundler");
 

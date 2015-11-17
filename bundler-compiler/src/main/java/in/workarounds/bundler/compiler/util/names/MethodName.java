@@ -1,6 +1,8 @@
 package in.workarounds.bundler.compiler.util.names;
 
+import in.workarounds.bundler.compiler.model.ArgModel;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
+import in.workarounds.bundler.compiler.util.StringUtils;
 
 /**
  * Created by madki on 14/11/15.
@@ -17,6 +19,7 @@ public class MethodName {
     public static final String isNull = "isNull";
     public static final String bundle = "bundle";
     public static final String intent = "intent";
+    public static final String typeWarning = "typeWarning";
 
     private MethodName() {
     }
@@ -28,6 +31,10 @@ public class MethodName {
     public static String build(ReqBundlerModel model) {
         return model.getBundlerMethodName().isEmpty() ?
                 VarName.from(model) : model.getBundlerMethodName();
+    }
+
+    public static String has(ArgModel arg) {
+        return "has" + StringUtils.getClassName(arg.getLabel());
     }
 
 }

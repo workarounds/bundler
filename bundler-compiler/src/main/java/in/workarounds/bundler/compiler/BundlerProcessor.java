@@ -2,8 +2,6 @@ package in.workarounds.bundler.compiler;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +17,6 @@ import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -28,12 +25,9 @@ import javax.tools.Diagnostic;
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.State;
-import in.workarounds.bundler.compiler.generator.Writer;
-import in.workarounds.bundler.compiler.model.ArgModel;
+import in.workarounds.bundler.compiler.generator.BundlerWriter;
+import in.workarounds.bundler.compiler.generator.HelperWriter;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
-import in.workarounds.bundler.compiler.model.StateModel;
-import in.workarounds.bundler.compiler.support.MethodAggregator;
-import in.workarounds.bundler.compiler.util.names.ClassProvider;
 
 @AutoService(Processor.class)
 public class BundlerProcessor extends AbstractProcessor implements Provider {
@@ -59,40 +53,27 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        MethodAggregator methodAggregator = new MethodAggregator(this);
 
         List<ReqBundlerModel> reqBundlerModels = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(RequireBundler.class)) {
             ReqBundlerModel model = new ReqBundlerModel(element, this);
-            if (hasErrorOccurred()) return true;
             reqBundlerModels.add(model);
         }
 
+        if (hasErrorOccurred()) return true;
+
         if (reqBundlerModels.size() == 0) return true;
 
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(bundlerClass().simpleName())
-                .addModifiers(Modifier.PUBLIC);
-
-        for (ReqBundlerModel model : reqBundlerModels) {
-
-            classBuilder.addMethod(methodAggregator.getBundlerBuildMethod(model));
-
-            if (hasErrorOccurred()) return true;
-
-            Writer writer = Writer.from(this, model);
-            writer.addToBundler(classBuilder);
-
+       for (ReqBundlerModel model : reqBundlerModels) {
             try {
-                writer.brewHelper().writeTo(filer);
+                new HelperWriter(model).brewJava().writeTo(filer);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         try {
-            JavaFile.builder(ClassProvider.bundler.packageName(), classBuilder.build())
-                    .build()
-                    .writeTo(filer);
+            new BundlerWriter(reqBundlerModels).brewJava().writeTo(filer);
         } catch (IOException e) {
             e.printStackTrace();
         }

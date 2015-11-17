@@ -108,6 +108,18 @@ public class ReqBundlerModel {
         }
     }
 
+    public List<ArgModel> getRequiredArgs() {
+        List<ArgModel> requiredArgs = new ArrayList<>();
+
+        for (ArgModel arg : getArgs()) {
+            if (arg.isRequired(requireAll)) {
+                requiredArgs.add(arg);
+            }
+        }
+
+        return requiredArgs;
+    }
+
     public boolean requireAll() {
         return this.requireAll;
     }
