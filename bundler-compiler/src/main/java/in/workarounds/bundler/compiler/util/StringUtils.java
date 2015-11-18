@@ -11,7 +11,7 @@ public class StringUtils {
     /**
      * Converts a given camel case java variable/class name
      * into a underscore separated all caps name
-     * e.g : mainActivity => MAIN_ACTIVITY
+     * e.g : mainActivity = MAIN_ACTIVITY
      * @param name camel cased variable/class name
      * @return snake cased constant name
      */
@@ -25,7 +25,7 @@ public class StringUtils {
      /**
      * Converts a given camel case java variable/class name
      * into a underscore separated small caps name
-     * e.g : mainActivity => main_activity
+     * e.g : mainActivity = main_activity
      * @param name camel cased variable/class name
      * @return snake cased name
      */
@@ -61,8 +61,8 @@ public class StringUtils {
     /**
      * Converts snake cased or constant names to
      * camel cased variable names
-     * e.g : main_activity => mainActivity
-     * e.g : MAIN_ACTIVITY => MAIN_ACTIVITY
+     * e.g : main_activity = mainActivity
+     * e.g : MAIN_ACTIVITY = MAIN_ACTIVITY
      * @param name snake-case/constant name
      * @return camel cased name
      */
@@ -94,7 +94,7 @@ public class StringUtils {
     /**
      * Converts snake-cased/constant name into
      * java class name
-     * e.g : MAIN_ACTIVITY => MainActivity
+     * e.g : MAIN_ACTIVITY = MainActivity
      * @param name snake-cased/constant name
      * @return name as class name
      */
@@ -109,7 +109,7 @@ public class StringUtils {
      /**
      * Converts snake-cased/constant name into
      * java variable name
-     * e.g : MAIN_ACTIVITY => mainActivity
+     * e.g : MAIN_ACTIVITY = mainActivity
      * @param name snake-cased/constant name
      * @return name as variable name
      */
