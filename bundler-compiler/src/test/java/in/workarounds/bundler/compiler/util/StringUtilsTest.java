@@ -85,4 +85,11 @@ public class StringUtilsTest {
         assertEquals(expected, StringUtils.getVariableName(className));
     }
 
+    @Test
+    public void isEmpty() {
+        assertTrue(StringUtils.isEmpty(null));
+        assertTrue(StringUtils.isEmpty(""));
+        assertTrue(!StringUtils.isEmpty("S"));
+    }
+
 }
