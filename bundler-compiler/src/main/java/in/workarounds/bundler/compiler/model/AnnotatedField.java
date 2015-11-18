@@ -10,8 +10,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 
 import in.workarounds.bundler.compiler.Provider;
-import in.workarounds.bundler.compiler.support.TypeHelperFactory;
-import in.workarounds.bundler.compiler.support.helper.TypeHelper;
+import in.workarounds.bundler.compiler.helper.TypeHelperFactory;
+import in.workarounds.bundler.compiler.helper.TypeHelper;
 import in.workarounds.bundler.compiler.util.StringUtils;
 import in.workarounds.bundler.compiler.util.names.VarName;
 

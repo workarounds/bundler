@@ -1,4 +1,4 @@
-package in.workarounds.bundler.compiler.support.helper;
+package in.workarounds.bundler.compiler.helper;
 
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;

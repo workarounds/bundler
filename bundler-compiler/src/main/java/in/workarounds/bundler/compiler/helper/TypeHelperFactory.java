@@ -1,4 +1,4 @@
-package in.workarounds.bundler.compiler.support;
+package in.workarounds.bundler.compiler.helper;
 
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
@@ -11,14 +11,6 @@ import java.io.Serializable;
 
 import javax.lang.model.util.Elements;
 
-import in.workarounds.bundler.compiler.support.helper.KnownTypeHelper;
-import in.workarounds.bundler.compiler.support.helper.ParcelableArrayHelper;
-import in.workarounds.bundler.compiler.support.helper.ParcelableHelper;
-import in.workarounds.bundler.compiler.support.helper.ParcelableTypeVariableHelper;
-import in.workarounds.bundler.compiler.support.helper.PrimitiveArrayHelper;
-import in.workarounds.bundler.compiler.support.helper.PrimitiveHelper;
-import in.workarounds.bundler.compiler.support.helper.SerializableHelper;
-import in.workarounds.bundler.compiler.support.helper.TypeHelper;
 import in.workarounds.bundler.compiler.util.Utils;
 
 /**

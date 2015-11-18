@@ -1,4 +1,4 @@
-package in.workarounds.bundler.compiler.support.helper;
+package in.workarounds.bundler.compiler.helper;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.lang.model.util.Elements;
-
-import in.workarounds.bundler.compiler.support.TypeHelperFactory;
 
 /**
  * Created by madki on 22/10/15.
