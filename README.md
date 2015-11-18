@@ -7,9 +7,12 @@ Here's an example of this in Action.
 ```java
 @RequiresBundler
 class BookDetailActivity extends Activity {
-  @BundlerArg int id;
-  @BundlerArg String name;
-  @BundlerArg String author;
+  @Arg 
+  int id;
+  @Arg 
+  String name;
+  @Arg @Required(false)
+  String author;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -23,9 +26,7 @@ class BookDetailActivity extends Activity {
 After defining the annotating the activity methods are added to the 'Bundler' class which help in building and parsing the intent for the activity. The above activity can be started as follows:
 
 ```java
-  Bundler.bookDetailActivity()
-    .id(1)
-    .name("Hitchhiker's guide to galaxy")
+  Bundler.bookDetailActivity(1, "Hitchhiker's guide to galaxy")
     .author("Douglas Adams")
     .start();
 ```
@@ -37,9 +38,12 @@ Here's an example for a fragment
 ```java
 @RequiresBundler
 class BookDetailsFragment extends Fragment {
-  @BundlerArg int id;
-  @BundlerArg String book;
-  @BundlerArg String author;
+  @Arg 
+  int id;
+  @Arg 
+  String book;
+  @Arg @Required(false)
+  String author;
   
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,9 +56,7 @@ class BookDetailsFragment extends Fragment {
 The above fragment can be created as follows:
 
 ```java
-BookDetailsFragment fragment = Bundler.bookDetailsFragment()
-                                  .id(1)
-                                  .name("Harry Potter")
+BookDetailsFragment fragment = Bundler.bookDetailsFragment(1, "Harry Potter")
                                   .author("J. K. Rowling")
                                   .create();
 ```
@@ -76,7 +78,7 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
   compile 'in.workarounds.bundler:bundler-annotations:0.0.2'
-  apt 'in.workarounds.bundler:bundler-compiler:0.0.3'
+  apt 'in.workarounds.bundler:bundler-compiler:0.0.2'
 }
 ```
 
