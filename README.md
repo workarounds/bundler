@@ -78,7 +78,7 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
   compile 'in.workarounds.bundler:bundler-annotations:0.0.2'
-  apt 'in.workarounds.bundler:bundler-compiler:0.0.2'
+  apt 'in.workarounds.bundler:bundler-compiler:0.0.3'
 }
 ```
 
