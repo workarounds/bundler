@@ -112,7 +112,7 @@ public class BundlerWriter {
                                 ClassProvider.parser(model),
                                 VarName.parser, ClassProvider.helper(model),
                                 MethodName.parse, VarName.from(model), getMethodName)
-                        .beginControlFlow("if($L.$L())", VarName.parser, MethodName.isNull)
+                        .beginControlFlow("if(!$L.$L())", VarName.parser, MethodName.isNull)
                         .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
                         .endControlFlow()
                         .build();
@@ -122,7 +122,7 @@ public class BundlerWriter {
                         .addParameter(model.getClassName(), VarName.from(model))
                         .addParameter(ClassProvider.intent, VarName.intent)
                         .addStatement("$T $L = $T.$L($L)", ClassProvider.parser(model), VarName.parser, ClassProvider.helper(model), MethodName.parse, VarName.intent)
-                        .beginControlFlow("if($L.$L())", VarName.parser, MethodName.isNull)
+                        .beginControlFlow("if(!$L.$L())", VarName.parser, MethodName.isNull)
                         .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
                         .endControlFlow()
                         .build();
@@ -133,7 +133,7 @@ public class BundlerWriter {
                         .addParameter(model.getClassName(), VarName.from(model))
                         .addParameter(ClassProvider.bundle, VarName.bundle)
                         .addStatement("$T $L = $T.$L($L)", ClassProvider.parser(model), VarName.parser, ClassProvider.helper(model), MethodName.parse, VarName.bundle)
-                        .beginControlFlow("if($L.$L())", VarName.parser, MethodName.isNull)
+                        .beginControlFlow("if(!$L.$L())", VarName.parser, MethodName.isNull)
                         .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
                         .endControlFlow()
                         .build();
