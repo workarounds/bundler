@@ -117,6 +117,15 @@ public class BundlerWriter {
                         .endControlFlow()
                         .build();
             case SERVICE:
+                return MethodSpec.methodBuilder(MethodName.inject)
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addParameter(model.getClassName(), VarName.from(model))
+                        .addParameter(ClassProvider.intent, VarName.intent)
+                        .addStatement("$T $L = $T.$L($L)", ClassProvider.parser(model), VarName.parser, ClassProvider.helper(model), MethodName.parse, VarName.intent)
+                        .beginControlFlow("if($L.$L())", VarName.parser, MethodName.isNull)
+                        .addStatement("$L.$L($L)", VarName.parser, MethodName.into, VarName.from(model))
+                        .endControlFlow()
+                        .build();
             case OTHER:
             default:
                 return MethodSpec.methodBuilder(MethodName.inject)
