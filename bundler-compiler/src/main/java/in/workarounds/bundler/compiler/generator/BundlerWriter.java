@@ -57,7 +57,7 @@ public class BundlerWriter {
     }
 
     public JavaFile brewJava() {
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(ClassProvider.bundler.simpleName())
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(ClassProvider.bundler().simpleName())
                 .addModifiers(Modifier.PUBLIC);
 
         // TODO check data validity, same method names?
@@ -70,7 +70,7 @@ public class BundlerWriter {
                     .addMethod(restoreMethod(model));
         }
 
-        return JavaFile.builder(ClassProvider.bundler.packageName(), classBuilder.build()).build();
+        return JavaFile.builder(ClassProvider.bundler().packageName(), classBuilder.build()).build();
     }
 
     protected MethodSpec saveMethod(ReqBundlerModel model) {

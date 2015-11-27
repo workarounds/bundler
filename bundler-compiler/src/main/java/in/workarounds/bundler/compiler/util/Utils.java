@@ -70,6 +70,18 @@ public class Utils {
     }
 
     /**
+     * @param element whose class name is needed
+     * @return qualified name if the element is of TypeElement else null
+     */
+    public static String getQualifiedName(Element element) {
+        if(element != null && element instanceof TypeElement) {
+            return ((TypeElement) element).getQualifiedName().toString();
+        }
+        return null;
+    }
+
+
+    /**
      * @param typeMirror of the element whose class name is needed
      * @return qualified name if the typeMirror is of declared type else null
      */

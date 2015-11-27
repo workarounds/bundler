@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.OptionsForBundler;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
 import in.workarounds.bundler.annotations.State;
@@ -11,7 +12,7 @@ import in.workarounds.bundler.annotations.State;
 /**
  * Created by madki on 18/11/15.
  */
-@RequireBundler(requireAll = false)
+@RequireBundler(requireAll = false) @OptionsForBundler(packageName = "in.workarounds")
 public class BaseActivity extends AppCompatActivity {
     @Arg
     int someInt;

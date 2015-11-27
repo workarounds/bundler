@@ -12,13 +12,13 @@ public class ClassProvider {
     private ClassProvider() {
     }
 
+    private static String bundlerPackage = null;
+
     // android classes
     public static final ClassName context = ClassName.get("android.content", "Context");
     public static final ClassName bundle = ClassName.get("android.os", "Bundle");
     public static final ClassName intent = ClassName.get("android.content", "Intent");
     public static final ClassName log = ClassName.get("android.util", "Log");
-
-    public static final ClassName bundler = ClassName.get("in.workarounds.bundler", "Bundler");
 
     public static ClassName helper(ReqBundlerModel model) {
         return ClassName.bestGuess(model.getPackageName() + "." + model.getSimpleName() + "Bundler");
@@ -38,5 +38,13 @@ public class ClassProvider {
 
     private static ClassName innerClass(ClassName superClass, String innerClass) {
         return ClassName.bestGuess(superClass.toString() + "." + innerClass);
+    }
+
+    public static void setBundlerPackage(String packageName) {
+        bundlerPackage = packageName;
+    }
+
+    public static ClassName bundler() {
+        return ClassName.get(bundlerPackage, "Bundler");
     }
 }

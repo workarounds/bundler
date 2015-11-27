@@ -1,7 +1,6 @@
 package in.workarounds.bundler.compiler;
 
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.ClassName;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,12 +23,15 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.OptionsForBundler;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.generator.BundlerWriter;
 import in.workarounds.bundler.compiler.generator.HelperWriter;
 import in.workarounds.bundler.compiler.model.ReqBundlerModel;
+import in.workarounds.bundler.compiler.util.StringUtils;
 import in.workarounds.bundler.compiler.util.Utils;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
 
 @AutoService(Processor.class)
 public class BundlerProcessor extends AbstractProcessor implements Provider {
@@ -40,6 +42,8 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     private Messager messager;
 
     private boolean errorOccurred;
+
+    private String bundlerPackage = "in.workarounds.bundler";
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -55,6 +59,8 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
+        setBundlerOptions(roundEnv);
 
         List<ReqBundlerModel> reqBundlerModels = getModels(roundEnv);
 
@@ -81,6 +87,29 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private void setBundlerOptions(RoundEnvironment roundEnv) {
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(OptionsForBundler.class);
+        if(elements.size() == 1) {
+            Element element = elements.iterator().next();
+            OptionsForBundler annotation = element.getAnnotation(OptionsForBundler.class);
+            String packageName = annotation.packageName();
+            if(!packageName.isEmpty() && StringUtils.isJavaClassName(packageName)) {
+                bundlerPackage = annotation.packageName();
+            } else {
+                error(element, "packageName:'%s' provided to @%s is invalid", packageName, OptionsForBundler.class.getSimpleName());
+            }
+        } else if(elements.size() > 1) {
+            String s = String.format("@%s have been provided at multiple places please keep only one: \n", OptionsForBundler.class.getSimpleName());
+            for (Element element: elements) {
+                s = s + String.format("%s \n", Utils.getQualifiedName(element));
+            }
+            error(null, s);
+        } else {
+           // Do nothing if no OptionsForBundler Provided
+        }
+        ClassProvider.setBundlerPackage(bundlerPackage);
     }
 
     private List<ReqBundlerModel> getModels(RoundEnvironment roundEnv) {
@@ -139,6 +168,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
         annotations.add(Arg.class.getCanonicalName());
         annotations.add(RequireBundler.class.getCanonicalName());
         annotations.add(State.class.getCanonicalName());
+        annotations.add(OptionsForBundler.class.getCanonicalName());
 
         return annotations;
     }
@@ -174,6 +204,7 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
                 Diagnostic.Kind.ERROR,
                 String.format(msg, args),
                 e);
+        reportError();
     }
 
     @Override
@@ -200,11 +231,6 @@ public class BundlerProcessor extends AbstractProcessor implements Provider {
     @Override
     public boolean hasErrorOccurred() {
         return errorOccurred;
-    }
-
-    @Override
-    public ClassName bundlerClass() {
-        return ClassName.get("in.workarounds.bundler", "Bundler");
     }
 
 }
