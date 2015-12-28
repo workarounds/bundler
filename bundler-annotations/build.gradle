@@ -30,5 +30,5 @@ ext {
     allLicenses = ["Apache-2.0"]
 }
 
-apply from: 'https://gist.githubusercontent.com/themadhukiran/6fb1b85f8be3d2bba733/raw/33bbbd3fbc103276cbb48d4a6e3c5e4d12e5f555/installv1.gradle'
-apply from: 'https://gist.githubusercontent.com/themadhukiran/6c9d0a3bc2413d5189a1/raw/c219633b67cd37f732f06fe45040be74bad15af1/bintrayv1java.gradle'
+apply from: 'https://gist.githubusercontent.com/madki/6fb1b85f8be3d2bba733/raw/33bbbd3fbc103276cbb48d4a6e3c5e4d12e5f555/installv1.gradle'
+apply from: 'https://gist.githubusercontent.com/madki/6c9d0a3bc2413d5189a1/raw/c219633b67cd37f732f06fe45040be74bad15af1/bintrayv1java.gradle'
