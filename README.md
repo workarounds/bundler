@@ -7,18 +7,31 @@ Here's an example of this in Action.
 ```java
 @RequiresBundler
 class BookDetailActivity extends Activity {
-  @Arg 
+  @Arg @State
   int id;
-  @Arg 
+  @Arg @State
   String name;
-  @Arg @Required(false)
+  @Arg @Required(false) @State
   String author;
 
-  @Override public void onCreate(Bundle savedInstanceState) {
+  @Override 
+  public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_book_detail);
     Bundler.inject(this);
     // TODO Use fields...
+  }
+  
+  @Override
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    super.onRestoreInstanceState(savedInstanceState);
+    Bundler.restoreState(this, savedInstanceState);
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    Bundler.saveState(this, outState);
   }
 }
 ```
@@ -30,6 +43,8 @@ After defining the annotating the activity methods are added to the 'Bundler' cl
     .author("Douglas Adams")
     .start();
 ```
+
+As you can see defining intent keys and parsing intents is not needed anymore. See [Why Bundler?](https://github.com/workarounds/bundler/wiki/Why-Bundler%3F) for a detailed explanation. State is also saved to bundle and retrieved backed automagically.
 
 If in future if the field `id` in `BookDetailActivity` for some reason has to be changed to type `String` then the class `Bundler` is regenerated and all the places where an `int` is being passed to the `BookDetailActivity` will throw a compile time error compared to the run time error it would have lead to in the normal scenario.
 The process for annotating Fragments and service is similar, but instead of `.start()` method fragment's builder will have `.create()` method.
@@ -62,6 +77,8 @@ BookDetailsFragment fragment = Bundler.bookDetailsFragment(1, "Harry Potter")
 ```
 This would create a `BookDetailsFragment` that have arguments set to the above values.
 
+The process of documenting and writing tests is on going. The library is currently being used in our app [Define](https://play.google.com/apps/publish/?dev_acc=04786613567846403539#MarketListingPlace:p=in.workarounds.define) and
+another library [Portal](https://github.com/workarounds/portal). Any PRs, suggestions are more than welcome. 
 
 
 Download
