@@ -77,7 +77,7 @@ BookDetailsFragment fragment = Bundler.bookDetailsFragment(1, "Harry Potter")
 ```
 This would create a `BookDetailsFragment` that have arguments set to the above values.
 
-The process of documenting and writing tests is on going. The library is currently being used in our app [Define](https://play.google.com/apps/publish/?dev_acc=04786613567846403539#MarketListingPlace:p=in.workarounds.define) and
+The process of documenting and writing tests is on going. The library is currently being used in our app [Define](https://play.google.com/store/apps/details?id=in.workarounds.define) and
 another library [Portal](https://github.com/workarounds/portal). Any PRs, suggestions are more than welcome. 
 
 
