@@ -5,7 +5,7 @@ Generates broilerplate code for intent and bundle builders and parsers. Autogene
 Here's an example of this in Action.
 
 ```java
-@RequiresBundler
+@RequireBundler
 class BookDetailActivity extends Activity {
   @Arg @State
   int id;
