@@ -93,8 +93,14 @@ public class ReqBundlerModel {
     }
 
     private void removeIfLabelPresent(String label, List<? extends AnnotatedField> fields) {
+        AnnotatedField foundField = null;
         for(AnnotatedField field: fields) {
-            if(field.getLabel().equals(label)) fields.remove(field);
+            if(field.getLabel().equals(label)) {
+                foundField = field;
+            }
+        }
+        if (foundField != null) {
+            fields.remove(foundField);
         }
     }
 

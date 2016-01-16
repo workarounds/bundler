@@ -1,10 +1,8 @@
 package in.workarounds.samples.bundler;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -14,6 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import in.workarounds.Bundler;
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.bundler.annotations.Required;
 import in.workarounds.bundler.annotations.State;
 
 /**
@@ -34,7 +33,6 @@ public class BookDetailActivity extends BaseActivity {
     @Arg
     @State
     String book;
-    @Nullable
     @Arg
     @State
     String author;
@@ -42,12 +40,13 @@ public class BookDetailActivity extends BaseActivity {
     @State
     @BookType
     int type;
+    @Arg @Required(false)
+    int someInt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = null;
         Bundler.inject(this);
 
         TextView bookName = (TextView) findViewById(R.id.tv_book_name);
