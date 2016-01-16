@@ -30,7 +30,7 @@ ext {
     siteUrl = 'https://github.com/workarounds/bundler'
     gitUrl = 'https://github.com/workarounds/bundler.git'
 
-    libraryVersion = '0.0.5'
+    libraryVersion = '0.0.6'
 
     developerId = 'workarounds'
     developerName = 'Workarounds'
