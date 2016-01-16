@@ -101,6 +101,87 @@ dependencies {
 }
 ```
 
+What can be an `@Arg` or `@State`?
+----------------------------------
+The short answer is anything that can be put into a `Bundle`. All primitives, `String`, any object that implements `Parcelable`, `Serializable`, `ArrayList<Parcelable>`, `ArrayList<Object>` (as `ArrayList` implements `Serializable`) can all be annotated with `@Arg` or `@State`. Currently `List` cannot be annotated, maybe in a future release we'll internally cast it to an `ArrayList` if it's implemented that way and support it. See [#2](https://github.com/workarounds/bundler/issues/2)
+
+Additional options to `@RequireBundler`
+--------------------------------------
+The `@RequireBundler` annotation accepts four arguments:
+* **requireAll (boolean defaults to true)** when set to true all fields are assumed to be as required unless specified using `@Required(false)`, similarly when set to false all fields are assumed optional unless specified using `@Required(true)`. This is there just for convenience if you have more fields that are required set this to `true` and if you have more optional fields set this to `false`
+
+* **bundlerMethod (String defaults to "")** this is to specify the name of the method that corresponds to this class in the generated `Bundler` class. The above `BookDetailActivity` by default generates a method `Bundler.bookDetailActivity(...)`, but you can specify a different name by annotation it with `@RequireBundler(bundlerMethod="detailActivity")` this generates the method `Bundler.detailActivity(...)` which can be used to start the activity. This is also useful when there are two activities with the same name. If there are two `BookDetailActivity`s in the project you have to specify a different name for atleast one of them.
+
+* **inheritArgs (boolean defaults to true)** If the super class of the current class is also annotated with `@RequireBundler` and the super class also contains fields annotated with `@Arg` then those fields will also be considered as arguments of current class. Discussed further below.
+
+* **inheritState (boolean defaults to true)** Similar to `inheritArgs`. Fields in the super class annotated with `@State` are also saved and restored in the subclass. 
+
+Inheritence
+-----------
+For example, consider the following classes `BaseActivity` and `ChildActivity`
+
+```java
+@RequireBundler(requireAll=false)
+public class BaseActivity extends Activity {
+  @Arg
+  int first;
+  @Arg @Required(true)
+  int second;
+  @Arg @Required(false)
+  int third;
+  
+  // rest of the class
+}
+
+@RequireBundler(inheritArgs=true)
+public class ChildActivity extends BaseActivity {
+  @Arg
+  String fourth;
+  
+  // rest of the class
+}
+```
+
+The above code leads to two generated methods in `Bundler` that can be used as below:
+
+```java
+// passing first and third values is optional
+Bundler.baseActivity(2).first(1).third(3).start(ctx);
+// only the value of field second needs to be passed to start the activity
+Bundler.baseActivity(2).start(ctx);
+
+// passing third is optional
+Bundler.childActivity(1, 2, "4").third(3).start(ctx);
+// where as first, second and fourth are required to start the activity
+Bundler.childActivity(1, 2, "4").start(ctx);
+```
+In the above code the activities are started by passing the values `first = 1`, `second = 2`, `third = 3`, `fourth = "4"` and `ctx` is `Context` object.
+
+Few things to note here are:
+* the order of fields in the generated method is parent fields followed by child fields in the order they are defined.
+* the global `requireAll` behavior is not inherited, where as the field-wise `@Required` behavior is inherited. So if it's required that `ChildActivity` does not require the field `second` to be necessarily passed in the intent then simply redefine that field in `ChildActivity` as follows:
+
+```java
+// inheriArgs is true by default
+@RequireBundler
+public class ChildActivity extends BaseActivity {
+  @Arg @Required(false)
+  int second;
+  @Arg 
+  String fourth;
+  
+  // rest of the class
+}
+```
+
+`ChildActivity` can now be started as
+```java
+// passing second and third is optional
+Bundler.childActivity(1, "4").second(2).third(3).start(ctx);
+// only first and fourth are required fields
+Bundler.childActivity(1, "4").start(ctx);
+```
+
 License
 -------
 
