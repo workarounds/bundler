@@ -3,7 +3,7 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "in.workarounds.samples.bundler"
@@ -26,7 +26,9 @@ dependencies {
     apt project(':bundler-compiler')
     compile 'com.hannesdorfmann.fragmentargs:annotation:3.0.0'
     apt 'com.hannesdorfmann.fragmentargs:processor:3.0.0'
+    compile 'org.parceler:parceler-api:1.0.4'
+    apt 'org.parceler:parceler:1.0.4'
 
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
 }

@@ -11,5 +11,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  */
 @Target(FIELD) @Retention(CLASS)
 public @interface Arg {
-    Class<? extends ArgSerializer> serializer() default DefaultSerializer.class;
+    Class<?> serializer() default DefaultSerializer.class;
 }
