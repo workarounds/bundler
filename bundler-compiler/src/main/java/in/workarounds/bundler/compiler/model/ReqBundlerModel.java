@@ -1,7 +1,6 @@
 package in.workarounds.bundler.compiler.model;
 
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +111,7 @@ public class ReqBundlerModel {
             State instanceState = enclosedElement.getAnnotation(State.class);
 
             if (instanceState != null) {
-                TypeName serializer = AnnotatedField.serializer(instanceState);
+                ClassName serializer = AnnotatedField.serializer(instanceState);
                 if(serializer == null) reportInvalidSerializer(enclosedElement, State.class, provider);
                 StateModel state = new StateModel(enclosedElement, provider, serializer);
                 tempStates.add(state);
@@ -127,7 +126,7 @@ public class ReqBundlerModel {
             Arg arg = enclosedElement.getAnnotation(Arg.class);
 
             if (arg != null) {
-                TypeName serializer = AnnotatedField.serializer(arg);
+                ClassName serializer = AnnotatedField.serializer(arg);
                 if(serializer == null) reportInvalidSerializer(enclosedElement, Arg.class, provider);
                 ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll(), serializer);
                 tempArgs.add(argModel);

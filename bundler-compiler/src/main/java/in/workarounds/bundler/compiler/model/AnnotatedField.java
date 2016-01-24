@@ -1,5 +1,6 @@
 package in.workarounds.bundler.compiler.model;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
@@ -32,9 +33,9 @@ public class AnnotatedField {
     private TypeName typeName;
     private TypeHelper helper;
     private Class<?> annotation;
-    private TypeName serializer;
+    private ClassName serializer;
 
-    public AnnotatedField(Element element, Provider provider, Class<?> annotation, TypeName serializer) {
+    public AnnotatedField(Element element, Provider provider, Class<?> annotation, ClassName serializer) {
         this.provider = provider;
 
         this.annotation = annotation;
@@ -85,6 +86,11 @@ public class AnnotatedField {
         return typeName;
     }
 
+    public TypeName getSerializer() {
+        if(serializer.toString().equals(DefaultSerializer.class.getName())) return null;
+        else return serializer;
+    }
+
     public ParameterSpec getAsParameter(Modifier... modifiers) {
         return ParameterSpec.builder(typeName, VarName.from(this))
                 .addModifiers(modifiers)
@@ -99,20 +105,20 @@ public class AnnotatedField {
     }
 
     /**
-     * Helper class to return the serializer of a @Arg as TypeName
+     * Helper class to return the serializer of a @Arg as ClassName
      * @param arg the @Arg annotation whose serializer is to be retrieved
-     * @return serializer of @Arg as TypeName if it's valid else null
+     * @return serializer of @Arg as ClassName if it's valid else null
      */
-    public static TypeName serializer(Arg arg) {
-        TypeName serializer;
+    public static ClassName serializer(Arg arg) {
+        ClassName serializer;
         boolean isValid;
         try {
             Class<?> clazz = arg.serializer();
-            serializer = TypeName.get(clazz);
+            serializer = ClassName.get(clazz);
             isValid = isValidSerializer(clazz);
         } catch (MirroredTypeException mte) {
             TypeMirror typeMirror = mte.getTypeMirror();
-            serializer = TypeName.get(typeMirror);
+            serializer = (ClassName) ClassName.get(typeMirror);
             isValid = isValidSerializer(typeMirror);
         }
 
@@ -124,17 +130,17 @@ public class AnnotatedField {
     }
 
     /**
-     * Helper class to return the serializer of a @State as TypeName
+     * Helper class to return the serializer of a @State as ClassName
      * @param state the @State annotation whose serializer is to be retrieved
-     * @return serializer of @State as TypeName if it's valid else null
+     * @return serializer of @State as ClassName if it's valid else null
      */
-    public static TypeName serializer(State state) {
-        TypeName serializer;
+    public static ClassName serializer(State state) {
+        ClassName serializer;
         try {
             Class<?> clazz = state.serializer();
-            serializer = TypeName.get(clazz);
+            serializer = ClassName.get(clazz);
         } catch (MirroredTypeException mte) {
-            serializer = TypeName.get(mte.getTypeMirror());
+            serializer = (ClassName) ClassName.get(mte.getTypeMirror());
         }
         return serializer;
     }
