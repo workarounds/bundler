@@ -6,10 +6,8 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -19,13 +17,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile project(':bundler-annotations')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 }
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'bundler-annotations'
+    bintrayName = 'bundler'
     orgName = 'workarounds'
 
     publishedGroupId = 'in.workarounds.bundler'
