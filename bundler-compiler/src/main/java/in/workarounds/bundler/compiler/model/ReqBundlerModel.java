@@ -1,6 +1,7 @@
 package in.workarounds.bundler.compiler.model;
 
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.Provider;
+import in.workarounds.bundler.compiler.util.names.ClassProvider;
 
 /**
  * Created by madki on 16/10/15.
@@ -110,7 +112,9 @@ public class ReqBundlerModel {
             State instanceState = enclosedElement.getAnnotation(State.class);
 
             if (instanceState != null) {
-                StateModel state = new StateModel(enclosedElement, provider);
+                TypeName serializer = AnnotatedField.serializer(instanceState);
+                if(serializer == null) reportInvalidSerializer(enclosedElement, State.class, provider);
+                StateModel state = new StateModel(enclosedElement, provider, serializer);
                 tempStates.add(state);
             }
         }
@@ -123,11 +127,19 @@ public class ReqBundlerModel {
             Arg arg = enclosedElement.getAnnotation(Arg.class);
 
             if (arg != null) {
-                ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll());
+                TypeName serializer = AnnotatedField.serializer(arg);
+                if(serializer == null) reportInvalidSerializer(enclosedElement, Arg.class, provider);
+                ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll(), serializer);
                 tempArgs.add(argModel);
             }
         }
         return tempArgs;
+    }
+
+    private void reportInvalidSerializer(Element element, Class annotation, Provider provider) {
+        provider.error(element,
+                "The serializer provided with @%s annotation does not implement %s. Please provide a valid serializer",
+                annotation.getSimpleName(), ClassProvider.serializer.simpleName());
     }
 
     private VARIETY getVariety(TypeElement element, Types typeUtils) {

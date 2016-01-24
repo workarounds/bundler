@@ -20,6 +20,20 @@ import javax.lang.model.util.Elements;
 public class Utils {
 
     /**
+     * @param clazz Class of the element
+     * @param interfaceName fully qualified name of the interface
+     * @return true if the given Class implements the interface
+     */
+    public static boolean implementsInterface(Class<?> clazz, String interfaceName) {
+        for(Class<?> i: clazz.getInterfaces()) {
+            if(i.getName().equals(interfaceName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param typeMirror    of the element
      * @param interfaceName fully qualified name of the interface
      * @return true is the type defined by typeMirror implements the given interface
