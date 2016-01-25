@@ -1,5 +1,6 @@
 package in.workarounds.bundler.compiler.generator;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
@@ -83,12 +84,22 @@ public class BuilderGenerator {
 
         for (ArgModel arg : model.getArgs()) {
             bundleBuilder.beginControlFlow("if($L != null)", arg.getLabel());
-            bundleBuilder.addStatement("$L.put$L($T.$L, $L)",
-                    VarName.bundle,
-                    arg.getBundleMethodSuffix(),
-                    ClassProvider.keys(model),
-                    arg.getKeyConstant(),
-                    arg.getLabel());
+            ClassName serializer = arg.getSerializer();
+            if(serializer != null) {
+               bundleBuilder.addStatement("$L.put($T.$L, $L, $L)",
+                       VarName.from(serializer),
+                       ClassProvider.keys(model),
+                       arg.getKeyConstant(),
+                       arg.getLabel(),
+                       VarName.bundle);
+            } else {
+                bundleBuilder.addStatement("$L.put$L($T.$L, $L)",
+                        VarName.bundle,
+                        arg.getBundleMethodSuffix(),
+                        ClassProvider.keys(model),
+                        arg.getKeyConstant(),
+                        arg.getLabel());
+            }
             bundleBuilder.endControlFlow();
         }
 

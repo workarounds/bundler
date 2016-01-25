@@ -1,5 +1,6 @@
 package in.workarounds.bundler.compiler.generator;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -104,6 +105,7 @@ public class ParserGenerator {
             builder.beginControlFlow("if($L())", MethodName.isNull)
                     .addStatement("return $L", VarName.defaultVal)
                     .endControlFlow();
+
             builder.addStatement("return $L.get$L($T.$L, $L)",
                     VarName.bundle,
                     arg.getBundleMethodSuffix(),
@@ -126,12 +128,22 @@ public class ParserGenerator {
             builder.beginControlFlow("if($L())", MethodName.isNull)
                     .addStatement("return null")
                     .endControlFlow();
-            builder.addStatement("return $L.get$L($T.$L)",
-                    VarName.bundle,
-                    arg.getBundleMethodSuffix(),
-                    ClassProvider.keys(model),
-                    arg.getKeyConstant()
-            );
+
+            ClassName serializer = arg.getSerializer();
+            if (serializer != null) {
+                builder.addStatement("return $L.get($T.$L, $L)",
+                        VarName.from(serializer),
+                        ClassProvider.keys(model),
+                        arg.getKeyConstant(),
+                        VarName.bundle);
+            } else {
+                builder.addStatement("return $L.get$L($T.$L)",
+                        VarName.bundle,
+                        arg.getBundleMethodSuffix(),
+                        ClassProvider.keys(model),
+                        arg.getKeyConstant()
+                );
+            }
         }
 
 

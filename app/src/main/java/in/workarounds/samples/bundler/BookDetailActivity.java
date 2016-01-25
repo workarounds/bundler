@@ -8,8 +8,10 @@ import android.widget.TextView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import in.workarounds.Bundler;
+import in.workarounds.bundler.ParcelListSerializer;
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
@@ -18,7 +20,7 @@ import in.workarounds.bundler.annotations.State;
 /**
  * Created by madki on 29/10/15.
  */
-@RequireBundler(inheritArgs = false)
+@RequireBundler(inheritArgs = false, requireAll = false)
 public class BookDetailActivity extends BaseActivity {
     private static final String TAG = "BookDetailActivity";
     public static final int BOOK_TYPE_FICTION = 1;
@@ -40,14 +42,20 @@ public class BookDetailActivity extends BaseActivity {
     @State
     @BookType
     int type;
-    @Arg @Required(false)
+    @Arg
+    @Required(false)
+    @State
     int someInt;
+    @Arg(serializer = ParcelListSerializer.class)
+    @State(serializer = ParcelListSerializer.class)
+    List<Bundle> bundles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundler.inject(this);
+        Bundler.restoreState(this, savedInstanceState);
 
         TextView bookName = (TextView) findViewById(R.id.tv_book_name);
         bookName.setText(book);
@@ -55,7 +63,14 @@ public class BookDetailActivity extends BaseActivity {
         TextView writer = (TextView) findViewById(R.id.tv_book_writer);
         writer.setText(author);
 
-        Log.d(TAG, "book id = " + id);
+        for (Bundle b : bundles) {
+            Log.d(TAG, b.getString("key"));
+        }
+
+        Bundle b3 = new Bundle();
+        b3.putString("key", "!!!");
+        bundles.add(b3);
+
     }
 
     @Override

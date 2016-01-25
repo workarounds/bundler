@@ -10,6 +10,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import in.workarounds.Bundler;
+
 /**
  * Created by madki on 29/10/15.
  */
@@ -28,7 +33,21 @@ public class BookListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle b1 = new Bundle();
+                Bundle b2 = new Bundle();
 
+                b1.putString("key", "Hello");
+                b2.putString("key", "World");
+
+                List<Bundle> bundles = new ArrayList<Bundle>();
+                bundles.add(b1);
+                bundles.add(b2);
+
+                Bundler.bookDetailActivity()
+                        .book("Harry Potter")
+                        .author("J K Rowling")
+                        .bundles(bundles)
+                        .start(BookListActivity.this);
             }
         });
     }

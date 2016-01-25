@@ -22,7 +22,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':bundler-annotations')
+    compile project(':bundler')
     apt project(':bundler-compiler')
     compile 'com.hannesdorfmann.fragmentargs:annotation:3.0.0'
     apt 'com.hannesdorfmann.fragmentargs:processor:3.0.0'

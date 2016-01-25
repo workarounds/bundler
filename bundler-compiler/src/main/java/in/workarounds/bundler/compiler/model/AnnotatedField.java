@@ -16,6 +16,7 @@ import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.DefaultSerializer;
 import in.workarounds.bundler.annotations.State;
 import in.workarounds.bundler.compiler.Provider;
+import in.workarounds.bundler.compiler.helper.SerializerTypeHelper;
 import in.workarounds.bundler.compiler.helper.TypeHelper;
 import in.workarounds.bundler.compiler.helper.TypeHelperFactory;
 import in.workarounds.bundler.compiler.util.StringUtils;
@@ -43,7 +44,11 @@ public class AnnotatedField {
 
         label = element.getSimpleName().toString();
         typeName = TypeName.get(element.asType());
-        helper = TypeHelperFactory.getHelper(typeName, provider.elementUtils());
+        if (getSerializer() != null) {
+            helper = new SerializerTypeHelper(typeName);
+        } else {
+            helper = TypeHelperFactory.getHelper(typeName, provider.elementUtils());
+        }
         checkModifiers(element);
         checkIfValidType(element);
     }
@@ -86,7 +91,7 @@ public class AnnotatedField {
         return typeName;
     }
 
-    public TypeName getSerializer() {
+    public ClassName getSerializer() {
         if(serializer.toString().equals(DefaultSerializer.class.getName())) return null;
         else return serializer;
     }
