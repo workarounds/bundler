@@ -12,8 +12,8 @@ import in.workarounds.bundler.compiler.Provider;
  */
 public class StateModel extends AnnotatedField {
 
-    public StateModel(Element element, Provider provider, ClassName serializer) {
-        super(element, provider, State.class, serializer);
+    public StateModel(Element element, Provider provider, ClassName serializer, String keyValue) {
+        super(element, provider, State.class, serializer, keyValue);
     }
 
 }

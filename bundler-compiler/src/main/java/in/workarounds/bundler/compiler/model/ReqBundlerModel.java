@@ -113,7 +113,7 @@ public class ReqBundlerModel {
             if (instanceState != null) {
                 ClassName serializer = AnnotatedField.serializer(instanceState);
                 if(serializer == null) reportInvalidSerializer(enclosedElement, State.class, provider);
-                StateModel state = new StateModel(enclosedElement, provider, serializer);
+                StateModel state = new StateModel(enclosedElement, provider, serializer, instanceState.key());
                 tempStates.add(state);
             }
         }
@@ -128,7 +128,7 @@ public class ReqBundlerModel {
             if (arg != null) {
                 ClassName serializer = AnnotatedField.serializer(arg);
                 if(serializer == null) reportInvalidSerializer(enclosedElement, Arg.class, provider);
-                ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll(), serializer);
+                ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll(), serializer, arg.key());
                 tempArgs.add(argModel);
             }
         }

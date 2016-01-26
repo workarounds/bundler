@@ -22,9 +22,10 @@ import in.workarounds.bundler.annotations.State;
 @RequireBundler
 public class BookDetailActivity extends AppCompatActivity {
     private static final String TAG = "BookDetailActivity";
+    private static final String KEY = "writer";
     @Arg
     Book book;
-    @Arg(serializer = ParcelSerializer.class)
+    @Arg(serializer = ParcelSerializer.class, key = KEY)
     Author author;
     @Arg
     @BookType

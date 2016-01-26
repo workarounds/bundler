@@ -26,8 +26,8 @@ public class ArgModel extends AnnotatedField {
     private Required required;
     private boolean requireAll;
 
-    public ArgModel(Element element, Provider provider, boolean requireAll, ClassName serializer) {
-        super(element, provider, Arg.class, serializer);
+    public ArgModel(Element element, Provider provider, boolean requireAll, ClassName serializer, String keyValue) {
+        super(element, provider, Arg.class, serializer, keyValue);
         this.element = element;
         this.requireAll = requireAll;
 

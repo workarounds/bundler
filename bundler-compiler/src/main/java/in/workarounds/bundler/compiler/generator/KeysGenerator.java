@@ -24,7 +24,7 @@ public class KeysGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (ArgModel arg : model.getArgs()) {
             FieldSpec fieldSpec = FieldSpec.builder(String.class, arg.getKeyConstant(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                    .initializer("$S", arg.getKeyConstant().toLowerCase())
+                    .initializer("$S", arg.getKeyValue())
                     .build();
             keyBuilder.addField(fieldSpec);
         }

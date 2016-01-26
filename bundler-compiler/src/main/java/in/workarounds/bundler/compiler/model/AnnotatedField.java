@@ -35,12 +35,14 @@ public class AnnotatedField {
     private TypeHelper helper;
     private Class<?> annotation;
     private ClassName serializer;
+    private String keyValue;
 
-    public AnnotatedField(Element element, Provider provider, Class<?> annotation, ClassName serializer) {
+    public AnnotatedField(Element element, Provider provider, Class<?> annotation, ClassName serializer, String keyValue) {
         this.provider = provider;
 
         this.annotation = annotation;
         this.serializer = serializer;
+        this.keyValue = keyValue;
 
         label = element.getSimpleName().toString();
         typeName = TypeName.get(element.asType());
@@ -73,6 +75,14 @@ public class AnnotatedField {
 
     public String getKeyConstant() {
         return StringUtils.getConstantName(label);
+    }
+
+    public String getKeyValue() {
+       if(StringUtils.isEmpty(keyValue)) {
+           return getKeyConstant().toLowerCase();
+       } else {
+           return keyValue;
+       }
     }
 
     public String getBundleMethodSuffix() {
