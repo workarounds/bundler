@@ -43,4 +43,10 @@
         android:text="@string/toast_via_service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/fragment_container"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

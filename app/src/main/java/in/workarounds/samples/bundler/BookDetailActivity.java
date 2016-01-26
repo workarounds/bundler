@@ -1,6 +1,7 @@
 package in.workarounds.samples.bundler;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -44,12 +45,14 @@ public class BookDetailActivity extends AppCompatActivity {
     @Bind(R.id.et_rating)
     EditText etRating;
 
+    BookSummaryFragment summaryFragment;
+
     @OnClick(R.id.btn_rate)
     void rate() {
         String ratingStr = etRating.getText().toString();
-        if(!TextUtils.isEmpty(ratingStr)) {
+        if (!TextUtils.isEmpty(ratingStr)) {
             tvRating.setText(ratingStr);
-            rating = Integer.parseInt(ratingStr);
+            setRating(Integer.parseInt(ratingStr));
         }
     }
 
@@ -73,6 +76,19 @@ public class BookDetailActivity extends AppCompatActivity {
         tvBookWriter.setText(author.name);
         tvRating.setText((rating > 0) ? Integer.toString(rating) : "unrated");
         tvType.setText((bookType == Book.FICTION) ? "Fiction" : "Non fiction");
+
+        Fragment temp = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        if(temp != null) {
+            summaryFragment = (BookSummaryFragment) temp;
+        } else {
+            summaryFragment =
+                    Bundler.bookSummaryFragment(book, author, bookType, rating).create();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container, summaryFragment)
+                    .commit();
+        }
     }
 
     @Override
@@ -85,6 +101,11 @@ public class BookDetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Bundler.saveState(this, outState);
+    }
+
+    private void setRating(int rating) {
+        this.rating = rating;
+        if(summaryFragment != null) summaryFragment.updateRating(rating);
     }
 
 }
