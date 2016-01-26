@@ -11,8 +11,8 @@ configurations {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided deps.android
-    compile project(':bundler-annotations')
-    compile 'org.parceler:parceler-api:1.0.4'
+    provided project(':bundler-annotations')
+    provided 'org.parceler:parceler-api:1.0.4'
 }
 
 ext {

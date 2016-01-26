@@ -32,7 +32,7 @@ ext {
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.1.1'
 }
 
 ext.deps = [
