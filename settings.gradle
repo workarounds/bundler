@@ -1,1 +1,1 @@
-include ':app', ':bundler-compiler', ':bundler-annotations'
+include ':app', ':bundler-compiler', ':bundler-annotations', ':bundler-parceler'
