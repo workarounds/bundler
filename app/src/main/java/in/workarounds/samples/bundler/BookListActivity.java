@@ -10,49 +10,53 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import in.workarounds.Bundler;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import in.workarounds.bundler.Bundler;
 
 /**
  * Created by madki on 29/10/15.
  */
 public class BookListActivity extends AppCompatActivity {
-    private int[] ids = {1, 2, 3};
-    private String[] books = {"To kill a mocking bird", "Hitchhiker's guide to galaxy", "Catcher in the rye"};
-    private String[] authors = {"Harper Lee", "Douglas Adams", "J. D. Salinger"};
+    private String[] books = {
+            "To kill a mocking bird",
+            "Hitchhiker's guide to galaxy",
+            "Catcher in the rye",
+            "Zero to one",
+            "A brief history of time"
+    };
+    private String[] authors = {
+            "Harper Lee",
+            "Douglas Adams",
+            "J. D. Salinger",
+            "Peter Theil",
+            "Stephen Hawkings"
+    };
+
+    @Bind(R.id.lv_books) ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
 
-        ListView listView = (ListView) findViewById(R.id.lv_books);
+        ButterKnife.bind(this);
+
         listView.setAdapter(new BookAdapter());
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundle b1 = new Bundle();
-                Bundle b2 = new Bundle();
-
-                b1.putString("key", "Hello");
-                b2.putString("key", "World");
-
-                List<Bundle> bundles = new ArrayList<Bundle>();
-                bundles.add(b1);
-                bundles.add(b2);
-
-                Bundler.bookDetailActivity()
-                        .book("Harry Potter")
-                        .author("J K Rowling")
-                        .bundles(bundles)
-                        .start(BookListActivity.this);
+                int type = (position > 2) ? Book.NON_FICTION : Book.FICTION;
+                Bundler.bookDetailActivity(
+                        new AutoParcel_Book(books[position]),
+                        new Author(authors[position]),
+                        type
+                ).start(BookListActivity.this);
             }
         });
     }
 
-    private class BookAdapter extends BaseAdapter {
+    class BookAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {
@@ -83,13 +87,12 @@ public class BookListActivity extends AppCompatActivity {
             return convertView;
         }
 
-        private class ViewHolder {
-            TextView title;
-            TextView author;
+        class ViewHolder {
+            @Bind(R.id.tv_book_title) TextView title;
+            @Bind(R.id.tv_book_author) TextView author;
 
             public ViewHolder(View view) {
-                title = (TextView) view.findViewById(R.id.tv_book_title);
-                author = (TextView) view.findViewById(R.id.tv_book_author);
+                ButterKnife.bind(this, view);
             }
 
             public void bind(String book, String writer) {

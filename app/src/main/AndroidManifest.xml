@@ -14,6 +14,8 @@
 
         <activity android:name="in.workarounds.samples.bundler.BookDetailActivity" />
 
+        <service android:name=".ToastService"/>
+
     </application>
 
 </manifest>

@@ -1,17 +1,15 @@
 package in.workarounds.samples.bundler;
 
 import android.os.Bundle;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.List;
-
-import in.workarounds.Bundler;
-import in.workarounds.bundler.ParcelListSerializer;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
@@ -20,57 +18,61 @@ import in.workarounds.bundler.annotations.State;
 /**
  * Created by madki on 29/10/15.
  */
-@RequireBundler(inheritArgs = false, requireAll = false)
-public class BookDetailActivity extends BaseActivity {
+@RequireBundler
+public class BookDetailActivity extends AppCompatActivity {
     private static final String TAG = "BookDetailActivity";
-    public static final int BOOK_TYPE_FICTION = 1;
-    public static final int BOOK_TYPE_NON_FICTION = 2;
-    private static final String FIRST_WAY = "firstWay";
-    private static final String SECOND_WAY = "secondWay";
-
     @Arg
-    @State
-    int id;
-    @NonNull
+    Book book;
+    @Arg(serializer = ParcelSerializer.class)
+    Author author;
     @Arg
-    @State
-    String book;
-    @Arg
-    @State
-    String author;
-    @Arg
-    @State
     @BookType
-    int type;
+    int bookType;
     @Arg
     @Required(false)
     @State
-    int someInt;
-    @Arg(serializer = ParcelListSerializer.class)
-    @State(serializer = ParcelListSerializer.class)
-    List<Bundle> bundles;
+    int rating;
+
+    @Bind(R.id.tv_book_name)
+    TextView tvBookName;
+    @Bind(R.id.tv_book_writer)
+    TextView tvBookWriter;
+    @Bind(R.id.tv_type)
+    TextView tvType;
+    @Bind(R.id.tv_rating)
+    TextView tvRating;
+    @Bind(R.id.et_rating)
+    EditText etRating;
+
+    @OnClick(R.id.btn_rate)
+    void rate() {
+        String ratingStr = etRating.getText().toString();
+        if(!TextUtils.isEmpty(ratingStr)) {
+            tvRating.setText(ratingStr);
+            rating = Integer.parseInt(ratingStr);
+        }
+    }
+
+    @OnClick(R.id.btn_toast)
+    void toast() {
+        Bundler.toastService(book, author).rating(rating).start(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_book_detail);
+
+        ButterKnife.bind(this);
+
         Bundler.inject(this);
         Bundler.restoreState(this, savedInstanceState);
 
-        TextView bookName = (TextView) findViewById(R.id.tv_book_name);
-        bookName.setText(book);
-
-        TextView writer = (TextView) findViewById(R.id.tv_book_writer);
-        writer.setText(author);
-
-        for (Bundle b : bundles) {
-            Log.d(TAG, b.getString("key"));
-        }
-
-        Bundle b3 = new Bundle();
-        b3.putString("key", "!!!");
-        bundles.add(b3);
-
+        tvBookName.setText(book.name());
+        tvBookWriter.setText(author.name);
+        tvRating.setText((rating > 0) ? Integer.toString(rating) : "unrated");
+        tvType.setText((bookType == Book.FICTION) ? "Fiction" : "Non fiction");
     }
 
     @Override
@@ -85,8 +87,4 @@ public class BookDetailActivity extends BaseActivity {
         Bundler.saveState(this, outState);
     }
 
-    @IntDef({BOOK_TYPE_FICTION, BOOK_TYPE_NON_FICTION})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface BookType {
-    }
 }

@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">Freighter Demo</string>
+    <string name="app_name">Bundler</string>
     <string name="hello_world">Hello world!</string>
+    <string name="toast_via_service">Toast via service</string>
+    <string name="rate_the_book">Rate the book</string>
+    <string name="rate">Rate</string>
 </resources>
