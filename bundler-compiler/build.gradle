@@ -16,6 +16,7 @@ dependencies {
     testCompile deps.robolectric
     testCompile deps.compiletesting
 }
+
 ext {
     bintrayRepo = 'maven'
     bintrayName = 'bundler-compiler'
