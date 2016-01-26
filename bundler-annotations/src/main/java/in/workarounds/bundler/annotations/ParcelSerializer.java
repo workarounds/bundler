@@ -1,10 +1,8 @@
-package in.workarounds.samples.bundler;
+package in.workarounds.bundler.annotations;
 
 import android.os.Bundle;
 
 import org.parceler.Parcels;
-
-import in.workarounds.bundler.annotations.Serializer;
 
 
 /**

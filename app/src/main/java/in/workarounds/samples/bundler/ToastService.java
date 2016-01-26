@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.Arg;
+import in.workarounds.bundler.annotations.ParcelSerializer;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
 
