@@ -90,6 +90,9 @@ Download
 Gradle:
 ```groovy
 buildscript {
+  repositories {
+    mavenCentral()
+  }
   dependencies {
     classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
   }
