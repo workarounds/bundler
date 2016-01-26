@@ -1,0 +1,28 @@
+language: android
+
+android:
+  components:
+    - tools
+    - build-tools-23.0.2
+    - android-23
+    - extra-android-m2repository
+
+jdk:
+  - oraclejdk7
+
+branches:
+  except:
+    - gh-pages
+
+env:
+  global:
+    - ADB_INSTALL_TIMEOUT=8 # minutes (2 minutes by default)
+
+script:
+  - ./gradlew build
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.m2
