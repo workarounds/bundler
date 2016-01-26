@@ -1,6 +1,8 @@
 Bundler
 ============
 
+[![Build Status](https://travis-ci.org/workarounds/bundler.svg?branch=master)](https://travis-ci.org/workarounds/bundler)
+
 Generates broilerplate code for intent and bundle builders and parsers. Autogeneration of this code at compile time ensures type-safety.
 Here's an example of this in Action.
 
