@@ -98,12 +98,15 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 ext {
-  bundlerVersion = '0.0.8'
+  bundlerVersion = '0.1.1'
 }
 
 dependencies {
   compile "in.workarounds.bundler:bundler-annotations:$bundlerVersion"
   apt "in.workarounds.bundler:bundler-compiler:$bundlerVersion"
+  
+  // if using Parceler library then uncomment
+  // compile "in.workarounds.bundler:bundler-parceler:$bundlerVersion"
 }
 ```
 
@@ -161,6 +164,17 @@ A serializer is already included in the `bundler-annotations` package for serial
 ```java
   @Arg(serializer = ParcelListSerializer.class)
   List<Foo> foos; //where Foo implements Parcelable
+```
+
+For putting a type annotated with `@Parcel` from Parceler library add the depedency 
+```groovy
+  compile "in.workarounds.bundler:bundler-parceler:$bundlerVersion"
+```
+This artifact containes a serializer `ParcelerSerializer` use it as follows:
+
+```java
+  @Arg(serializer = ParcelerSerializer.class)
+  Dog dog; // where Dog is annotated with @Parcel
 ```
 
 Additional options to `@RequireBundler`
