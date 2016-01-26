@@ -25,6 +25,7 @@ public interface Serializer<T> {
      *
      * @param key    The key for the value
      * @param bundle The Bundle where the value is saved in
+     * @param <V>    The return type expected
      * @return The value retrieved from the Bundle with the given key
      */
     <V extends T> V get(String key, Bundle bundle);

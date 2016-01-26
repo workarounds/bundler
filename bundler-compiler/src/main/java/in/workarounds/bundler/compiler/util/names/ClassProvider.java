@@ -15,6 +15,7 @@ public class ClassProvider {
     private static String bundlerPackage = null;
 
     public static final ClassName serializer = ClassName.get("in.workarounds.bundler", "Serializer");
+    public static final ClassName bundlerUtils = ClassName.get("in.workarounds.bundler", "Utils");
 
     // android classes
     public static final ClassName context = ClassName.get("android.content", "Context");

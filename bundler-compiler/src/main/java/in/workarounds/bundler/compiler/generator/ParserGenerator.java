@@ -115,12 +115,15 @@ public class ParserGenerator {
             );
         } else if (arg.requiresCasting()) {
             builder.beginControlFlow("if($L())", MethodName.has(arg));
-            builder.addStatement("return ($T) $L.get$L($T.$L)",
-                    type,
+            builder.addStatement("return $T.silentCast($S, $L.get$L($T.$L), $S, null, $L)",
+                    ClassProvider.bundlerUtils,
+                    arg.getLabel(),
                     VarName.bundle,
                     arg.getBundleMethodSuffix(),
                     ClassProvider.keys(model),
-                    arg.getKeyConstant()
+                    arg.getKeyConstant(),
+                    arg.getTypeName().toString(),
+                    VarName.tag
             );
             builder.endControlFlow();
             builder.addStatement("return null");

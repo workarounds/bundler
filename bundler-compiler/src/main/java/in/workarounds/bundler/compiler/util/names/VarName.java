@@ -17,6 +17,8 @@ public class VarName {
     public static final String defaultVal = "defaultVal";
     public static final String parser     = "parser";
 
+    public static final String tag = "TAG";
+
     private VarName() {
     }
 

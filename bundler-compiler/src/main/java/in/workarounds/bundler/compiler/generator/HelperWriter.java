@@ -44,6 +44,7 @@ public class HelperWriter {
     public JavaFile brewJava() {
         TypeSpec helper = TypeSpec.classBuilder(ClassProvider.helper(model).simpleName())
                 .addModifiers(Modifier.PUBLIC)
+                .addField(getTagField())
                 .addFields(getSerializerFields())
                 .addType(builderGenerator.createClass())
                 .addType(parserGenerator.createClass())
@@ -55,6 +56,15 @@ public class HelperWriter {
                 .addMethods(additionalMethods())
                 .build();
         return JavaFile.builder(model.getPackageName(), helper).build();
+    }
+
+    private FieldSpec getTagField() {
+        return FieldSpec.builder(
+                String.class,
+                VarName.tag,
+                Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL
+        ).initializer("$S", ClassProvider.helper(model).simpleName())
+                .build();
     }
 
     private List<FieldSpec> getSerializerFields() {
@@ -110,7 +120,7 @@ public class HelperWriter {
             } else {
                 builder.beginControlFlow("if($L.$L != null)", VarName.from(model), label);
                 ClassName serializer = state.getSerializer();
-                if(serializer != null) {
+                if (serializer != null) {
                     builder.addStatement("$L.put($S, $L.$L, $L)",
                             VarName.from(serializer),
                             label,
@@ -153,7 +163,7 @@ public class HelperWriter {
                             VarName.from(model), label, type, VarName.bundle, state.getBundleMethodSuffix(), label);
                 } else {
                     ClassName serializer = state.getSerializer();
-                    if(serializer != null) {
+                    if (serializer != null) {
                         builder.addStatement("$L.$L = $L.get($S, $L)",
                                 VarName.from(model),
                                 label,
