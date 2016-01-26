@@ -12,10 +12,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.Arg;
-import in.workarounds.bundler.annotations.ParcelSerializer;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
 import in.workarounds.bundler.annotations.State;
+import in.workarounds.bundler.parceler.ParcelerSerializer;
 
 /**
  * Created by madki on 29/10/15.
@@ -26,7 +26,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private static final String KEY = "writer";
     @Arg
     Book book;
-    @Arg(serializer = ParcelSerializer.class, key = KEY)
+    @Arg(serializer = ParcelerSerializer.class, key = KEY)
     Author author;
     @Arg
     @BookType

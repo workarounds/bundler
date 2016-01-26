@@ -8,9 +8,9 @@ import android.widget.Toast;
 
 import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.Arg;
-import in.workarounds.bundler.annotations.ParcelSerializer;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
+import in.workarounds.bundler.parceler.ParcelerSerializer;
 
 /**
  * A demo service that simply toasts the given book, author, rating
@@ -19,7 +19,7 @@ import in.workarounds.bundler.annotations.Required;
 public class ToastService extends Service {
     @Arg
     Book book;
-    @Arg(serializer = ParcelSerializer.class)
+    @Arg(serializer = ParcelerSerializer.class)
     Author author;
     @Arg @Required(false)
     int rating = -1;

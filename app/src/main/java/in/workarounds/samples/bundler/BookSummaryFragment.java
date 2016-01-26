@@ -12,9 +12,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import in.workarounds.bundler.Bundler;
 import in.workarounds.bundler.annotations.Arg;
-import in.workarounds.bundler.annotations.ParcelSerializer;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.State;
+import in.workarounds.bundler.parceler.ParcelerSerializer;
 
 /**
  * A demo fragment that simple contains text view showing summary of the book details
@@ -23,7 +23,7 @@ import in.workarounds.bundler.annotations.State;
 public class BookSummaryFragment extends Fragment {
     @Arg
     Book book;
-    @Arg(serializer = ParcelSerializer.class)
+    @Arg(serializer = ParcelerSerializer.class)
     Author author;
     @Arg @BookType
     int bookType;

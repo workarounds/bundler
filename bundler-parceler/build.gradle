@@ -1,7 +1,16 @@
 apply plugin: 'java'
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+
+configurations {
+    provided
+    compile.extendsFrom provided
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    provided deps.android
     compile project(':bundler-annotations')
     compile 'org.parceler:parceler-api:1.0.4'
 }
