@@ -4,7 +4,8 @@ import android.os.Bundle;
 
 import org.parceler.Parcels;
 
-import in.workarounds.bundler.Serializer;
+import in.workarounds.bundler.annotations.Serializer;
+
 
 /**
  * Serializer for objects annotated with @Parcel from Parceler library

@@ -112,26 +112,18 @@ public class AnnotatedField {
     /**
      * Helper class to return the serializer of a @Arg as ClassName
      * @param arg the @Arg annotation whose serializer is to be retrieved
-     * @return serializer of @Arg as ClassName if it's valid else null
+     * @return serializer of @Arg as ClassName
      */
     public static ClassName serializer(Arg arg) {
         ClassName serializer;
-        boolean isValid;
         try {
             Class<?> clazz = arg.serializer();
             serializer = ClassName.get(clazz);
-            isValid = isValidSerializer(clazz);
         } catch (MirroredTypeException mte) {
             TypeMirror typeMirror = mte.getTypeMirror();
             serializer = (ClassName) ClassName.get(typeMirror);
-            isValid = isValidSerializer(typeMirror);
         }
-
-        if (isValid) {
-            return serializer;
-        }
-
-        return null;
+        return serializer;
     }
 
     /**
@@ -148,15 +140,6 @@ public class AnnotatedField {
             serializer = (ClassName) ClassName.get(mte.getTypeMirror());
         }
         return serializer;
-    }
-
-    /**
-     * @param serializer the serializer Class to be validated
-     * @return true if the given serializer is DefaultSerializer or implements Serializer
-     */
-    private static boolean isValidSerializer(Class<?> serializer) {
-        return serializer.equals(DefaultSerializer.class) ||
-                Utils.implementsInterface(serializer, ClassProvider.serializer.toString());
     }
 
     /**
