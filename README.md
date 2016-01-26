@@ -97,9 +97,13 @@ buildscript {
 
 apply plugin: 'com.neenbedankt.android-apt'
 
+ext {
+  bundlerVersion = '0.0.8'
+}
+
 dependencies {
-  compile 'in.workarounds.bundler:bundler-annotations:0.0.3'
-  apt 'in.workarounds.bundler:bundler-compiler:0.0.6'
+  compile "in.workarounds.bundler:bundler-annotations:$bundlerVersion"
+  apt "in.workarounds.bundler:bundler-compiler:$bundlerVersion"
 }
 ```
 

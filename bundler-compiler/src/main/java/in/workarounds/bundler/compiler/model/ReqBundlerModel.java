@@ -3,7 +3,9 @@ package in.workarounds.bundler.compiler.model;
 import com.squareup.javapoet.ClassName;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -41,26 +43,28 @@ public class ReqBundlerModel {
 
         args = retrieveArgs(element, provider);
         states = retrieveStates(element, provider);
-   }
+
+        validateKeys(element, provider);
+    }
 
     public ReqBundlerModel(Element element, ReqBundlerModel superClass, Provider provider) {
         init(element, provider);
 
         RequireBundler annotation = element.getAnnotation(RequireBundler.class);
-        if(annotation.inheritState()) {
+        if (annotation.inheritState()) {
             states = getInheritedFields(retrieveStates(element, provider), superClass.getStates());
         } else {
             states = retrieveStates(element, provider);
         }
 
-        if(annotation.inheritArgs()) {
+        if (annotation.inheritArgs()) {
             args = getInheritedFields(retrieveArgs(element, provider), superClass.getArgs());
         } else {
             args = retrieveArgs(element, provider);
         }
     }
 
-    private void init(Element element,Provider provider) {
+    private void init(Element element, Provider provider) {
         if (element.getKind() != ElementKind.CLASS) {
             provider.error(element, "@%s annotation used on a non-class element %s",
                     RequireBundler.class.getSimpleName(),
@@ -80,11 +84,69 @@ public class ReqBundlerModel {
 
     }
 
+    private void validateKeys(Element element, Provider provider) {
+        Map<String, List<AnnotatedField>> argKeys = new HashMap<>();
+        Map<String, List<AnnotatedField>> stateKeys = new HashMap<>();
+
+        mapKeys(args, argKeys);
+        mapKeys(states, stateKeys);
+
+        checkForErrors(args, argKeys, element, provider);
+        checkForErrors(states, stateKeys, element, provider);
+    }
+
+    private void checkForErrors(List<? extends AnnotatedField> fields,
+                                Map<String, List<AnnotatedField>> map,
+                                Element element, Provider provider) {
+        if(map.size() == fields.size()) return;
+
+        for(Map.Entry<String, List<AnnotatedField>> entry: map.entrySet()) {
+            if(entry.getValue().size() > 1) {
+                reportDuplicateKeys(entry.getKey(), entry.getValue(), element, provider);
+            }
+        }
+    }
+
+    private void reportDuplicateKeys(String key, List<AnnotatedField> duplicateFields, Element element, Provider provider) {
+        StringBuilder error = new StringBuilder("Multiple fields {");
+        AnnotatedField field = null;
+        for (int i = 0; i < duplicateFields.size(); i++) {
+            field = duplicateFields.get(i);
+            error.append(field.getLabel());
+            if(i != duplicateFields.size() - 1) error.append(", ");
+        }
+        error.append("} in ")
+                .append(className.simpleName())
+                .append(" annotated with @")
+                .append(field != null ? field.getAnnotation().getSimpleName() : "?")
+                .append(" have the same key ")
+                .append("\"")
+                .append(key)
+                .append("\"")
+                .append(". Please make them unique.");
+        provider.error(element, error.toString());
+    }
+
+    private void mapKeys(List<? extends AnnotatedField> fields, Map<String, List<AnnotatedField>> map) {
+        String key;
+        for (AnnotatedField field : fields) {
+            key = field.getKeyValue();
+            if (map.containsKey(key)) {
+                map.get(key).add(field);
+            } else {
+                List<AnnotatedField> temp = new ArrayList<>();
+                temp.add(field);
+                map.put(key, temp);
+            }
+        }
+
+    }
+
     private <T extends AnnotatedField> List<T> getInheritedFields(List<T> currentFields, List<T> superFields) {
         List<T> tempFields = new ArrayList<>();
         tempFields.addAll(superFields);
 
-        for (AnnotatedField field: currentFields) {
+        for (AnnotatedField field : currentFields) {
             removeIfLabelPresent(field.getLabel(), tempFields);
         }
 
@@ -95,8 +157,8 @@ public class ReqBundlerModel {
 
     private void removeIfLabelPresent(String label, List<? extends AnnotatedField> fields) {
         AnnotatedField foundField = null;
-        for(AnnotatedField field: fields) {
-            if(field.getLabel().equals(label)) {
+        for (AnnotatedField field : fields) {
+            if (field.getLabel().equals(label)) {
                 foundField = field;
             }
         }
@@ -112,7 +174,8 @@ public class ReqBundlerModel {
 
             if (instanceState != null) {
                 ClassName serializer = AnnotatedField.serializer(instanceState);
-                if(serializer == null) reportInvalidSerializer(enclosedElement, State.class, provider);
+                if (serializer == null)
+                    reportInvalidSerializer(enclosedElement, State.class, provider);
                 StateModel state = new StateModel(enclosedElement, provider, serializer, instanceState.key());
                 tempStates.add(state);
             }
@@ -127,7 +190,8 @@ public class ReqBundlerModel {
 
             if (arg != null) {
                 ClassName serializer = AnnotatedField.serializer(arg);
-                if(serializer == null) reportInvalidSerializer(enclosedElement, Arg.class, provider);
+                if (serializer == null)
+                    reportInvalidSerializer(enclosedElement, Arg.class, provider);
                 ArgModel argModel = new ArgModel(enclosedElement, provider, requireAll(), serializer, arg.key());
                 tempArgs.add(argModel);
             }

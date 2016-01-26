@@ -106,6 +106,10 @@ public class AnnotatedField {
         else return serializer;
     }
 
+    public Class<?> getAnnotation() {
+        return annotation;
+    }
+
     public ParameterSpec getAsParameter(Modifier... modifiers) {
         return ParameterSpec.builder(typeName, VarName.from(this))
                 .addModifiers(modifiers)
