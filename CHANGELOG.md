@@ -1,6 +1,13 @@
 Change log
 ==========
 
+Version 0.1.1 *(2016-01-26)*
+----------------------------
+
+* Reverted back to using `bundler-annotation` artifact
+* Added `bundler-parceler` for Parceler library support
+* Added argument `key` to `@Arg` and `@State` to specify custom key
+
 Version 0.0.7 *(2016-01-26)*
 ----------------------------
 
