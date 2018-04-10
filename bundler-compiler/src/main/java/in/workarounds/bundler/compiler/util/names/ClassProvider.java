@@ -16,6 +16,7 @@ public class ClassProvider {
 
     private static String bundlerPackage = null;
 
+    public static final ClassName object = ClassName.get(Object.class);
     public static final ClassName serializer = ClassName.get(Serializer.class);
     public static final ClassName bundlerUtils = ClassName.get(Utils.class);
 
@@ -23,6 +24,10 @@ public class ClassProvider {
     public static final ClassName context = ClassName.get("android.content", "Context");
     public static final ClassName bundle = ClassName.get("android.os", "Bundle");
     public static final ClassName intent = ClassName.get("android.content", "Intent");
+    public static final ClassName activity = ClassName.get("android.app", "Activity");
+    public static final ClassName fragment = ClassName.get("android.app", "Fragment");
+    public static final ClassName fragmentV4 = ClassName.get("android.support.v4.app", "Fragment");
+    public static final ClassName service = ClassName.get("android.app", "Service");
 
     public static ClassName helper(ReqBundlerModel model) {
         return ClassName.bestGuess(model.getPackageName() + "." + model.getSimpleName() + "Bundler");
