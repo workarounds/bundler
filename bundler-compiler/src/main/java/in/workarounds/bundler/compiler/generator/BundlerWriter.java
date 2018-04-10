@@ -42,7 +42,7 @@ public class BundlerWriter {
             }
         }
 
-        if(models.size() == methodMap.size()) return;
+        if (models.size() == methodMap.size()) return;
 
         for (Map.Entry<String, List<Integer>> entry : methodMap.entrySet()) {
             if (entry.getValue().size() > 1) {
@@ -62,6 +62,14 @@ public class BundlerWriter {
 
         // TODO check data validity, same method names?
 
+        classBuilder
+                .addMethod(genericInjectMethod())
+                .addMethod(genericInjectMethodWithIntent())
+                .addMethod(genericInjectMethodWithBundle())
+                .addMethod(genericInjectMethod(models))
+                .addMethod(genericSaveMethod(models))
+                .addMethod(genericRestoreMethod(models));
+
         for (ReqBundlerModel model : models) {
             classBuilder
                     .addMethod(injectMethod(model))
@@ -71,6 +79,110 @@ public class BundlerWriter {
         }
 
         return JavaFile.builder(ClassProvider.bundler().packageName(), classBuilder.build()).build();
+    }
+
+    protected MethodSpec genericInjectMethod() {
+        return MethodSpec.methodBuilder(MethodName.inject)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassProvider.object, VarName.object)
+                .addStatement("$L($L, null, null)", MethodName.inject, VarName.object)
+                .build();
+    }
+
+    protected MethodSpec genericInjectMethodWithIntent() {
+        return MethodSpec.methodBuilder(MethodName.inject)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassProvider.object, VarName.object)
+                .addParameter(ClassProvider.intent, VarName.intent)
+                .addStatement("$L($L, $L, null)", MethodName.inject, VarName.object, VarName.intent)
+                .build();
+    }
+
+    protected MethodSpec genericInjectMethodWithBundle() {
+        return MethodSpec.methodBuilder(MethodName.inject)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassProvider.object, VarName.object)
+                .addParameter(ClassProvider.bundle, VarName.bundle)
+                .addStatement("$L($L, null, $L)", MethodName.inject, VarName.object, VarName.bundle)
+                .build();
+    }
+
+    protected MethodSpec genericInjectMethod(List<ReqBundlerModel> models) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(MethodName.inject)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassProvider.object, VarName.object)
+                .addParameter(ClassProvider.intent, VarName.intent)
+                .addParameter(ClassProvider.bundle, VarName.bundle);
+
+        for (ReqBundlerModel model : models) {
+            methodBuilder
+                    .beginControlFlow("if ($L instanceof $T)", VarName.object, model.getClassName());
+
+            switch (model.getVariety()) {
+                case ACTIVITY:
+                case FRAGMENT:
+                case FRAGMENT_V4:
+                    methodBuilder.addStatement("$L(($T) $L)",
+                            MethodName.inject, model.getClassName(),
+                            VarName.object);
+                    break;
+                case SERVICE:
+                    methodBuilder.addStatement("$L(($T) $L, $L)",
+                            MethodName.inject, model.getClassName(),
+                            VarName.object, VarName.intent);
+                    break;
+                case OTHER:
+                default:
+                    methodBuilder.addStatement("$L(($T) $L, $L)",
+                            MethodName.inject, model.getClassName(),
+                            VarName.object, VarName.bundle);
+                    break;
+            }
+
+            methodBuilder.addStatement("return")
+                    .endControlFlow();
+        }
+
+        return methodBuilder.build();
+    }
+
+    protected MethodSpec genericRestoreMethod(List<ReqBundlerModel> models) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(MethodName.restoreState)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassProvider.object, VarName.object)
+                .addParameter(ClassProvider.bundle, VarName.bundle);
+
+        for (ReqBundlerModel model : models) {
+            methodBuilder
+                    .beginControlFlow("if ($L instanceof $T)", VarName.object, model.getClassName())
+                    .addStatement("$T.$L(($T) $L, $L)",
+                            ClassProvider.helper(model), MethodName.restoreState,
+                            model.getClassName(), VarName.object, VarName.bundle)
+                    .addStatement("return")
+                    .endControlFlow();
+        }
+
+        return methodBuilder.build();
+    }
+
+    protected MethodSpec genericSaveMethod(List<ReqBundlerModel> models) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(MethodName.saveState)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassProvider.object, VarName.object)
+                .addParameter(ClassProvider.bundle, VarName.bundle)
+                .returns(ClassProvider.bundle);
+
+        for (ReqBundlerModel model : models) {
+            methodBuilder
+                    .beginControlFlow("if ($L instanceof $T)", VarName.object, model.getClassName())
+                    .addStatement("return $T.$L(($T) $L, $L)",
+                            ClassProvider.helper(model), MethodName.saveState,
+                            model.getClassName(), VarName.object, VarName.bundle)
+                    .endControlFlow();
+        }
+
+        return methodBuilder.addCode("return null;\n")
+                .build();
     }
 
     protected MethodSpec saveMethod(ReqBundlerModel model) {
